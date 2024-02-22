@@ -40,7 +40,7 @@ const ShareGPT = React.memo(() => {
 
   return (
     <>
-      /*
+      {/*
       <button
         className='btn btn-neutral'
         onClick={() => {
@@ -50,7 +50,7 @@ const ShareGPT = React.memo(() => {
       >
         {t('postOnShareGPT.title')}
       </button>
-      */
+      */}
       {isModalOpen && (
         <PopupModal
           setIsModalOpen={setIsModalOpen}
