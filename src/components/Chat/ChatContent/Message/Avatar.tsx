@@ -17,7 +17,7 @@ const UserAvatar = () => {
   return (
     <div
       className='relative h-[30px] w-[30px] p-1 rounded-sm text-white flex items-center justify-center'
-      style={{ backgroundColor: 'rgb(200, 70, 70)' }}
+      style={{ backgroundColor: 'rgb(56, 183, 188)' }}
     >
       <PersonIcon />
     </div>
@@ -28,7 +28,7 @@ const AssistantAvatar = () => {
   return (
     <div
       className='relative h-[30px] w-[30px] p-1 rounded-sm text-white flex items-center justify-center'
-      style={{ backgroundColor: 'rgb(16, 163, 127)' }}
+      style={{ backgroundColor: 'rgb(73, 36, 150)' }}
     >
       <svg
         width='41'
