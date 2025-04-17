@@ -18,14 +18,17 @@ const dateString =
 // default system message obtained using the following method: https://twitter.com/DeminDimin/status/1619935545144279040
 export const _defaultSystemMessage =
   import.meta.env.VITE_DEFAULT_SYSTEM_MESSAGE ??
-  `You are ChatGPT, a large language model trained by OpenAI.
-Carefully heed the user's instructions. 
-Respond using Markdown.`;
+  `以下のルールを守って対応してください
+
+# 要件
+- 私は13才なので、表現や言葉を合わせて接してください
+- 革新を付いた説明を箇条書き風に端的に教えてください
+- 絵文字を使って親しく話してください`;
 
 export const defaultApiVersion = '2024-04-01-preview';
 export const defaultModel = 'gpt-4o-mini';
 
-export const defaultUserMaxToken = 4000;
+export const defaultUserMaxToken = 128000;
 export const reduceMessagesToTotalToken = 256000; // sufficient for almost all models; gemini has 1.5kk though
 
 export const _defaultChatConfig: ConfigInterface = {
