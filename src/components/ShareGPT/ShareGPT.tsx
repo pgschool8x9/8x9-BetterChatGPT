@@ -40,7 +40,8 @@ const ShareGPT = React.memo(() => {
 
   return (
     <>
-      {/* <button
+{/*       
+      <button
         className='btn btn-neutral'
         onClick={() => {
           setIsModalOpen(true);
@@ -48,7 +49,8 @@ const ShareGPT = React.memo(() => {
         aria-label={t('postOnShareGPT.title') as string}
       >
         {t('postOnShareGPT.title')}
-      </button> */}
+      </button>
+       */}
       {isModalOpen && (
         <PopupModal
           setIsModalOpen={setIsModalOpen}
