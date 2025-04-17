@@ -1,12 +1,17 @@
-import React from 'react';
 import useStore from '@store/store';
 import { useTranslation } from 'react-i18next';
-import { ChatInterface, MessageInterface } from '@type/chat';
+import {
+  ChatInterface,
+  ConfigInterface,
+  MessageInterface,
+  TextContentInterface,
+} from '@type/chat';
 import { getChatCompletion, getChatCompletionStream } from '@api/api';
 import { parseEventSource } from '@api/helper';
 import { limitMessageTokens, updateTotalTokenUsed } from '@utils/messageUtils';
 import { _defaultChatConfig } from '@constants/chat';
 import { officialAPIEndpoint } from '@constants/auth';
+import { modelStreamSupport } from '@constants/modelLoader';
 
 const useSubmit = () => {
   const { t, i18n } = useTranslation('api');
@@ -20,7 +25,8 @@ const useSubmit = () => {
   const setChats = useStore((state) => state.setChats);
 
   const generateTitle = async (
-    message: MessageInterface[]
+    message: MessageInterface[],
+    modelConfig: ConfigInterface
   ): Promise<string> => {
     let data;
     try {
@@ -29,24 +35,38 @@ const useSubmit = () => {
         if (apiEndpoint === officialAPIEndpoint) {
           throw new Error(t('noApiKeyWarning') as string);
         }
-
+        const titleChatConfig = {
+          ..._defaultChatConfig, // Spread the original config
+          model: useStore.getState().titleModel ?? _defaultChatConfig.model, // Override the model property
+        };
         // other endpoints
         data = await getChatCompletion(
           useStore.getState().apiEndpoint,
           message,
-          _defaultChatConfig
+          titleChatConfig,
+          undefined,
+          undefined,
+          useStore.getState().apiVersion
         );
       } else if (apiKey) {
+        const titleChatConfig = {
+          ...modelConfig, // Spread the original config
+          model: useStore.getState().titleModel ?? modelConfig.model, // Override the model property
+        };
         // own apikey
         data = await getChatCompletion(
           useStore.getState().apiEndpoint,
           message,
-          _defaultChatConfig,
-          apiKey
+          titleChatConfig,
+          apiKey,
+          undefined,
+          useStore.getState().apiVersion
         );
       }
     } catch (error: unknown) {
-      throw new Error(`Error generating title!\n${(error as Error).message}`);
+      throw new Error(
+        `${t('errors.errorGeneratingTitle')}\n${(error as Error).message}`
+      );
     }
     return data.choices[0].message.content;
   };
@@ -59,90 +79,158 @@ const useSubmit = () => {
 
     updatedChats[currentChatIndex].messages.push({
       role: 'assistant',
-      content: '',
+      content: [
+        {
+          type: 'text',
+          text: '',
+        } as TextContentInterface,
+      ],
     });
 
     setChats(updatedChats);
     setGenerating(true);
 
     try {
+      const isStreamSupported =
+        modelStreamSupport[chats[currentChatIndex].config.model];
+        const { model, temperature, max_tokens } = chats[currentChatIndex].config;
+        const supportsStream = modelStreamSupport[model];
+        console.log('[useSubmit] Model streaming support:', {
+          model,
+          supportsStream,
+          isStreamSupported
+        });
+      let data;
       let stream;
       if (chats[currentChatIndex].messages.length === 0)
-        throw new Error('No messages submitted!');
+        throw new Error(t('errors.noMessagesSubmitted') as string);
 
       const messages = limitMessageTokens(
         chats[currentChatIndex].messages,
         chats[currentChatIndex].config.max_tokens,
         chats[currentChatIndex].config.model
       );
-      if (messages.length === 0) throw new Error('Message exceed max token!');
-
-      // no api key (free)
-      if (!apiKey || apiKey.length === 0) {
-        // official endpoint
-        if (apiEndpoint === officialAPIEndpoint) {
-          throw new Error(t('noApiKeyWarning') as string);
-        }
-
-        // other endpoints
-        stream = await getChatCompletionStream(
-          useStore.getState().apiEndpoint,
-          messages,
-          chats[currentChatIndex].config
-        );
-      } else if (apiKey) {
-        // own apikey
-        stream = await getChatCompletionStream(
-          useStore.getState().apiEndpoint,
-          messages,
-          chats[currentChatIndex].config,
-          apiKey
-        );
-      }
-
-      if (stream) {
-        if (stream.locked)
-          throw new Error(
-            'Oops, the stream is locked right now. Please try again'
-          );
-        const reader = stream.getReader();
-        let reading = true;
-        let partial = '';
-        while (reading && useStore.getState().generating) {
-          const { done, value } = await reader.read();
-          const result = parseEventSource(
-            partial + new TextDecoder().decode(value)
-          );
-          partial = '';
-
-          if (result === '[DONE]' || done) {
-            reading = false;
-          } else {
-            const resultString = result.reduce((output: string, curr) => {
-              if (typeof curr === 'string') {
-                partial += curr;
-              } else {
-                const content = curr.choices[0]?.delta?.content ?? null;
-                if (content) output += content;
-              }
-              return output;
-            }, '');
-
-            const updatedChats: ChatInterface[] = JSON.parse(
-              JSON.stringify(useStore.getState().chats)
-            );
-            const updatedMessages = updatedChats[currentChatIndex].messages;
-            updatedMessages[updatedMessages.length - 1].content += resultString;
-            setChats(updatedChats);
+      if (messages.length === 0)
+        throw new Error(t('errors.messageExceedMaxToken') as string);
+      if (!isStreamSupported) {
+        if (!apiKey || apiKey.length === 0) {
+          // official endpoint
+          if (apiEndpoint === officialAPIEndpoint) {
+            throw new Error(t('noApiKeyWarning') as string);
           }
+          // other endpoints
+          data = await getChatCompletion(
+            useStore.getState().apiEndpoint,
+            messages,
+            chats[currentChatIndex].config,
+            undefined,
+            undefined,
+            useStore.getState().apiVersion
+          );
+        } else if (apiKey) {
+          data = await getChatCompletion(
+            useStore.getState().apiEndpoint,
+            messages,
+            chats[currentChatIndex].config,
+            apiKey,
+            undefined,
+            useStore.getState().apiVersion
+          );
         }
-        if (useStore.getState().generating) {
-          reader.cancel('Cancelled by user');
-        } else {
-          reader.cancel('Generation completed');
+
+        if (
+          !data ||
+          !data.choices ||
+          !data.choices[0] ||
+          !data.choices[0].message ||
+          !data.choices[0].message.content
+        ) {
+          throw new Error(t('errors.failedToRetrieveData') as string);
         }
-        reader.releaseLock();
-        stream.cancel();
+
+        const updatedChats: ChatInterface[] = JSON.parse(
+          JSON.stringify(useStore.getState().chats)
+        );
+        const updatedMessages = updatedChats[currentChatIndex].messages;
+        (
+          updatedMessages[updatedMessages.length - 1]
+            .content[0] as TextContentInterface
+        ).text += data.choices[0].message.content;
+        setChats(updatedChats);
+      } else {
+        // no api key (free)
+        if (!apiKey || apiKey.length === 0) {
+          // official endpoint
+          if (apiEndpoint === officialAPIEndpoint) {
+            throw new Error(t('noApiKeyWarning') as string);
+          }
+
+          // other endpoints
+          stream = await getChatCompletionStream(
+            useStore.getState().apiEndpoint,
+            messages,
+            chats[currentChatIndex].config,
+            undefined,
+            undefined,
+            useStore.getState().apiVersion
+          );
+        } else if (apiKey) {
+          // own apikey
+          stream = await getChatCompletionStream(
+            useStore.getState().apiEndpoint,
+            messages,
+            chats[currentChatIndex].config,
+            apiKey,
+            undefined,
+            useStore.getState().apiVersion
+          );
+        }
+
+        if (stream) {
+          if (stream.locked)
+            throw new Error(t('errors.streamLocked') as string);
+          const reader = stream.getReader();
+          let reading = true;
+          let partial = '';
+          while (reading && useStore.getState().generating) {
+            const { done, value } = await reader.read();
+            const result = parseEventSource(
+              partial + new TextDecoder().decode(value)
+            );
+            partial = '';
+
+            if (result === '[DONE]' || done) {
+              reading = false;
+            } else {
+              const resultString = result.reduce((output: string, curr) => {
+                if (typeof curr === 'string') {
+                  partial += curr;
+                } else {
+                  const content = curr.choices[0]?.delta?.content ?? null;
+                  if (content) output += content;
+                }
+                return output;
+              }, '');
+
+              const updatedChats: ChatInterface[] = JSON.parse(
+                JSON.stringify(useStore.getState().chats)
+              );
+              const updatedMessages = updatedChats[currentChatIndex].messages;
+              (
+                updatedMessages[updatedMessages.length - 1]
+                  .content[0] as TextContentInterface
+              ).text += resultString;
+              setChats(updatedChats);
+            }
+          }
+          if (useStore.getState().generating) {
+            reader.cancel(t('errors.cancelledByUser') as string);
+          } else {
+            reader.cancel(t('errors.generationCompleted') as string);
+          }
+          reader.releaseLock();
+          stream.cancel();
+        }
       }
 
       // update tokens used in chatting
@@ -173,16 +261,25 @@ const useSubmit = () => {
 
         const message: MessageInterface = {
           role: 'user',
-          content: `Generate a title in less than 6 words for the following message (language: ${i18n.language}):\n"""\nUser: ${user_message}\nAssistant: ${assistant_message}\n"""`,
+          content: [
+            ...user_message,
+            ...assistant_message,
+            {
+              type: 'text',
+              text: `Generate a title in less than 6 words for the conversation so far (language: ${i18n.language})`,
+            } as TextContentInterface,
+          ],
         };
 
-        let title = (await generateTitle([message])).trim();
-        if (title.startsWith('"') && title.endsWith('"')) {
-          title = title.slice(1, -1);
-        }
         const updatedChats: ChatInterface[] = JSON.parse(
           JSON.stringify(useStore.getState().chats)
         );
+        let title = (
+          await generateTitle([message], updatedChats[currentChatIndex].config)
+        ).trim();
+        if (title.startsWith('"') && title.endsWith('"')) {
+          title = title.slice(1, -1);
+        }
         updatedChats[currentChatIndex].title = title;
         updatedChats[currentChatIndex].titleSet = true;
         setChats(updatedChats);
@@ -192,7 +289,7 @@ const useSubmit = () => {
           const model = _defaultChatConfig.model;
           updateTotalTokenUsed(model, [message], {
             role: 'assistant',
-            content: title,
+            content: [{ type: 'text', text: title } as TextContentInterface],
           });
         }
       }

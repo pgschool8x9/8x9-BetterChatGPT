@@ -1,12 +1,51 @@
+import { ModelOptions } from '@utils/modelReader';
 import { Prompt } from './prompt';
 import { Theme } from './theme';
 
+// The types in this file must mimick the structure of the the API request
+
+export type Content = 'text' | 'image_url';
+export type ImageDetail = 'low' | 'high' | 'auto';
+export const imageDetails: ImageDetail[] = ['low', 'high', 'auto'];
 export type Role = 'user' | 'assistant' | 'system';
 export const roles: Role[] = ['user', 'assistant', 'system'];
 
+export interface ImageContentInterface extends ContentInterface {
+  type: 'image_url';
+  image_url: {
+    url: string; // base64 or image URL
+    detail: ImageDetail;
+  };
+}
+
+export interface TextContentInterface extends ContentInterface {
+  type: 'text';
+  text: string;
+}
+
+export function strToTextContent(ob: string): TextContentInterface {
+  return {
+    type: 'text',
+    text: ob
+  };
+}
+
+export function isTextContent(ob: ContentInterface | undefined): ob is TextContentInterface {
+  return ob !== undefined && ob !== null && (ob as TextContentInterface).text !== undefined;
+}
+
+export function isImageContent(ob: ContentInterface | undefined): ob is ImageContentInterface {
+  return ob !== undefined && ob !== null && (ob as ImageContentInterface).image_url !== undefined;
+}
+
+export interface ContentInterface {
+  [x: string]: any;
+  type: Content;
+}
+
 export interface MessageInterface {
   role: Role;
-  content: string;
+  content: ContentInterface[];
 }
 
 export interface ChatInterface {
@@ -16,6 +55,7 @@ export interface ChatInterface {
   messages: MessageInterface[];
   config: ConfigInterface;
   titleSet: boolean;
+  imageDetail: ImageDetail;
 }
 
 export interface ConfigInterface {
@@ -31,6 +71,7 @@ export interface ChatHistoryInterface {
   title: string;
   index: number;
   id: string;
+  chatSize?: number;
 }
 
 export interface ChatHistoryFolderInterface {
@@ -49,29 +90,26 @@ export interface Folder {
   color?: string;
 }
 
-export type ModelOptions =
-  | 'gpt-4o'
-  | 'gpt-4o-2024-05-13'
-  | 'gpt-4'
-  | 'gpt-4-32k'
-  | 'gpt-4-1106-preview'
-  | 'gpt-4-0125-preview'
-  | 'gpt-4-turbo'
-  | 'gpt-4-turbo-2024-04-09'
-  | 'gpt-3.5-turbo'
-  | 'gpt-3.5-turbo-16k'
-  | 'gpt-3.5-turbo-1106'
-  | 'gpt-3.5-turbo-0125'
-  | 'gpt-4o-mini'
-  | 'gpt-4o-mini-2024-07-18';
-// | 'gpt-3.5-turbo-0301';
-// | 'gpt-4-0314'
-// | 'gpt-4-32k-0314'
+interface Pricing {
+  price: number;
+  unit: number;
+}
+
+interface CostDetails {
+  prompt: Pricing;
+  completion: Pricing;
+  image: Pricing;
+}
+
+export interface ModelCost {
+  [modelName: string]: CostDetails;
+}
 
 export type TotalTokenUsed = {
   [model in ModelOptions]?: {
     promptTokens: number;
     completionTokens: number;
+    imageTokens: number;
   };
 };
 export interface LocalStorageInterfaceV0ToV1 {
@@ -161,3 +199,22 @@ export interface LocalStorageInterfaceV7oV8
   foldersExpanded: boolean[];
   folders: FolderCollection;
 }
+export interface LocalStorageInterfaceV8oV8_1
+  extends LocalStorageInterfaceV7oV8 {
+  apiVersion: string;
+}
+
+export interface LocalStorageInterfaceV8_1ToV8_2
+  extends LocalStorageInterfaceV8oV8_1 {
+  menuWidth: number;
+  displayChatSize: boolean;
+}
+
+export interface LocalStorageInterfaceV8_2ToV9
+  extends LocalStorageInterfaceV8_1ToV8_2 {
+  defaultImageDetail: ImageDetail;
+}
+
+export type { ModelOptions };
+// export interface LocalStorageInterfaceV9ToV10
+//   extends LocalStorageInterfaceV8_2ToV9 {

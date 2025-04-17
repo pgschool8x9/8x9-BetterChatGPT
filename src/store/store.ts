@@ -6,6 +6,7 @@ import { AuthSlice, createAuthSlice } from './auth-slice';
 import { ConfigSlice, createConfigSlice } from './config-slice';
 import { PromptSlice, createPromptSlice } from './prompt-slice';
 import { ToastSlice, createToastSlice } from './toast-slice';
+import { CustomModelsSlice, createCustomModelsSlice } from './custom-models-slice';
 import {
   LocalStorageInterfaceV0ToV1,
   LocalStorageInterfaceV1ToV2,
@@ -15,6 +16,9 @@ import {
   LocalStorageInterfaceV5ToV6,
   LocalStorageInterfaceV6ToV7,
   LocalStorageInterfaceV7oV8,
+  LocalStorageInterfaceV8_1ToV8_2,
+  LocalStorageInterfaceV8oV8_1,
+  LocalStorageInterfaceV8_2ToV9,
 } from '@type/chat';
 import {
   migrateV0,
@@ -25,6 +29,9 @@ import {
   migrateV5,
   migrateV6,
   migrateV7,
+  migrateV8_1,
+  migrateV8_1_fix,
+  migrateV8_2,
 } from './migrate';
 
 export type StoreState = ChatSlice &
@@ -32,7 +39,8 @@ export type StoreState = ChatSlice &
   AuthSlice &
   ConfigSlice &
   PromptSlice &
-  ToastSlice;
+  ToastSlice &
+  CustomModelsSlice;
 
 export type StoreSlice<T> = (
   set: StoreApi<StoreState>['setState'],
@@ -43,6 +51,7 @@ export const createPartializedState = (state: StoreState) => ({
   chats: state.chats,
   currentChatIndex: state.currentChatIndex,
   apiKey: state.apiKey,
+  apiVersion: state.apiVersion,
   apiEndpoint: state.apiEndpoint,
   theme: state.theme,
   autoTitle: state.autoTitle,
@@ -59,6 +68,11 @@ export const createPartializedState = (state: StoreState) => ({
   markdownMode: state.markdownMode,
   totalTokenUsed: state.totalTokenUsed,
   countTotalTokens: state.countTotalTokens,
+  displayChatSize: state.displayChatSize,
+  menuWidth: state.menuWidth,
+  defaultImageDetail: state.defaultImageDetail,
+  customModels: state.customModels,
+  autoFetchModels: state.autoFetchModels,
 });
 
 const useStore = create<StoreState>()(
@@ -70,11 +84,12 @@ const useStore = create<StoreState>()(
       ...createConfigSlice(set, get),
       ...createPromptSlice(set, get),
       ...createToastSlice(set, get),
+      ...createCustomModelsSlice(set, get),
     }),
     {
       name: 'free-chat-gpt',
       partialize: (state) => createPartializedState(state),
-      version: 8,
+      version: 9,
       migrate: (persistedState, version) => {
         switch (version) {
           case 0:
@@ -93,6 +108,12 @@ const useStore = create<StoreState>()(
             migrateV6(persistedState as LocalStorageInterfaceV6ToV7);
           case 7:
             migrateV7(persistedState as LocalStorageInterfaceV7oV8);
+          case 8:
+            migrateV8_1(persistedState as LocalStorageInterfaceV8oV8_1);
+          case 8.1:
+            migrateV8_1_fix(persistedState as LocalStorageInterfaceV8_1ToV8_2);
+          case 8.2:
+            migrateV8_2(persistedState as LocalStorageInterfaceV8_2ToV9);
             break;
         }
         return persistedState as StoreState;

@@ -10,6 +10,10 @@ import { ChatInterface } from '@type/chat';
 import { Theme } from '@type/theme';
 import ApiPopup from '@components/ApiPopup';
 import Toast from '@components/Toast';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import VersionInfo from '@components/Footer/VersionInfo';
+import { initializeModels } from '@constants/modelLoader';
 
 function App() {
   const initialiseNewChat = useInitialiseNewChat();
@@ -17,6 +21,7 @@ function App() {
   const setTheme = useStore((state) => state.setTheme);
   const setApiKey = useStore((state) => state.setApiKey);
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
+  const autoFetchModels = useStore((state) => state.autoFetchModels);
 
   useEffect(() => {
     document.documentElement.lang = i18n.language;
@@ -24,6 +29,10 @@ function App() {
       document.documentElement.lang = lng;
     });
   }, []);
+
+  useEffect(() => {
+    initializeModels(autoFetchModels);
+  }, [autoFetchModels]);
 
   useEffect(() => {
     // legacy local storage
@@ -77,9 +86,13 @@ function App() {
   return (
     <div className='overflow-hidden w-full h-full relative'>
       <Menu />
-      <Chat />
-      <ApiPopup />
-      <Toast />
+      <div className={`flex h-full flex-1 flex-col`}>
+        <Chat />
+        <ApiPopup />
+        <Toast />
+        <ToastContainer />
+        <VersionInfo />
+      </div>
     </div>
   );
 }

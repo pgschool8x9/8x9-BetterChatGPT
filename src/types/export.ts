@@ -1,4 +1,11 @@
-import { ChatInterface, FolderCollection, Role } from './chat';
+import {
+  ChatInterface,
+  ConfigInterface,
+  ContentInterface,
+  FolderCollection,
+  MessageInterface,
+  Role,
+} from './chat';
 
 export interface ExportBase {
   version: number;
@@ -18,9 +25,11 @@ export type OpenAIChat = {
         author: {
           role: Role;
         };
-        content: {
-          parts?: string[];
-        };
+        content:
+          | {
+              parts?: string[];
+            }
+          | ContentInterface;
       } | null;
       parent: string | null;
       children: string[];
@@ -28,5 +37,9 @@ export type OpenAIChat = {
   };
   current_node: string;
 };
+
+export interface OpenAIPlaygroundJSON extends ConfigInterface {
+  messages: MessageInterface[];
+}
 
 export default ExportV1;

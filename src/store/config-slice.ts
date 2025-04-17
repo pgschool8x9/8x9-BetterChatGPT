@@ -1,12 +1,14 @@
 import { StoreSlice } from './store';
 import { Theme } from '@type/theme';
-import { ConfigInterface, TotalTokenUsed } from '@type/chat';
-import { _defaultChatConfig, _defaultSystemMessage } from '@constants/chat';
+import { _defaultChatConfig, _defaultSystemMessage,_defaultMenuWidth, defaultModel, _defaultImageDetail, _defaultDisplayChatSize } from '@constants/chat';
+import { ConfigInterface, ImageDetail, TotalTokenUsed } from '@type/chat';
+import { ModelOptions } from '@utils/modelReader';
 
 export interface ConfigSlice {
   openConfig: boolean;
   theme: Theme;
   autoTitle: boolean;
+  titleModel: ModelOptions;
   hideMenuOptions: boolean;
   advancedMode: boolean;
   defaultChatConfig: ConfigInterface;
@@ -17,9 +19,14 @@ export interface ConfigSlice {
   markdownMode: boolean;
   countTotalTokens: boolean;
   totalTokenUsed: TotalTokenUsed;
+  menuWidth: number;
+  displayChatSize: boolean;
+  defaultImageDetail: ImageDetail;
+  autoFetchModels: boolean;
   setOpenConfig: (openConfig: boolean) => void;
   setTheme: (theme: Theme) => void;
   setAutoTitle: (autoTitle: boolean) => void;
+  setTitleModel: (titleModel: ModelOptions) => void;
   setAdvancedMode: (advancedMode: boolean) => void;
   setDefaultChatConfig: (defaultChatConfig: ConfigInterface) => void;
   setDefaultSystemMessage: (defaultSystemMessage: string) => void;
@@ -30,6 +37,10 @@ export interface ConfigSlice {
   setMarkdownMode: (markdownMode: boolean) => void;
   setCountTotalTokens: (countTotalTokens: boolean) => void;
   setTotalTokenUsed: (totalTokenUsed: TotalTokenUsed) => void;
+  setMenuWidth: (menuWidth: number) => void;
+  setDisplayChatSize: (displayChatSize: boolean) => void;
+  setDefaultImageDetail: (imageDetail: ImageDetail) => void;
+  setAutoFetchModels: (autoFetchModels: boolean) => void;
 }
 
 export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
@@ -38,6 +49,7 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
   hideMenuOptions: false,
   hideSideMenu: false,
   autoTitle: false,
+  titleModel: defaultModel,
   enterToSubmit: true,
   advancedMode: true,
   defaultChatConfig: _defaultChatConfig,
@@ -46,6 +58,10 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
   markdownMode: true,
   countTotalTokens: false,
   totalTokenUsed: {},
+  menuWidth: _defaultMenuWidth,
+  displayChatSize: _defaultDisplayChatSize,
+  defaultImageDetail: _defaultImageDetail,
+  autoFetchModels: false,
   setOpenConfig: (openConfig: boolean) => {
     set((prev: ConfigSlice) => ({
       ...prev,
@@ -62,6 +78,12 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
     set((prev: ConfigSlice) => ({
       ...prev,
       autoTitle: autoTitle,
+    }));
+  },
+  setTitleModel: (titleModel: ModelOptions) => {
+    set((prev: ConfigSlice) => ({
+      ...prev,
+      titleModel: titleModel,
     }));
   },
   setAdvancedMode: (advancedMode: boolean) => {
@@ -122,6 +144,30 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
     set((prev: ConfigSlice) => ({
       ...prev,
       totalTokenUsed: totalTokenUsed,
+    }));
+  },
+  setMenuWidth: (menuWidth: number) => {
+    set((prev: ConfigSlice) => ({
+      ...prev,
+      menuWidth: menuWidth,
+    }));
+  },
+  setDisplayChatSize: (displayChatSize: boolean) => {
+    set((prev: ConfigSlice) => ({
+      ...prev,
+      displayChatSize: displayChatSize,
+    }));
+  },
+  setDefaultImageDetail: (imageDetail: ImageDetail) => {
+    set((prev: ConfigSlice) => ({
+      ...prev,
+      defaultImageDetail: imageDetail,
+    }));
+  },
+  setAutoFetchModels: (autoFetchModels: boolean) => {
+    set((prev: ConfigSlice) => ({
+      ...prev,
+      autoFetchModels,
     }));
   },
 });

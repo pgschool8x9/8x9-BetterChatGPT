@@ -1,5 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ChatInterface, ConfigInterface, ModelOptions } from '@type/chat';
+import {
+  ChatInterface,
+  ConfigInterface,
+  ImageDetail,
+  TextContentInterface,
+} from '@type/chat';
 import useStore from '@store/store';
 
 const date = new Date();
@@ -17,140 +22,11 @@ export const _defaultSystemMessage =
 Carefully heed the user's instructions. 
 Respond using Markdown.`;
 
-export const modelOptions: ModelOptions[] = [
-  'gpt-3.5-turbo',
-  'gpt-3.5-turbo-16k',
-  'gpt-3.5-turbo-1106',
-  'gpt-3.5-turbo-0125',
-  'gpt-4',
-  'gpt-4-32k',
-  'gpt-4-1106-preview',
-  'gpt-4-0125-preview',
-  'gpt-4-turbo',
-  'gpt-4-turbo-2024-04-09',
-  'gpt-4o',
-  'gpt-4o-2024-05-13',
-  'gpt-4o-mini',
-  'gpt-4o-mini-2024-07-18'
-  // 'gpt-3.5-turbo-0301',
-  // 'gpt-4-0314',
-  // 'gpt-4-32k-0314',
-];
-
-export const defaultModel = 'gpt-3.5-turbo';
-
-export const modelMaxToken = {
-  'gpt-3.5-turbo': 4096,
-  'gpt-3.5-turbo-0301': 4096,
-  'gpt-3.5-turbo-0613': 4096,
-  'gpt-3.5-turbo-16k': 16384,
-  'gpt-3.5-turbo-16k-0613': 16384,
-  'gpt-3.5-turbo-1106': 16384,
-  'gpt-3.5-turbo-0125': 16384,
-  'gpt-4': 8192,
-  'gpt-4-0314': 8192,
-  'gpt-4-0613': 8192,
-  'gpt-4-32k': 32768,
-  'gpt-4-32k-0314': 32768,
-  'gpt-4-32k-0613': 32768,
-  'gpt-4-1106-preview': 128000,
-  'gpt-4-0125-preview': 128000,
-  'gpt-4-turbo': 128000,
-  'gpt-4-turbo-2024-04-09': 128000,
-  'gpt-4o': 128000,
-  'gpt-4o-2024-05-13': 128000,
-  'gpt-4o-mini': 128000,
-  'gpt-4o-mini-2024-07-18': 128000
-};
-
-export const modelCost = {
-  'gpt-3.5-turbo': {
-    prompt: { price: 0.0015, unit: 1000 },
-    completion: { price: 0.002, unit: 1000 },
-  },
-  'gpt-3.5-turbo-0301': {
-    prompt: { price: 0.0015, unit: 1000 },
-    completion: { price: 0.002, unit: 1000 },
-  },
-  'gpt-3.5-turbo-0613': {
-    prompt: { price: 0.0015, unit: 1000 },
-    completion: { price: 0.002, unit: 1000 },
-  },
-  'gpt-3.5-turbo-16k': {
-    prompt: { price: 0.003, unit: 1000 },
-    completion: { price: 0.004, unit: 1000 },
-  },
-  'gpt-3.5-turbo-16k-0613': {
-    prompt: { price: 0.003, unit: 1000 },
-    completion: { price: 0.004, unit: 1000 },
-  },
-  'gpt-3.5-turbo-1106': {
-    prompt: { price: 0.001, unit: 1000 },
-    completion: { price: 0.0015, unit: 1000 },
-  },
-  'gpt-3.5-turbo-0125': {
-    prompt: { price: 0.0005, unit: 1000 },
-    completion: { price: 0.0015, unit: 1000 },
-  },
-  'gpt-4': {
-    prompt: { price: 0.03, unit: 1000 },
-    completion: { price: 0.06, unit: 1000 },
-  },
-  'gpt-4-0314': {
-    prompt: { price: 0.03, unit: 1000 },
-    completion: { price: 0.06, unit: 1000 },
-  },
-  'gpt-4-0613': {
-    prompt: { price: 0.03, unit: 1000 },
-    completion: { price: 0.06, unit: 1000 },
-  },
-  'gpt-4-32k': {
-    prompt: { price: 0.06, unit: 1000 },
-    completion: { price: 0.12, unit: 1000 },
-  },
-  'gpt-4-32k-0314': {
-    prompt: { price: 0.06, unit: 1000 },
-    completion: { price: 0.12, unit: 1000 },
-  },
-  'gpt-4-32k-0613': {
-    prompt: { price: 0.06, unit: 1000 },
-    completion: { price: 0.12, unit: 1000 },
-  },
-  'gpt-4-1106-preview': {
-    prompt: { price: 0.01, unit: 1000 },
-    completion: { price: 0.03, unit: 1000 },
-  },
-  'gpt-4-0125-preview': {
-    prompt: { price: 0.01, unit: 1000 },
-    completion: { price: 0.03, unit: 1000 },
-  },
-  'gpt-4-turbo': {
-    prompt: { price: 0.01, unit: 1000 },
-    completion: { price: 0.03, unit: 1000 },
-  },
-  'gpt-4-turbo-2024-04-09': {
-    prompt: { price: 0.01, unit: 1000 },
-    completion: { price: 0.03, unit: 1000 },
-  },
-  'gpt-4o': {
-    prompt: { price: 0.005, unit: 1000 },
-    completion: { price: 0.015, unit: 1000 },
-  },
-  'gpt-4o-2024-05-13': {
-    prompt: { price: 0.005, unit: 1000 },
-    completion: { price: 0.015, unit: 1000 },
-  },
-  'gpt-4o-mini': {
-    prompt: { price: 0.000150, unit: 1000 },
-    completion: { price: 0.000600, unit: 1000 },
-  },
-  'gpt-4o-mini-2024-07-18': {
-    prompt: { price: 0.000150, unit: 1000 },
-    completion: { price: 0.000600, unit: 1000 },
-  }
-};
+export const defaultApiVersion = '2024-04-01-preview';
+export const defaultModel = 'gpt-4o-mini';
 
 export const defaultUserMaxToken = 4000;
+export const reduceMessagesToTotalToken = 256000; // sufficient for almost all models; gemini has 1.5kk though
 
 export const _defaultChatConfig: ConfigInterface = {
   model: defaultModel,
@@ -169,11 +45,22 @@ export const generateDefaultChat = (
   title: title ? title : 'New Chat',
   messages:
     useStore.getState().defaultSystemMessage.length > 0
-      ? [{ role: 'system', content: useStore.getState().defaultSystemMessage }]
+      ? [
+          {
+            role: 'system',
+            content: [
+              {
+                type: 'text',
+                text: useStore.getState().defaultSystemMessage,
+              } as TextContentInterface,
+            ],
+          },
+        ]
       : [],
   config: { ...useStore.getState().defaultChatConfig },
   titleSet: false,
   folder,
+  imageDetail: useStore.getState().defaultImageDetail,
 });
 
 export const codeLanguageSubset = [
@@ -213,3 +100,7 @@ export const codeLanguageSubset = [
   'xml',
   'yaml',
 ];
+
+export const _defaultMenuWidth = 260;
+export const _defaultDisplayChatSize = false;
+export const _defaultImageDetail: ImageDetail = 'auto';

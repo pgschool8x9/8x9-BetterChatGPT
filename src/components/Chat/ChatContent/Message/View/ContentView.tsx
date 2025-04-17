@@ -19,7 +19,13 @@ import CrossIcon from '@icon/CrossIcon';
 
 import useSubmit from '@hooks/useSubmit';
 
-import { ChatInterface } from '@type/chat';
+import {
+  ChatInterface,
+  ContentInterface,
+  ImageContentInterface,
+  isImageContent,
+  isTextContent,
+} from '@type/chat';
 
 import { codeLanguageSubset } from '@constants/chat';
 
@@ -32,6 +38,8 @@ import DeleteButton from './Button/DeleteButton';
 import MarkdownModeButton from './Button/MarkdownModeButton';
 
 import CodeBlock from '../CodeBlock';
+import PopupModal from '@components/PopupModal';
+import { preprocessLaTeX } from '@utils/chat';
 
 const ContentView = memo(
   ({
@@ -41,13 +49,14 @@ const ContentView = memo(
     messageIndex,
   }: {
     role: string;
-    content: string;
+    content: ContentInterface[];
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     messageIndex: number;
   }) => {
     const { handleSubmit } = useSubmit();
 
     const [isDelete, setIsDelete] = useState<boolean>(false);
+    const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
     const currentChatIndex = useStore((state) => state.currentChatIndex);
     const setChats = useStore((state) => state.setChats);
@@ -98,11 +107,21 @@ const ContentView = memo(
       setChats(updatedChats);
       handleSubmit();
     };
-
+    const currentTextContent = isTextContent(content[0]) ? content[0].text : '';
     const handleCopy = () => {
-      navigator.clipboard.writeText(content);
+      navigator.clipboard.writeText(currentTextContent);
     };
 
+    const handleImageClick = (imageUrl: string) => {
+      setZoomedImage(imageUrl);
+    };
+
+    const handleCloseZoom = () => {
+      setZoomedImage(null);
+    };
+    const validImageContents = Array.isArray(content)
+    ? (content.slice(1).filter(isImageContent) as ImageContentInterface[])
+    : [];
     return (
       <>
         <div className='markdown prose w-full md:max-w-full break-words dark:prose-invert dark share-gpt-message'>
@@ -129,12 +148,44 @@ const ContentView = memo(
                 p,
               }}
             >
-              {content}
+              {inlineLatex
+                ? preprocessLaTeX(currentTextContent)
+                : currentTextContent}
             </ReactMarkdown>
           ) : (
-            <span className='whitespace-pre-wrap'>{content}</span>
+            <span className='whitespace-pre-wrap'>{currentTextContent}</span>
           )}
         </div>
+        {validImageContents.length > 0 && (
+          <div className='flex gap-4'>
+            {validImageContents.map((image, index) => (
+              <div key={index} className='image-container'>
+                <img
+                  src={image.image_url.url}
+                  alt={`uploaded-${index}`}
+                  className='h-20 cursor-pointer'
+                  onClick={() => handleImageClick(image.image_url.url)}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+        {zoomedImage && (
+          <PopupModal
+            title=''
+            setIsModalOpen={handleCloseZoom}
+            handleConfirm={handleCloseZoom}
+            cancelButton={false}
+          >
+            <div className='flex justify-center'>
+              <img
+                src={zoomedImage}
+                alt='Zoomed'
+                className='max-w-full max-h-full'
+              />
+            </div>
+          </PopupModal>
+        )}
         <div className='flex justify-end gap-2 w-full mt-2'>
           {isDelete || (
             <>
