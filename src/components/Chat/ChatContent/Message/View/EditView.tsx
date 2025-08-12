@@ -440,7 +440,7 @@ const EditView = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <div className='space-y-2 relative'>
+        <div className='relative'>
           {/* ドラッグオーバー時のオーバーレイ */}
           {isDragOver && (
             <div className='absolute inset-0 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 border-2 border-dashed border-blue-400 dark:border-blue-500 rounded-lg z-10'>
@@ -490,7 +490,7 @@ const EditView = ({
               content={_content}
               onRemoveImage={handleRemoveImage}
               onImageClick={(url) => console.log('Image clicked:', url)}
-              className="mt-3"
+              className="mt-2"
             />
           )}
         </div>

@@ -85,15 +85,12 @@ const StorageManager = () => {
       
       <div className='w-full'>
         <div className='space-y-1 text-sm mb-2 text-gray-900 dark:text-gray-300'>
-          <div className='flex justify-between'>
-            <span>localStorage: {storageUsage.usedMB} MB</span>
-            <span>上限: {storageUsage.quotaMB} MB</span>
+          <div className='text-center'>
+            <span>合計使用量: {(storageUsage.usedMB + (storageUsage.indexedDBUsedMB || 0)).toFixed(2)} MB</span>
           </div>
-          {storageUsage.indexedDBUsedMB !== undefined && (
-            <div className='flex justify-between'>
-              <span>IndexedDB: {storageUsage.indexedDBUsedMB} MB</span>
-            </div>
-          )}
+          <div className='text-xs text-gray-500 dark:text-gray-400 text-center'>
+            <span>チャット履歴: {storageUsage.usedMB} MB / 画像: {storageUsage.indexedDBUsedMB || 0} MB</span>
+          </div>
         </div>
         
         <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3'>
@@ -103,16 +100,8 @@ const StorageManager = () => {
           />
         </div>
         
-        <div className='flex justify-between items-center text-sm mt-1 text-gray-900 dark:text-gray-300'>
+        <div className='text-center text-sm mt-1 text-gray-900 dark:text-gray-300'>
           <span>{storageUsage.usagePercent}% 使用中</span>
-          <button
-            onClick={updateStorageUsage}
-            disabled={isLoading}
-            className='text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors'
-            title='使用量を更新'
-          >
-            🔄 更新
-          </button>
         </div>
       </div>
 

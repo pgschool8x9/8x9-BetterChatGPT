@@ -24,14 +24,14 @@ const ImagePreviewList: React.FC<ImagePreviewListProps> = ({
   }
 
   return (
-    <div className={`flex flex-wrap gap-2 ${className}`}>
+    <div className={`flex flex-wrap gap-1 sm:gap-2 ${className}`}>
       {imageContents.map((image, index) => {
         // 元のコンテンツ配列での実際のインデックスを取得
         const originalIndex = content.findIndex((item) => item === image);
         
         return (
           <div key={index} className="relative group">
-            <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow bg-gray-50 dark:bg-gray-800">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow bg-gray-50 dark:bg-gray-800">
               <ImageDisplay
                 imageUrl={image.image_url.url}
                 alt={`preview-${index}`}
