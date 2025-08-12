@@ -59,7 +59,7 @@ const Message = React.memo(
           {/* メッセージ吹き出し */}
           <div 
             className={`${
-              isUser ? 'max-w-[70%]' : 'max-w-[90%]'
+              isUser ? 'max-w-[70%]' : 'w-full md:max-w-[90%]'
             } rounded-2xl px-4 py-3 ${
               isUser 
                 ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600 shadow-sm ml-auto' 

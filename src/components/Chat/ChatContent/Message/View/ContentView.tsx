@@ -32,9 +32,6 @@ import { codeLanguageSubset } from '@constants/chat';
 import RefreshButton from './Button/RefreshButton';
 import UpButton from './Button/UpButton';
 import DownButton from './Button/DownButton';
-import CopyButton from './Button/CopyButton';
-import EditButton from './Button/EditButton';
-import DeleteButton from './Button/DeleteButton';
 import MarkdownModeButton from './Button/MarkdownModeButton';
 
 import CodeBlock from '../CodeBlock';
@@ -57,7 +54,6 @@ const ContentView = memo(
   }) => {
     const { handleSubmit } = useSubmit();
 
-    const [isDelete, setIsDelete] = useState<boolean>(false);
     const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
     const currentChatIndex = useStore((state) => state.currentChatIndex);
@@ -69,13 +65,6 @@ const ContentView = memo(
     const markdownMode = useStore((state) => state.markdownMode);
     const searchHighlightTerm = useStore((state) => state.searchHighlightTerm);
 
-    const handleDelete = () => {
-      const updatedChats: ChatInterface[] = JSON.parse(
-        JSON.stringify(useStore.getState().chats)
-      );
-      updatedChats[currentChatIndex].messages.splice(messageIndex, 1);
-      setChats(updatedChats);
-    };
 
     const handleMove = (direction: 'up' | 'down') => {
       const updatedChats: ChatInterface[] = JSON.parse(
@@ -110,10 +99,8 @@ const ContentView = memo(
       setChats(updatedChats);
       handleSubmit();
     };
+
     const currentTextContent = isTextContent(content[0]) ? content[0].text : '';
-    const handleCopy = () => {
-      navigator.clipboard.writeText(currentTextContent);
-    };
 
     const handleImageClick = (imageUrl: string) => {
       setZoomedImage(imageUrl);

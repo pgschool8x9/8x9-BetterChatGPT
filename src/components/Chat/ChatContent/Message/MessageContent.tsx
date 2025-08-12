@@ -90,10 +90,10 @@ const MessageContent = ({
               >
                 <div 
                   className={`${
-                    isUser ? 'max-w-[70%] ml-auto' : 'max-w-[90%]'
+                    isUser ? 'max-w-[70%] ml-auto' : 'w-full md:max-w-[90%]'
                   }`}
                 >
-                  <div className="flex gap-1 mt-1 justify-end">
+                  <div className={`flex gap-1 mt-1 ${isUser ? 'justify-start' : 'justify-end'}`}>
                     <DeleteButton setIsDelete={setIsDelete} />
                     <EditButton setIsEdit={setIsEdit} />
                     <CopyButton onClick={handleCopy} />
