@@ -19,6 +19,8 @@ import AttachmentIcon from '@icon/AttachmentIcon';
 import { ModelOptions } from '@utils/modelReader';
 import { modelTypes } from '@constants/modelLoader';
 import { toast } from 'react-toastify';
+import { indexedDBManager } from '@utils/indexedDBManager';
+import ImagePreviewList from './ImagePreviewList';
 
 const EditView = ({
   content: content,
@@ -52,7 +54,8 @@ const EditView = ({
 
   const [_content, _setContent] = useState<ContentInterface[]>(content);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string>('');
+  // imageUrl関連は不要（IndexedDB化により削除）
+  const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const textareaRef = React.createRef<HTMLTextAreaElement>();
 
   const { t } = useTranslation();
@@ -106,57 +109,69 @@ const EditView = ({
       JSON.stringify(useStore.getState().chats)
     );
     const chat = updatedChats[currentChatIndex];
-    const files = e.target.files!;
-    const newImageURLs = Array.from(files).map((file: Blob) =>
-      URL.createObjectURL(file)
-    );
-    const newImages = await Promise.all(
-      newImageURLs.map(async (url) => {
-        const blob = await fetch(url).then((r) => r.blob());
-        return {
-          type: 'image_url',
-          image_url: {
-            detail: chat.imageDetail,
-            url: (await blobToBase64(blob)) as string,
-          },
-        } as ImageContentInterface;
-      })
-    );
-    const updatedContent = [..._content, ...newImages];
-
-    _setContent(updatedContent);
+    const files = Array.from(e.target.files!);
+    
+    // 画像ファイルのみをフィルタリング
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    const nonImageFiles = files.filter(file => !file.type.startsWith('image/'));
+    
+    // 非画像ファイルの警告
+    if (nonImageFiles.length > 0) {
+      const fileNames = nonImageFiles.map(f => f.name).join(', ');
+      toast.error(`画像ファイルのみサポートしています。スキップしたファイル: ${fileNames}`);
+    }
+    
+    if (imageFiles.length === 0) {
+      return;
+    }
+    
+    try {
+      const newImages = await Promise.all(
+        imageFiles.map(async (file: File) => {
+          // IndexedDBにファイルを保存
+          const fileId = await indexedDBManager.saveFile(file, {
+            name: file.name,
+            type: file.type,
+          });
+          
+          return {
+            type: 'image_url',
+            image_url: {
+              detail: 'auto',
+              url: `indexeddb:${fileId}`,
+            },
+          } as ImageContentInterface;
+        })
+      );
+      
+      const updatedContent = [..._content, ...newImages];
+      _setContent(updatedContent);
+      
+      if (imageFiles.length > 0) {
+        toast.success(`${imageFiles.length}個の画像を追加しました`);
+      }
+    } catch (error) {
+      console.error('ファイル保存中にエラーが発生しました:', error);
+      toast.error('ファイルの保存に失敗しました');
+    }
   };
 
-  const handleImageUrlChange = () => {
-    if (imageUrl.trim() === '') return;
-    const updatedChats: ChatInterface[] = JSON.parse(
-      JSON.stringify(useStore.getState().chats)
-    );
-    const chat = updatedChats[currentChatIndex];
-    const newImage: ImageContentInterface = {
-      type: 'image_url',
-      image_url: {
-        detail: chat.imageDetail,
-        url: imageUrl,
-      },
-    };
+  // handleImageUrlChangeは不要（IndexedDB化により削除）
 
-    const updatedContent = [..._content, newImage];
-    _setContent(updatedContent);
-    setImageUrl('');
-  };
-
-  const handleImageDetailChange = (index: number, detail: string) => {
-    const updatedImages = [..._content];
-    updatedImages[index + 1].image_url.detail = detail;
-    _setContent(updatedImages);
-  };
+  // handleImageDetailChangeは不要に（常にautoで固定）
 
   const handleRemoveImage = (index: number) => {
+    // indexが-1の場合はエラー
+    if (index === -1) {
+      console.error('Invalid index: -1, cannot remove image');
+      return;
+    }
+    
     const updatedImages = [..._content];
-    updatedImages.splice(index + 1, 1);
-
+    updatedImages.splice(index, 1);
     _setContent(updatedImages);
+    
+    toast.success('画像を削除しました');
   };
   const handleSave = () => {
     const hasTextContent = (_content[0] as TextContentInterface).text !== '';
@@ -308,22 +323,33 @@ const EditView = ({
       JSON.stringify(useStore.getState().chats)
     );
     const chat = updatedChats[currentChatIndex];
-    for (const item of items) {
-      if (item.type.startsWith('image/')) {
-        const blob = item.getAsFile();
-        if (blob) {
-          const base64Image = (await blobToBase64(blob)) as string;
-          const newImage: ImageContentInterface = {
-            type: 'image_url',
-            image_url: {
-              detail: chat.imageDetail,
-              url: base64Image,
-            },
-          };
-          const updatedContent = [..._content, newImage];
-          _setContent(updatedContent);
+    
+    try {
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          const blob = item.getAsFile();
+          if (blob) {
+            // IndexedDBにファイルを保存
+            const fileId = await indexedDBManager.saveFile(blob, {
+              name: `pasted-image-${Date.now()}`,
+              type: blob.type,
+            });
+            
+            const newImage: ImageContentInterface = {
+              type: 'image_url',
+              image_url: {
+                detail: 'auto',
+                url: `indexeddb:${fileId}`,
+              },
+            };
+            const updatedContent = [..._content, newImage];
+            _setContent(updatedContent);
+          }
         }
       }
+    } catch (error) {
+      console.error('ペーストした画像の保存に失敗しました:', error);
+      toast.error('ペーストした画像の保存に失敗しました');
     }
   };
 
@@ -341,6 +367,62 @@ const EditView = ({
     }
   }, []);
 
+  // ドラッグ&ドロップ処理
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    const nonImageFiles = files.filter(file => !file.type.startsWith('image/'));
+
+    // 非画像ファイルの警告
+    if (nonImageFiles.length > 0) {
+      const fileNames = nonImageFiles.map(f => f.name).join(', ');
+      toast.error(`画像ファイルのみサポートしています。スキップしたファイル: ${fileNames}`);
+    }
+
+    if (imageFiles.length === 0) {
+      return;
+    }
+
+    try {
+      const newImages = await Promise.all(
+        imageFiles.map(async (file: File) => {
+          const fileId = await indexedDBManager.saveFile(file, {
+            name: file.name,
+            type: file.type,
+          });
+          
+          return {
+            type: 'image_url',
+            image_url: {
+              detail: 'auto',
+              url: `indexeddb:${fileId}`,
+            },
+          } as ImageContentInterface;
+        })
+      );
+      
+      const updatedContent = [..._content, ...newImages];
+      _setContent(updatedContent);
+      toast.success(`${imageFiles.length}個の画像を追加しました`);
+    } catch (error) {
+      console.error('ドロップした画像の保存に失敗しました:', error);
+      toast.error('ドロップした画像の保存に失敗しました');
+    }
+  };
+
   const fileInputRef = useRef(null);
   const handleUploadButtonClick = () => {
     // Trigger the file input when the custom button is clicked
@@ -349,50 +431,73 @@ const EditView = ({
   return (
     <div className='relative'>
       <div
-        className={`w-full  ${
+        className={`w-full ${isDragOver ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''} ${
           sticky
             ? 'py-2 md:py-3 px-2 md:px-4 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
             : ''
         }`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
       >
-        <div className='relative flex items-start'>
-          {modelTypes[model] == 'image' && (
-            <>
-              <button
-                className='absolute left-0 bottom-0  btn btn-secondary h-10 ml-[-1.2rem] mb-[-0.4rem]'
-                onClick={handleUploadButtonClick}
-                aria-label={'Upload Images'}
-              >
-                <div className='flex items-center justify-center gap-2'>
-                  <AttachmentIcon />
-                </div>
-              </button>
-            </>
+        <div className='space-y-2 relative'>
+          {/* ドラッグオーバー時のオーバーレイ */}
+          {isDragOver && (
+            <div className='absolute inset-0 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 border-2 border-dashed border-blue-400 dark:border-blue-500 rounded-lg z-10'>
+              <div className='text-blue-600 dark:text-blue-400 font-medium'>
+                画像ファイルをドロップしてください
+              </div>
+            </div>
           )}
-          {/* Place the AttachmentIcon directly over the textarea */}
-          <textarea
-            ref={textareaRef}
-            className={`m-0 resize-none rounded-lg bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 w-full placeholder:text-gray-500/40 pr-10 ${
-              modelTypes[model] == 'image' ? 'pl-7' : ''
-            }`} // Adjust padding-right to make space for the icon
-            onChange={(e) => {
-              _setContent((prev) => [
-                { type: 'text', text: e.target.value },
-                ...prev.slice(1),
-              ]);
-            }}
-            value={(_content[0] as TextContentInterface).text}
-            placeholder={t('submitPlaceholder') as string}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            rows={1}
-          ></textarea>
+          
+          <div className='relative flex items-start'>
+            {modelTypes[model] == 'image' && (
+              <>
+                <button
+                  className='absolute left-0 bottom-0  btn btn-secondary h-10 ml-[-1.2rem] mb-[-0.4rem]'
+                  onClick={handleUploadButtonClick}
+                  aria-label={'Upload Images'}
+                >
+                  <div className='flex items-center justify-center gap-2'>
+                    <AttachmentIcon />
+                  </div>
+                </button>
+              </>
+            )}
+            {/* Place the AttachmentIcon directly over the textarea */}
+            <textarea
+              ref={textareaRef}
+              className={`m-0 resize-none rounded-lg bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 w-full placeholder:text-gray-500/40 pr-10 ${
+                modelTypes[model] == 'image' ? 'pl-7' : ''
+              }`} // Adjust padding-right to make space for the icon
+              onChange={(e) => {
+                _setContent((prev) => [
+                  { type: 'text', text: e.target.value },
+                  ...prev.slice(1),
+                ]);
+              }}
+              value={(_content[0] as TextContentInterface).text}
+              placeholder={t('submitPlaceholder') as string}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              rows={1}
+            ></textarea>
+          </div>
+          
+          {/* 画像プレビューエリア */}
+          {modelTypes[model] == 'image' && (
+            <ImagePreviewList
+              content={_content}
+              onRemoveImage={handleRemoveImage}
+              onImageClick={(url) => console.log('Image clicked:', url)}
+              className="mt-3"
+            />
+          )}
         </div>
       </div>
       <EditViewButtons
         sticky={sticky}
         handleFileChange={handleFileChange}
-        handleImageDetailChange={handleImageDetailChange}
         handleRemoveImage={handleRemoveImage}
         handleGenerate={handleGenerate}
         handleSave={handleSave}
@@ -400,9 +505,6 @@ const EditView = ({
         setIsEdit={setIsEdit}
         _setContent={_setContent}
         _content={_content}
-        imageUrl={imageUrl}
-        setImageUrl={setImageUrl}
-        handleImageUrlChange={handleImageUrlChange}
         fileInputRef={fileInputRef}
         model={model}
       />
@@ -422,7 +524,6 @@ const EditViewButtons = memo(
   ({
     sticky = false,
     handleFileChange,
-    handleImageDetailChange,
     handleRemoveImage,
     handleGenerate,
     handleSave,
@@ -430,15 +531,11 @@ const EditViewButtons = memo(
     setIsEdit,
     _setContent,
     _content,
-    imageUrl,
-    setImageUrl,
-    handleImageUrlChange,
     fileInputRef,
     model,
   }: {
     sticky?: boolean;
     handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleImageDetailChange: (index: number, e: string) => void;
     handleRemoveImage: (index: number) => void;
     handleGenerate: () => void;
     handleSave: () => void;
@@ -446,9 +543,6 @@ const EditViewButtons = memo(
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     _setContent: React.Dispatch<React.SetStateAction<ContentInterface[]>>;
     _content: ContentInterface[];
-    imageUrl: string;
-    setImageUrl: React.Dispatch<React.SetStateAction<string>>;
-    handleImageUrlChange: () => void;
     fileInputRef: React.MutableRefObject<null>;
     model: ModelOptions;
   }) => {
@@ -458,67 +552,15 @@ const EditViewButtons = memo(
 
     return (
       <div>
+        {/* IndexedDB化によりImageURL機能は不要になったため削除 */}
         {modelTypes[model] == 'image' && (
           <>
-            <div className='flex justify-center'>
-              <div className='flex gap-5'>
-                {_content.slice(1).map((image, index) => (
-                  <div
-                    key={index}
-                    className='image-container flex flex-col gap-2'
-                  >
-                    <img
-                      src={image.image_url.url}
-                      alt={`uploaded-${index}`}
-                      className='h-10'
-                    />
-                    <div className='flex flex-row gap-3'>
-                      <select
-                        onChange={(event) =>
-                          handleImageDetailChange(index, event.target.value)
-                        }
-                        title='Select image resolution'
-                        aria-label='Select image resolution'
-                        defaultValue={image.image_url.detail}
-                        style={{ color: 'black' }}
-                      >
-                        <option value='auto'>Auto</option>
-                        <option value='high'>High</option>
-                        <option value='low'>Low</option>
-                      </select>
-                      <button
-                        className='close-button'
-                        onClick={() => handleRemoveImage(index)}
-                        aria-label='Remove Image'
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className='flex justify-center mt-4'>
-              <input
-                type='text'
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder={t('enter_image_url_placeholder') as string}
-                className='input input-bordered w-full max-w-xs text-gray-800 dark:text-white p-3  border-none bg-gray-200 dark:bg-gray-600 rounded-md m-0 w-full mr-0 h-10 focus:outline-none'
-              />
-              <button
-                className='btn btn-neutral ml-2'
-                onClick={handleImageUrlChange}
-                aria-label={t('add_image_url') as string}
-              >
-                {t('add_image_url')}
-              </button>
-            </div>
             {/* Hidden file input */}
             <input
               type='file'
               ref={fileInputRef}
               style={{ display: 'none' }}
+              accept='image/*'
               onChange={handleFileChange}
               multiple
             />

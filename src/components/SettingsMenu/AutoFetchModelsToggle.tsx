@@ -20,7 +20,7 @@ const AutoFetchModelsToggle = () => {
 
   return (
     <Toggle
-      label={t('Auto-fetch models from OpenRouter on start') as string}
+      label={t('学習モデルを自動取得') as string}
       isChecked={isChecked}
       setIsChecked={setIsChecked}
     />

@@ -12,6 +12,64 @@ import { limitMessageTokens, updateTotalTokenUsed } from '@utils/messageUtils';
 import { _defaultChatConfig } from '@constants/chat';
 import { officialAPIEndpoint } from '@constants/auth';
 import { modelStreamSupport } from '@constants/modelLoader';
+import { indexedDBManager } from '@utils/indexedDBManager';
+import { ContentInterface, ImageContentInterface } from '@type/chat';
+
+// IndexedDBのfileIDをbase64に変換する関数
+const convertIndexedDBToBase64 = async (messages: MessageInterface[]): Promise<MessageInterface[]> => {
+  const convertedMessages = await Promise.all(
+    messages.map(async (message) => {
+      if (!message.content || !Array.isArray(message.content)) {
+        return message;
+      }
+
+      const convertedContent = (await Promise.all(
+        message.content.map(async (content: ContentInterface) => {
+          if (content.type === 'image_url' && 
+              content.image_url?.url?.startsWith('indexeddb:')) {
+            try {
+              const fileId = content.image_url.url.replace('indexeddb:', '');
+              console.log('Converting IndexedDB file to base64, fileId:', fileId);
+              
+              const base64Data = await indexedDBManager.getFileBase64(fileId);
+              console.log('Base64 data received:', base64Data ? base64Data.substring(0, 100) + '...' : 'null');
+              
+              if (base64Data) {
+                // 画像ファイルのみをAPIに送信
+                const isImageFile = base64Data.startsWith('data:image/');
+                console.log('Is image file:', isImageFile, 'starts with:', base64Data.substring(0, 50));
+                
+                if (isImageFile) {
+                  return {
+                    ...content,
+                    image_url: {
+                      ...content.image_url,
+                      url: base64Data,
+                    },
+                  } as ImageContentInterface;
+                } else {
+                  console.warn('Non-image file detected, skipping API transmission:', base64Data.substring(0, 50));
+                  // 非画像ファイルはAPI送信から除外
+                  return null;
+                }
+              }
+            } catch (error) {
+              console.error('IndexedDBファイルの変換に失敗しました:', error);
+            }
+          }
+          return content;
+        })
+      )).filter(content => content !== null); // nullを除外
+
+      return {
+        ...message,
+        content: convertedContent,
+      };
+    })
+  );
+  
+  return convertedMessages;
+};
 
 const useSubmit = () => {
   const { t, i18n } = useTranslation('api');
@@ -30,6 +88,8 @@ const useSubmit = () => {
   ): Promise<string> => {
     let data;
     try {
+      // IndexedDBファイルIDをbase64に変換
+      const convertedMessage = await convertIndexedDBToBase64(message);
       if (!apiKey || apiKey.length === 0) {
         // official endpoint
         if (apiEndpoint === officialAPIEndpoint) {
@@ -42,7 +102,7 @@ const useSubmit = () => {
         // other endpoints
         data = await getChatCompletion(
           useStore.getState().apiEndpoint,
-          message,
+          convertedMessage,
           titleChatConfig,
           undefined,
           undefined,
@@ -56,7 +116,7 @@ const useSubmit = () => {
         // own apikey
         data = await getChatCompletion(
           useStore.getState().apiEndpoint,
-          message,
+          convertedMessage,
           titleChatConfig,
           apiKey,
           undefined,
@@ -105,13 +165,16 @@ const useSubmit = () => {
       if (chats[currentChatIndex].messages.length === 0)
         throw new Error(t('errors.noMessagesSubmitted') as string);
 
-      const messages = limitMessageTokens(
+      let messages = limitMessageTokens(
         chats[currentChatIndex].messages,
         chats[currentChatIndex].config.max_tokens,
         chats[currentChatIndex].config.model
       );
       if (messages.length === 0)
         throw new Error(t('errors.messageExceedMaxToken') as string);
+      
+      // IndexedDBファイルIDをbase64に変換
+      messages = await convertIndexedDBToBase64(messages);
       if (!isStreamSupported) {
         if (!apiKey || apiKey.length === 0) {
           // official endpoint

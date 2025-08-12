@@ -40,6 +40,7 @@ import MarkdownModeButton from './Button/MarkdownModeButton';
 import CodeBlock from '../CodeBlock';
 import PopupModal from '@components/PopupModal';
 import { preprocessLaTeX } from '@utils/chat';
+import ImageDisplay from './ImageDisplay';
 
 const ContentView = memo(
   ({
@@ -119,9 +120,10 @@ const ContentView = memo(
     const handleCloseZoom = () => {
       setZoomedImage(null);
     };
+    // 画像コンテンツをフィルタリング
     const validImageContents = Array.isArray(content)
-    ? (content.slice(1).filter(isImageContent) as ImageContentInterface[])
-    : [];
+      ? (content.slice(1).filter(isImageContent) as ImageContentInterface[])
+      : [];
     return (
       <>
         <div className='markdown prose w-full md:max-w-full break-words dark:prose-invert dark share-gpt-message'>
@@ -156,16 +158,19 @@ const ContentView = memo(
             <span className='whitespace-pre-wrap'>{currentTextContent}</span>
           )}
         </div>
+        {/* チャット履歴に画像を表示 */}
         {validImageContents.length > 0 && (
-          <div className='flex gap-4'>
+          <div className='flex flex-wrap gap-2 sm:gap-3 mt-3'>
             {validImageContents.map((image, index) => (
-              <div key={index} className='image-container'>
-                <img
-                  src={image.image_url.url}
-                  alt={`uploaded-${index}`}
-                  className='h-20 cursor-pointer'
-                  onClick={() => handleImageClick(image.image_url.url)}
-                />
+              <div key={index} className='image-container w-full sm:max-w-sm'>
+                <div className='border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow'>
+                  <ImageDisplay
+                    imageUrl={image.image_url.url}
+                    alt={`image-${index}`}
+                    className='w-full h-auto max-h-48 sm:max-h-64 cursor-pointer hover:opacity-90 transition-opacity'
+                    onClick={handleImageClick}
+                  />
+                </div>
               </div>
             ))}
           </div>

@@ -13,11 +13,10 @@ import PromptLibraryMenu from '@components/PromptLibraryMenu';
 import ChatConfigMenu from '@components/ChatConfigMenu';
 import EnterToSubmitToggle from './EnterToSubmitToggle';
 import TotalTokenCost, { TotalTokenCostToggle } from './TotalTokenCost';
-import ClearConversation from '@components/Menu/MenuOptions/ClearConversation';
 import DisplayChatSizeToggle from './DisplayChatSizeToggle';
 import MigrationButton from './MigrationButton';
-import CustomModelsManager from './CustomModelsManager';
 import AutoFetchModelsToggle from './AutoFetchModelsToggle';
+import StorageManager from './StorageManager';
 
 const SettingsMenu = () => {
   const { t } = useTranslation();
@@ -48,7 +47,7 @@ const SettingsMenu = () => {
           <div className='p-6 border-b border-gray-200 dark:border-gray-600 flex flex-col items-center gap-4'>
             <LanguageSelector />
             <ThemeSwitcher />
-            <div className='flex flex-col gap-3'>
+            <div className='grid grid-cols-2 gap-3'>
               <AutoTitleToggle />
               <EnterToSubmitToggle />
               <InlineLatexToggle />
@@ -57,11 +56,12 @@ const SettingsMenu = () => {
               <DisplayChatSizeToggle />
               <AutoFetchModelsToggle />
             </div>
-            <ClearConversation />
-            <PromptLibraryMenu />
-            <ChatConfigMenu />
             <TotalTokenCost />
-            <CustomModelsManager />
+            <StorageManager />
+            <div className='grid grid-cols-2 gap-3'>
+              <ChatConfigMenu />
+              <PromptLibraryMenu />
+            </div>
             <MigrationButton />
           </div>
         </PopupModal>

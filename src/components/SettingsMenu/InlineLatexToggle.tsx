@@ -18,7 +18,7 @@ const InlineLatexToggle = () => {
 
   return (
     <Toggle
-      label={t('inlineLatex') as string}
+      label={t('数式を表示') as string}
       isChecked={isChecked}
       setIsChecked={setIsChecked}
     />

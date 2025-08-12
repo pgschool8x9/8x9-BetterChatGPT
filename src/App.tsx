@@ -14,6 +14,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import VersionInfo from '@components/Footer/VersionInfo';
 import { initializeModels } from '@constants/modelLoader';
+import { migrateImagesFromLocalStorage } from '@utils/indexedDBManager';
 
 function App() {
   const initialiseNewChat = useInitialiseNewChat();
@@ -33,6 +34,25 @@ function App() {
   useEffect(() => {
     initializeModels(autoFetchModels);
   }, [autoFetchModels]);
+
+  // IndexedDB移行処理
+  useEffect(() => {
+    const runMigration = async () => {
+      try {
+        await migrateImagesFromLocalStorage();
+      } catch (error) {
+        console.error('データ移行中にエラーが発生しました:', error);
+      }
+    };
+    
+    // アプリ起動時に1回だけ実行
+    const migrationFlag = localStorage.getItem('indexeddb-migration-done');
+    if (!migrationFlag) {
+      runMigration().finally(() => {
+        localStorage.setItem('indexeddb-migration-done', 'true');
+      });
+    }
+  }, []);
 
   useEffect(() => {
     // legacy local storage
