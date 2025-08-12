@@ -2,7 +2,6 @@ import React from 'react';
 import useStore from '@store/store';
 
 import ChatContent from './ChatContent';
-import StopGeneratingButton from '@components/StopGeneratingButton/StopGeneratingButton';
 
 const Chat = () => {
   const hideSideMenu = useStore((state) => state.hideSideMenu);
@@ -15,7 +14,6 @@ const Chat = () => {
     >
       <main className='relative h-full w-full transition-width flex flex-col overflow-hidden items-stretch flex-1'>
         <ChatContent />
-        <StopGeneratingButton />
       </main>
     </div>
   );

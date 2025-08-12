@@ -136,7 +136,9 @@ const useSubmit = () => {
     if (generating || !chats) return;
 
     const updatedChats: ChatInterface[] = JSON.parse(JSON.stringify(chats));
-
+    
+    // アシスタントメッセージを一時的に追加
+    const assistantMessageIndex = updatedChats[currentChatIndex].messages.length;
     updatedChats[currentChatIndex].messages.push({
       role: 'assistant',
       content: [
@@ -149,6 +151,42 @@ const useSubmit = () => {
 
     setChats(updatedChats);
     setGenerating(true);
+    
+    // キャンセル時のクリーンアップ関数
+    const cleanupOnCancel = () => {
+      const currentChats = useStore.getState().chats;
+      if (currentChats) {
+        const cleanedChats: ChatInterface[] = JSON.parse(JSON.stringify(currentChats));
+        let hasChanges = false;
+        
+        // 空のアシスタントメッセージを削除
+        const lastMessage = cleanedChats[currentChatIndex].messages[assistantMessageIndex];
+        if (lastMessage && lastMessage.role === 'assistant') {
+          const textContent = lastMessage.content[0] as TextContentInterface;
+          const isEmpty = !textContent || 
+                         !textContent.text || 
+                         textContent.text.trim() === '';
+          if (isEmpty) {
+            cleanedChats[currentChatIndex].messages.splice(assistantMessageIndex, 1);
+            hasChanges = true;
+          }
+        }
+        
+        // その前のユーザーメッセージも削除（キャンセル時の場合）
+        const userMessageIndex = assistantMessageIndex - 1;
+        if (userMessageIndex >= 0) {
+          const userMessage = cleanedChats[currentChatIndex].messages[userMessageIndex];
+          if (userMessage && userMessage.role === 'user') {
+            cleanedChats[currentChatIndex].messages.splice(userMessageIndex, 1);
+            hasChanges = true;
+          }
+        }
+        
+        if (hasChanges) {
+          setChats(cleanedChats);
+        }
+      }
+    };
 
     try {
       const isStreamSupported =
@@ -360,7 +398,28 @@ const useSubmit = () => {
       const err = (e as Error).message;
       console.log(err);
       setError(err);
+      // エラー時も空のアシスタントメッセージを削除
+      cleanupOnCancel();
     }
+    
+    // generating がfalseになった時点でキャンセルチェック
+    if (!useStore.getState().generating) {
+      // ストリーミングが中断された場合のクリーンアップ
+      const currentChats = useStore.getState().chats;
+      if (currentChats && currentChats[currentChatIndex].messages[assistantMessageIndex]) {
+        const lastMessage = currentChats[currentChatIndex].messages[assistantMessageIndex];
+        if (lastMessage && lastMessage.role === 'assistant') {
+          const textContent = lastMessage.content[0] as TextContentInterface;
+          const isEmpty = !textContent || 
+                         !textContent.text || 
+                         textContent.text.trim() === '';
+          if (isEmpty) {
+            cleanupOnCancel();
+          }
+        }
+      }
+    }
+    
     setGenerating(false);
   };
 

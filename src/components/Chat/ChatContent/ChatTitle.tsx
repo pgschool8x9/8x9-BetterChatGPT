@@ -165,9 +165,9 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
 
         {/* 右端のボタン群 */}
         <div className='flex items-center gap-1 md:gap-2'>
-          {/* モバイル表示でのNewChatボタン */}
+          {/* 新しいチャットボタン（全レスポンシブサイズで表示） */}
           <button
-            className={`md:hidden p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+            className={`p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
               generating ? 'cursor-not-allowed opacity-40' : ''
             }`}
             onClick={() => {

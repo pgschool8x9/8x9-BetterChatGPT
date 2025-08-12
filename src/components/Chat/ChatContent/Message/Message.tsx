@@ -3,11 +3,8 @@ import useStore from '@store/store';
 
 import Avatar from './Avatar';
 import MessageContent from './MessageContent';
-import CopyButton from './View/Button/CopyButton';
-import EditButton from './View/Button/EditButton';
-import RefreshButton from './View/Button/RefreshButton';
 
-import { ContentInterface, Role, isTextContent } from '@type/chat';
+import { ContentInterface, Role } from '@type/chat';
 import RoleSelector from './RoleSelector';
 
 // const backgroundStyle: { [role in Role]: string } = {
@@ -29,29 +26,10 @@ const Message = React.memo(
   }) => {
     const hideSideMenu = useStore((state) => state.hideSideMenu);
     const advancedMode = useStore((state) => state.advancedMode);
-    const lastMessageIndex = useStore((state) =>
-      state.chats ? state.chats[state.currentChatIndex].messages.length - 1 : 0
-    );
 
     // チャット風レイアウト: userは右側、assistantは左側
     const isUser = role === 'user';
     const isSystem = role === 'system';
-
-    // ボタンハンドラー
-    const currentTextContent = isTextContent(content[0]) ? content[0].text : '';
-    const handleCopy = () => {
-      navigator.clipboard.writeText(currentTextContent);
-    };
-
-    const handleEdit = () => {
-      // 編集機能は別途実装が必要
-      console.log('Edit clicked');
-    };
-
-    const handleRefresh = () => {
-      // リフレッシュ機能は別途実装が必要
-      console.log('Refresh clicked');
-    };
 
     // stickyの場合は入力エリア用のレイアウト
     if (sticky) {
@@ -80,7 +58,9 @@ const Message = React.memo(
           
           {/* メッセージ吹き出し */}
           <div 
-            className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+            className={`${
+              isUser ? 'max-w-[70%]' : 'max-w-[90%]'
+            } rounded-2xl px-4 py-3 ${
               isUser 
                 ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600 shadow-sm ml-auto' 
                 : isSystem
@@ -99,33 +79,6 @@ const Message = React.memo(
 
           {/* アバター削除 */}
         </div>
-        
-        {/* ボタンをチャット吹き出しの外側に配置 */}
-        {!sticky && (
-          <div className="w-full px-4">
-            <div
-              className={`flex gap-3 ${
-                hideSideMenu
-                  ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
-                  : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
-              } mx-auto ${isUser ? 'justify-end' : 'justify-start'}`}
-            >
-              <div 
-                className={`max-w-[70%] ${isUser ? 'ml-auto' : ''}`}
-              >
-                <div className="flex gap-1 mt-1 justify-end">
-                  {!useStore.getState().generating &&
-                    role === 'assistant' &&
-                    messageIndex === lastMessageIndex && (
-                      <RefreshButton onClick={handleRefresh} />
-                    )}
-                  <CopyButton onClick={handleCopy} />
-                  <EditButton setIsEdit={() => {}} />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   }

@@ -18,7 +18,7 @@ import { defaultModel } from '@constants/chat';
 import ImageIcon from '@icon/ImageIcon';
 import SendIcon from '@icon/SendIcon';
 import { ModelOptions } from '@utils/modelReader';
-import { modelTypes } from '@constants/modelLoader';
+import { modelTypes, modelStreamSupport } from '@constants/modelLoader';
 import { toast } from 'react-toastify';
 import { indexedDBManager } from '@utils/indexedDBManager';
 import ImagePreviewList from './ImagePreviewList';
@@ -59,6 +59,7 @@ const EditView = ({
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const textareaRef = React.createRef<HTMLTextAreaElement>();
   const generating = useStore((state) => state.generating);
+  const setGenerating = useStore((state) => state.setGenerating);
 
   const { t } = useTranslation();
 
@@ -242,6 +243,55 @@ const EditView = ({
   };
 
   const { handleSubmit } = useSubmit();
+
+  const handleStopGenerating = () => {
+    if (modelStreamSupport[model]) {
+      setGenerating(false);
+      // キャンセル時に空のアシスタントメッセージを削除
+      cleanupEmptyAssistantMessage();
+    } else {
+      const confirmMessage = t('stopNonStreamGenerationWarning');
+      if (window.confirm(confirmMessage)) {
+        setGenerating(false);
+        // キャンセル時に空のアシスタントメッセージを削除
+        cleanupEmptyAssistantMessage();
+      }
+    }
+  };
+  
+  const cleanupEmptyAssistantMessage = () => {
+    const chats = useStore.getState().chats;
+    if (chats && chats[currentChatIndex]) {
+      const messages = chats[currentChatIndex].messages;
+      const updatedChats: ChatInterface[] = JSON.parse(JSON.stringify(chats));
+      let hasChanges = false;
+      
+      // 最後のメッセージが空のアシスタントメッセージの場合削除
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage && lastMessage.role === 'assistant') {
+        const textContent = lastMessage.content[0] as TextContentInterface;
+        const isEmpty = !textContent || 
+                       !textContent.text || 
+                       textContent.text.trim() === '';
+        if (isEmpty) {
+          updatedChats[currentChatIndex].messages.pop();
+          hasChanges = true;
+        }
+      }
+      
+      // その前のユーザーメッセージも削除（キャンセル時の場合）
+      const secondLastMessage = updatedChats[currentChatIndex].messages[updatedChats[currentChatIndex].messages.length - 1];
+      if (secondLastMessage && secondLastMessage.role === 'user') {
+        updatedChats[currentChatIndex].messages.pop();
+        hasChanges = true;
+      }
+      
+      if (hasChanges) {
+        setChats(updatedChats);
+      }
+    }
+  };
+
   const handleGenerate = () => {
     const hasTextContent = (_content[0] as TextContentInterface).text !== '';
     const hasImageContent = Array.isArray(_content) && _content.some(
@@ -473,13 +523,30 @@ const EditView = ({
             <div className='absolute right-1 top-1/2 transform -translate-y-1/2 z-10'>
               {sticky && (
                 <button
-                  className={`btn btn-primary h-8 w-8 p-1 flex items-center justify-center rounded-md ${
-                    generating ? 'cursor-not-allowed opacity-40' : ''
+                  className={`btn h-8 w-8 p-1 flex items-center justify-center rounded-md ${
+                    generating ? 'btn-neutral' : 'btn-primary'
                   }`}
-                  onClick={handleGenerate}
-                  aria-label="送信"
+                  onClick={generating ? handleStopGenerating : handleGenerate}
+                  aria-label={generating ? "停止" : "送信"}
                 >
-                  <SendIcon />
+                  {generating ? (
+                    <svg
+                      stroke='currentColor'
+                      fill='none'
+                      strokeWidth='1.5'
+                      viewBox='0 0 24 24'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      className='h-4 w-4'
+                      height='1em'
+                      width='1em'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <rect x='3' y='3' width='18' height='18' rx='2' ry='2'></rect>
+                    </svg>
+                  ) : (
+                    <SendIcon />
+                  )}
                 </button>
               )}
               {!sticky && (
