@@ -59,7 +59,7 @@ const convertIndexedDBToBase64 = async (messages: MessageInterface[]): Promise<M
           }
           return content;
         })
-      )).filter(content => content !== null); // nullを除外
+      )).filter((content): content is ContentInterface => content !== null); // nullを除外
 
       return {
         ...message,
