@@ -1,7 +1,6 @@
 import React from 'react';
 import useStore from '@store/store';
 
-import Api from './Api';
 import Me from './Me';
 import AboutMenu from '@components/AboutMenu';
 import ImportExportChat from '@components/ImportExportChat';
@@ -23,12 +22,18 @@ const MenuOptions = () => {
           hideMenuOptions ? 'max-h-0' : 'max-h-full'
         } overflow-hidden transition-all`}
       >
-        {countTotalTokens && <TotalTokenCostDisplay />}
+        {/* トークン表示と設定を同じ行に配置 */}
+        <div className='flex items-center justify-between'>
+          <div>
+            {countTotalTokens && <TotalTokenCostDisplay />}
+          </div>
+          <div>
+            <SettingsMenu />
+          </div>
+        </div>
         {googleClientId && <GoogleSync clientId={googleClientId} />}
         {/* <AboutMenu /> */}
         {/* <ImportExportChat /> */}
-        <Api />
-        <SettingsMenu />
         {/* <Me /> */}
       </div>
     </>

@@ -7,6 +7,7 @@ import { ConfigSlice, createConfigSlice } from './config-slice';
 import { PromptSlice, createPromptSlice } from './prompt-slice';
 import { ToastSlice, createToastSlice } from './toast-slice';
 import { CustomModelsSlice, createCustomModelsSlice } from './custom-models-slice';
+import { SearchSlice, createSearchSlice } from './search-slice';
 import {
   LocalStorageInterfaceV0ToV1,
   LocalStorageInterfaceV1ToV2,
@@ -40,7 +41,8 @@ export type StoreState = ChatSlice &
   ConfigSlice &
   PromptSlice &
   ToastSlice &
-  CustomModelsSlice;
+  CustomModelsSlice &
+  SearchSlice;
 
 export type StoreSlice<T> = (
   set: StoreApi<StoreState>['setState'],
@@ -85,6 +87,7 @@ const useStore = create<StoreState>()(
       ...createPromptSlice(set, get),
       ...createToastSlice(set, get),
       ...createCustomModelsSlice(set, get),
+      ...createSearchSlice(set, get),
     }),
     {
       name: 'free-chat-gpt',

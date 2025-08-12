@@ -6,11 +6,9 @@ import { useTranslation } from 'react-i18next';
 import ScrollToBottomButton from './ScrollToBottomButton';
 import ChatTitle from './ChatTitle';
 import Message from './Message';
-import NewMessageButton from './Message/NewMessageButton';
 import CrossIcon from '@icon/CrossIcon';
 
 import useSubmit from '@hooks/useSubmit';
-import DownloadChat from './DownloadChat';
 import CloneChat from './CloneChat';
 import ShareGPT from '@components/ShareGPT';
 import { ImageContentInterface, TextContentInterface } from '@type/chat';
@@ -100,80 +98,81 @@ const ChatContent = () => {
   const { error } = useSubmit();
 
   return (
-    <div className='flex-1 overflow-hidden'>
-      <ScrollToBottom
-        className='h-full dark:bg-gray-800'
-        followButtonClassName='hidden'
-      >
-        <ScrollToBottomButton />
-        <div className='flex flex-col items-center text-sm dark:bg-gray-800'>
-          <div
-            className='flex flex-col items-center text-sm dark:bg-gray-800 w-full'
-            ref={saveRef}
-          >
-            {advancedMode && <ChatTitle />}
-            {!generating && advancedMode && messages?.length === 0 && (
-              <NewMessageButton messageIndex={-1} />
-            )}
-            {messagesLimited?.map(
-              (message, index) =>
-                (advancedMode || index !== 0 || message.role !== 'system') && (
-                  <React.Fragment key={index}>
-                    <Message
-                      role={message.role}
-                      content={message.content}
-                      messageIndex={index}
-                    />
-                    {!generating && advancedMode && (
-                      <NewMessageButton messageIndex={index} />
-                    )}
-                  </React.Fragment>
-                )
-            )}
-          </div>
+    <div className='flex-1 flex flex-col overflow-hidden'>
+      {/* チャット履歴エリア（スクロール可能） */}
+      <div className='flex-1 overflow-hidden'>
+        <ScrollToBottom
+          className='h-full bg-gray-50 dark:bg-gray-800'
+          followButtonClassName='hidden'
+        >
+          <ScrollToBottomButton />
+          <div className='flex flex-col items-center text-sm bg-gray-50 dark:bg-gray-800'>
+            <div
+              className='flex flex-col items-center text-sm bg-gray-50 dark:bg-gray-800 w-full'
+              ref={saveRef}
+            >
+              <ChatTitle saveRef={saveRef} />
+              {/* NewMessageButton非表示化 */}
+              {messagesLimited?.map(
+                (message, index) =>
+                  (advancedMode || index !== 0 || message.role !== 'system') && (
+                    <React.Fragment key={index}>
+                      <Message
+                        role={message.role}
+                        content={message.content}
+                        messageIndex={index}
+                      />
+                      {/* NewMessageButton非表示化 */}
+                    </React.Fragment>
+                  )
+              )}
+            </div>
 
+            {error !== '' && (
+              <div className='relative py-2 px-3 w-3/5 mt-3 max-md:w-11/12 border rounded-md border-red-500 bg-red-500/10'>
+                <div className='text-gray-600 dark:text-gray-100 text-sm whitespace-pre-wrap'>
+                  {error}
+                </div>
+                <div
+                  className='text-white absolute top-1 right-1 cursor-pointer'
+                  onClick={() => {
+                    setError('');
+                  }}
+                >
+                  <CrossIcon />
+                </div>
+              </div>
+            )}
+            <div
+              className={`mt-4 w-full m-auto  ${
+                hideSideMenu
+                  ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
+                  : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
+              }`}
+            >
+              {useStore.getState().generating || (
+                <div className='md:w-[calc(100%-50px)] flex gap-4 flex-wrap justify-center'>
+                  <ShareGPT />
+                  <CloneChat />
+                </div>
+              )}
+            </div>
+            <div className='w-full h-24'></div>
+          </div>
+        </ScrollToBottom>
+      </div>
+
+      {/* 入力エリア（下部固定） */}
+      <div className='flex-shrink-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700'>
+        <div className='max-w-4xl mx-auto px-4 py-4'>
           <Message
             role={inputRole}
-            // For now we always initizlize a new message with an empty text content.
-            // It is possible to send a message to the API without a TextContentInterface,
-            // but the UI would need to be modified to allow the user to control the order of text and image content
             content={[{ type: 'text', text: '' } as TextContentInterface]}
             messageIndex={stickyIndex}
             sticky
           />
-          {error !== '' && (
-            <div className='relative py-2 px-3 w-3/5 mt-3 max-md:w-11/12 border rounded-md border-red-500 bg-red-500/10'>
-              <div className='text-gray-600 dark:text-gray-100 text-sm whitespace-pre-wrap'>
-                {error}
-              </div>
-              <div
-                className='text-white absolute top-1 right-1 cursor-pointer'
-                onClick={() => {
-                  setError('');
-                }}
-              >
-                <CrossIcon />
-              </div>
-            </div>
-          )}
-          <div
-            className={`mt-4 w-full m-auto  ${
-              hideSideMenu
-                ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
-                : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
-            }`}
-          >
-            {useStore.getState().generating || (
-              <div className='md:w-[calc(100%-50px)] flex gap-4 flex-wrap justify-center'>
-                <DownloadChat saveRef={saveRef} />
-                <ShareGPT />
-                <CloneChat />
-              </div>
-            )}
-          </div>
-          <div className='w-full h-36'></div>
         </div>
-      </ScrollToBottom>
+      </div>
     </div>
   );
 };

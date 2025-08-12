@@ -3,8 +3,11 @@ import useStore from '@store/store';
 
 import Avatar from './Avatar';
 import MessageContent from './MessageContent';
+import CopyButton from './View/Button/CopyButton';
+import EditButton from './View/Button/EditButton';
+import RefreshButton from './View/Button/RefreshButton';
 
-import { ContentInterface, Role } from '@type/chat';
+import { ContentInterface, Role, isTextContent } from '@type/chat';
 import RoleSelector from './RoleSelector';
 
 // const backgroundStyle: { [role in Role]: string } = {
@@ -12,8 +15,6 @@ import RoleSelector from './RoleSelector';
 //   assistant: 'bg-gray-50 dark:bg-gray-650',
 //   system: 'bg-gray-50 dark:bg-gray-650',
 // };
-const backgroundStyle = ['dark:bg-gray-800', 'bg-gray-50 dark:bg-gray-650'];
-
 const Message = React.memo(
   ({
     role,
@@ -28,28 +29,66 @@ const Message = React.memo(
   }) => {
     const hideSideMenu = useStore((state) => state.hideSideMenu);
     const advancedMode = useStore((state) => state.advancedMode);
+    const lastMessageIndex = useStore((state) =>
+      state.chats ? state.chats[state.currentChatIndex].messages.length - 1 : 0
+    );
+
+    // チャット風レイアウト: userは右側、assistantは左側
+    const isUser = role === 'user';
+    const isSystem = role === 'system';
+
+    // ボタンハンドラー
+    const currentTextContent = isTextContent(content[0]) ? content[0].text : '';
+    const handleCopy = () => {
+      navigator.clipboard.writeText(currentTextContent);
+    };
+
+    const handleEdit = () => {
+      // 編集機能は別途実装が必要
+      console.log('Edit clicked');
+    };
+
+    const handleRefresh = () => {
+      // リフレッシュ機能は別途実装が必要
+      console.log('Refresh clicked');
+    };
+
+    // stickyの場合は入力エリア用のレイアウト
+    if (sticky) {
+      return (
+        <div className="w-full">
+          <MessageContent
+            role={role}
+            content={content}
+            messageIndex={messageIndex}
+            sticky={sticky}
+          />
+        </div>
+      );
+    }
 
     return (
-      <div
-        className={`w-full border-b border-black/10 dark:border-gray-900/50 text-gray-800 dark:text-gray-100 group ${
-          backgroundStyle[messageIndex % 2]
-        }`}
-      >
+      <div className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800">
         <div
-          className={`text-base gap-4 md:gap-6 m-auto p-4 md:py-6 flex transition-all ease-in-out ${
+          className={`flex gap-3 ${
             hideSideMenu
               ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
               : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
-          }`}
+          } mx-auto ${isUser ? 'justify-end' : 'justify-start'}`}
         >
-          <Avatar role={role} />
-          <div className='w-[calc(100%-50px)] '>
-            {advancedMode &&
-              <RoleSelector
-                role={role}
-                messageIndex={messageIndex}
-                sticky={sticky}
-              />}
+          {/* アバター削除 */}
+          
+          {/* メッセージ吹き出し */}
+          <div 
+            className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+              isUser 
+                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600 shadow-sm ml-auto' 
+                : isSystem
+                ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                : 'bg-transparent text-gray-900 dark:text-gray-100'
+            }`}
+          >
+            {/* RoleSelector非表示化 */}
             <MessageContent
               role={role}
               content={content}
@@ -57,7 +96,36 @@ const Message = React.memo(
               sticky={sticky}
             />
           </div>
+
+          {/* アバター削除 */}
         </div>
+        
+        {/* ボタンをチャット吹き出しの外側に配置 */}
+        {!sticky && (
+          <div className="w-full px-4">
+            <div
+              className={`flex gap-3 ${
+                hideSideMenu
+                  ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
+                  : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
+              } mx-auto ${isUser ? 'justify-end' : 'justify-start'}`}
+            >
+              <div 
+                className={`max-w-[70%] ${isUser ? 'ml-auto' : ''}`}
+              >
+                <div className="flex gap-1 mt-1 justify-end">
+                  {!useStore.getState().generating &&
+                    role === 'assistant' &&
+                    messageIndex === lastMessageIndex && (
+                      <RefreshButton onClick={handleRefresh} />
+                    )}
+                  <CopyButton onClick={handleCopy} />
+                  <EditButton setIsEdit={() => {}} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

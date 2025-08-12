@@ -7,6 +7,47 @@ import { modelOptions, modelMaxToken } from '@constants/modelLoader';
 import { ModelOptions } from '@utils/modelReader';
 import useStore from '@store/store';
 
+// テーマに応じたカスタムスタイルを生成する関数
+const getCustomStyles = () => {
+  const isDark = document.documentElement.classList.contains('dark');
+  
+  return {
+    control: (provided: any) => ({
+      ...provided,
+      backgroundColor: isDark ? '#2D3748' : '#ffffff',
+      color: isDark ? '#E2E8F0' : '#1a1a1a',
+      borderColor: isDark ? '#4A5568' : '#d1d5db',
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      backgroundColor: isDark ? '#2D3748' : '#ffffff',
+      borderColor: isDark ? '#4A5568' : '#d1d5db',
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      'backgroundColor': state.isSelected 
+        ? (isDark ? '#4A5568' : '#e5e7eb') 
+        : (isDark ? '#2D3748' : '#ffffff'),
+      'color': isDark ? '#E2E8F0' : '#1a1a1a',
+      '&:hover': {
+        backgroundColor: isDark ? '#4A5568' : '#f3f4f6',
+      },
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      color: isDark ? '#E2E8F0' : '#1a1a1a',
+    }),
+    input: (provided: any) => ({
+      ...provided,
+      color: isDark ? '#E2E8F0' : '#1a1a1a',
+    }),
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: isDark ? '#A0AEC0' : '#9ca3af',
+    }),
+  };
+};
+
 const ConfigMenu = ({
   setIsModalOpen,
   config,
@@ -115,38 +156,6 @@ export const ModelSelector = ({
     };
   });
 
-  const customStyles = {
-    control: (provided: any) => ({
-      ...provided,
-      backgroundColor: '#2D3748', // Dark background color
-      color: '#E2E8F0', // Light text color
-    }),
-    menu: (provided: any) => ({
-      ...provided,
-      backgroundColor: '#2D3748', // Dark background color
-    }),
-    option: (provided: any, state: any) => ({
-      ...provided,
-      'backgroundColor': state.isSelected ? '#4A5568' : '#2D3748', // Darker background for selected option
-      'color': '#E2E8F0', // Light text color
-      '&:hover': {
-        backgroundColor: '#4A5568', // Darker background on hover
-      },
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      color: '#E2E8F0', // Light text color
-    }),
-    input: (provided: any) => ({
-      ...provided,
-      color: '#E2E8F0', // Light text color for input
-    }),
-    placeholder: (provided: any) => ({
-      ...provided,
-      color: '#A0AEC0', // Light gray color for placeholder
-    }),
-  };
-
   return (
     <div className='mb-4'>
       <label className='block text-sm font-medium text-gray-900 dark:text-white'>
@@ -165,7 +174,7 @@ export const ModelSelector = ({
         options={modelOptionsFormatted}
         className='basic-single'
         classNamePrefix='select'
-        styles={customStyles}
+        styles={getCustomStyles()}
       />
     </div>
   );
@@ -360,38 +369,6 @@ export const ImageDetailSelector = ({
     { value: 'auto', label: t('imageDetail.auto') },
   ];
 
-  const customStyles = {
-    control: (provided: any) => ({
-      ...provided,
-      backgroundColor: '#2D3748', // Dark background color
-      color: '#E2E8F0', // Light text color
-    }),
-    menu: (provided: any) => ({
-      ...provided,
-      backgroundColor: '#2D3748', // Dark background color
-    }),
-    option: (provided: any, state: any) => ({
-      ...provided,
-      'backgroundColor': state.isSelected ? '#4A5568' : '#2D3748', // Darker background for selected option
-      'color': '#E2E8F0', // Light text color
-      '&:hover': {
-        backgroundColor: '#4A5568', // Darker background on hover
-      },
-    }),
-    singleValue: (provided: any) => ({
-      ...provided,
-      color: '#E2E8F0', // Light text color
-    }),
-    input: (provided: any) => ({
-      ...provided,
-      color: '#E2E8F0', // Light text color for input
-    }),
-    placeholder: (provided: any) => ({
-      ...provided,
-      color: '#A0AEC0', // Light gray color for placeholder
-    }),
-  };
-
   return (
     <div className='mt-5 pt-5 border-t border-gray-500'>
       <label className='block text-sm font-medium text-gray-900 dark:text-white'>
@@ -407,7 +384,7 @@ export const ImageDetailSelector = ({
         options={imageDetailOptions}
         className='basic-single'
         classNamePrefix='select'
-        styles={customStyles}
+        styles={getCustomStyles()}
       />
     </div>
   );

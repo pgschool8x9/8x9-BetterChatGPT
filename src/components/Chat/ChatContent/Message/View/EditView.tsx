@@ -15,7 +15,8 @@ import PopupModal from '@components/PopupModal';
 import TokenCount from '@components/TokenCount';
 import CommandPrompt from '../CommandPrompt';
 import { defaultModel } from '@constants/chat';
-import AttachmentIcon from '@icon/AttachmentIcon';
+import ImageIcon from '@icon/ImageIcon';
+import SendIcon from '@icon/SendIcon';
 import { ModelOptions } from '@utils/modelReader';
 import { modelTypes } from '@constants/modelLoader';
 import { toast } from 'react-toastify';
@@ -57,6 +58,7 @@ const EditView = ({
   // imageUrl関連は不要（IndexedDB化により削除）
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const textareaRef = React.createRef<HTMLTextAreaElement>();
+  const generating = useStore((state) => state.generating);
 
   const { t } = useTranslation();
 
@@ -451,25 +453,53 @@ const EditView = ({
           )}
           
           <div className='relative flex items-start'>
-            {modelTypes[model] == 'image' && (
-              <>
+            {/* 左側のボタン群 */}
+            <div className='absolute left-1 top-1/2 transform -translate-y-1/2 flex items-center gap-2 z-10'>
+              <div style={{ marginLeft: '-6px', marginRight: '-6px' }}>
+                <CommandPrompt _setContent={_setContent} />
+              </div>
+              {modelTypes[model] == 'image' && (
                 <button
-                  className='absolute left-0 bottom-0  btn btn-secondary h-10 ml-[-1.2rem] mb-[-0.4rem]'
+                  className='btn btn-secondary h-8 w-8 p-1 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-600'
                   onClick={handleUploadButtonClick}
                   aria-label={'Upload Images'}
                 >
-                  <div className='flex items-center justify-center gap-2'>
-                    <AttachmentIcon />
-                  </div>
+                  <ImageIcon className='w-4 h-4' />
                 </button>
-              </>
-            )}
-            {/* Place the AttachmentIcon directly over the textarea */}
+              )}
+            </div>
+
+            {/* 右側の送信ボタン */}
+            <div className='absolute right-1 top-1/2 transform -translate-y-1/2 z-10'>
+              {sticky && (
+                <button
+                  className={`btn btn-primary h-8 w-8 p-1 flex items-center justify-center rounded-md ${
+                    generating ? 'cursor-not-allowed opacity-40' : ''
+                  }`}
+                  onClick={handleGenerate}
+                  aria-label="送信"
+                >
+                  <SendIcon />
+                </button>
+              )}
+              {!sticky && (
+                <button
+                  className='btn btn-primary h-8 w-8 p-1 flex items-center justify-center rounded-md'
+                  onClick={() => {
+                    !generating && setIsModalOpen(true);
+                  }}
+                  aria-label="送信"
+                >
+                  <SendIcon />
+                </button>
+              )}
+            </div>
+
             <textarea
               ref={textareaRef}
-              className={`m-0 resize-none rounded-lg bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 w-full placeholder:text-gray-500/40 pr-10 ${
-                modelTypes[model] == 'image' ? 'pl-7' : ''
-              }`} // Adjust padding-right to make space for the icon
+              className={`m-0 resize-none rounded-lg bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 w-full placeholder:text-gray-500/40 pr-12 ${
+                modelTypes[model] == 'image' ? 'pl-20' : 'pl-12'
+              }`} // 右パディングを追加して送信ボタンのスペースを確保
               onChange={(e) => {
                 _setContent((prev) => [
                   { type: 'text', text: e.target.value },
@@ -567,65 +597,20 @@ const EditViewButtons = memo(
           </>
         )}
 
-        <div className='flex'>
-          <div className='flex-1 text-center mt-2 flex justify-center'>
-            {sticky && (
+        {/* TokenCountとキャンセルボタンエリア */}
+        <div className='flex justify-between items-center mt-2'>
+          <div className='flex-1'>
+            {!sticky && (
               <button
-                className={`btn relative mr-2 btn-primary ${
-                  generating ? 'cursor-not-allowed opacity-40' : ''
-                }`}
-                onClick={handleGenerate}
-                aria-label={t('generate') as string}
-              >
-                <div className='flex items-center justify-center gap-2'>
-                  {t('generate')}
-                </div>
-              </button>
-            )}
-
-            {sticky || (
-              <button
-                className='btn relative mr-2 btn-primary'
-                onClick={() => {
-                  !generating && setIsModalOpen(true);
-                }}
-              >
-                <div className='flex items-center justify-center gap-2'>
-                  {t('generate')}
-                </div>
-              </button>
-            )}
-
-            <button
-              className={`btn relative mr-2 ${
-                sticky
-                  ? `btn-neutral ${
-                      generating ? 'cursor-not-allowed opacity-40' : ''
-                    }`
-                  : 'btn-neutral'
-              }`}
-              onClick={handleSave}
-              aria-label={t('save') as string}
-            >
-              <div className='flex items-center justify-center gap-2'>
-                {t('save')}
-              </div>
-            </button>
-
-            {sticky || (
-              <button
-                className='btn relative btn-neutral'
+                className='btn btn-neutral'
                 onClick={() => setIsEdit(false)}
                 aria-label={t('cancel') as string}
               >
-                <div className='flex items-center justify-center gap-2'>
-                  {t('cancel')}
-                </div>
+                {t('cancel')}
               </button>
             )}
           </div>
           {sticky && advancedMode && <TokenCount />}
-          <CommandPrompt _setContent={_setContent} />
         </div>
       </div>
     );

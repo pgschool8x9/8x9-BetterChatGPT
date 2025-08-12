@@ -40,6 +40,7 @@ import MarkdownModeButton from './Button/MarkdownModeButton';
 import CodeBlock from '../CodeBlock';
 import PopupModal from '@components/PopupModal';
 import { preprocessLaTeX } from '@utils/chat';
+import { highlightText } from '@utils/textHighlight';
 import ImageDisplay from './ImageDisplay';
 
 const ContentView = memo(
@@ -66,6 +67,7 @@ const ContentView = memo(
     );
     const inlineLatex = useStore((state) => state.inlineLatex);
     const markdownMode = useStore((state) => state.markdownMode);
+    const searchHighlightTerm = useStore((state) => state.searchHighlightTerm);
 
     const handleDelete = () => {
       const updatedChats: ChatInterface[] = JSON.parse(
@@ -155,7 +157,9 @@ const ContentView = memo(
                 : currentTextContent}
             </ReactMarkdown>
           ) : (
-            <span className='whitespace-pre-wrap'>{currentTextContent}</span>
+            <span className='whitespace-pre-wrap'>
+              {highlightText(currentTextContent, searchHighlightTerm)}
+            </span>
           )}
         </div>
         {/* チャット履歴に画像を表示 */}
@@ -191,44 +195,7 @@ const ContentView = memo(
             </div>
           </PopupModal>
         )}
-        <div className='flex justify-end gap-2 w-full mt-2'>
-          {isDelete || (
-            <>
-              {!useStore.getState().generating &&
-                role === 'assistant' &&
-                messageIndex === lastMessageIndex && (
-                  <RefreshButton onClick={handleRefresh} />
-                )}
-              {messageIndex !== 0 && <UpButton onClick={handleMoveUp} />}
-              {messageIndex !== lastMessageIndex && (
-                <DownButton onClick={handleMoveDown} />
-              )}
-
-              <MarkdownModeButton />
-              <CopyButton onClick={handleCopy} />
-              <EditButton setIsEdit={setIsEdit} />
-              <DeleteButton setIsDelete={setIsDelete} />
-            </>
-          )}
-          {isDelete && (
-            <>
-              <button
-                className='p-1 hover:text-white'
-                aria-label='cancel'
-                onClick={() => setIsDelete(false)}
-              >
-                <CrossIcon />
-              </button>
-              <button
-                className='p-1 hover:text-white'
-                aria-label='confirm'
-                onClick={handleDelete}
-              >
-                <TickIcon />
-              </button>
-            </>
-          )}
-        </div>
+        {/* ボタンはMessage.tsxの外側に移動 */}
       </>
     );
   }
@@ -257,7 +224,14 @@ const p = memo(
     > &
       ReactMarkdownProps
   ) => {
-    return <p className='whitespace-pre-wrap'>{props?.children}</p>;
+    const searchHighlightTerm = useStore((state) => state.searchHighlightTerm);
+    const textContent = typeof props?.children === 'string' ? props.children : String(props?.children || '');
+    
+    return (
+      <p className='whitespace-pre-wrap'>
+        {searchHighlightTerm ? highlightText(textContent, searchHighlightTerm) : props?.children}
+      </p>
+    );
   }
 );
 
