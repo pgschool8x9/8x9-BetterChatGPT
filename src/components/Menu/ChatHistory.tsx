@@ -13,6 +13,7 @@ import countTokens from '@utils/messageUtils';
 import { modelCost } from '@constants/modelLoader';
 import { TotalTokenUsed, isTextContent, isImageContent } from '@type/chat';
 import { ModelOptions } from '@utils/modelReader';
+import { useLocalizedCurrency } from '@utils/currency';
 
 const ChatHistoryClass = {
   normal:
@@ -73,10 +74,12 @@ const ChatHistory = React.memo(
     const active = useStore((state) => state.currentChatIndex === chatIndex);
     const generating = useStore((state) => state.generating);
     const chats = useStore((state) => state.chats);
+    const { formatLocalizedCurrency } = useLocalizedCurrency();
 
     const [isDelete, setIsDelete] = useState<boolean>(false);
     const [isEdit, setIsEdit] = useState<boolean>(false);
     const [_title, _setTitle] = useState<string>(title);
+    const [localizedCost, setLocalizedCost] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);
 
     // トークン情報を計算
@@ -104,12 +107,33 @@ const ChatHistory = React.memo(
       };
       
       const cost = tokenCostToCost(tokenCost, model as ModelOptions);
+      console.log('Debug - Token counts:', {
+        promptTokens: tokenCount,
+        completionTokens: 0,
+        imageTokens: imageTokenCount,
+        model: model,
+        rawCost: cost
+      });
       
       return {
         tokens: tokenCount,
-        cost: cost.toPrecision(3)
+        usdCost: typeof cost === 'number' ? cost : 0
       };
     }, [chats, chatIndex]);
+
+    // 通貨変換を非同期で実行
+    useEffect(() => {
+      if (tokenInfo?.usdCost !== undefined) {
+        console.log('Debug - USD Cost:', tokenInfo.usdCost, 'for chat index:', chatIndex);
+        formatLocalizedCurrency(tokenInfo.usdCost).then((formatted) => {
+          console.log('Debug - Formatted Cost:', formatted);
+          setLocalizedCost(formatted);
+        }).catch((error) => {
+          console.error('Debug - Currency formatting error:', error);
+          setLocalizedCost(`$${tokenInfo.usdCost.toFixed(4)}`);
+        });
+      }
+    }, [tokenInfo, formatLocalizedCurrency, chatIndex]);
 
     const editTitle = () => {
       const updatedChats = JSON.parse(
@@ -242,7 +266,7 @@ const ChatHistory = React.memo(
           {/* 2行目: トークン情報 */}
           {!isEdit && tokenInfo && (
             <div className='text-xs text-gray-400 leading-tight mt-0.5'>
-              Tokens: {tokenInfo.tokens} (${tokenInfo.cost})
+              Tokens: {tokenInfo.tokens} ({localizedCost || 'Loading...'})
             </div>
           )}
 

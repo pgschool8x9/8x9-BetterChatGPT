@@ -9,6 +9,7 @@ import CalculatorIcon from '@icon/CalculatorIcon';
 import { modelCost } from '@constants/modelLoader';
 import { TotalTokenUsed } from '@type/chat';
 import { ModelOptions } from '@utils/modelReader';
+import { useLocalizedCurrency } from '@utils/currency';
 
 type CostMapping = { model: string; cost: number }[];
 
@@ -34,12 +35,15 @@ const tokenCostToCost = (
 
 const TotalTokenCost = () => {
   const { t } = useTranslation(['main', 'model']);
+  const { formatLocalizedCurrency, currentCurrency } = useLocalizedCurrency();
 
   const totalTokenUsed = useStore((state) => state.totalTokenUsed);
   const setTotalTokenUsed = useStore((state) => state.setTotalTokenUsed);
   const countTotalTokens = useStore((state) => state.countTotalTokens);
 
   const [costMapping, setCostMapping] = useState<CostMapping>([]);
+  const [localizedCostMapping, setLocalizedCostMapping] = useState<{ model: string; cost: string }[]>([]);
+  const [localizedTotal, setLocalizedTotal] = useState<string>('');
 
   const resetCost = () => {
     setTotalTokenUsed({});
@@ -55,6 +59,27 @@ const TotalTokenCost = () => {
     setCostMapping(updatedCostMapping);
   }, [totalTokenUsed]);
 
+  // 通貨変換を非同期で実行
+  useEffect(() => {
+    const convertCosts = async () => {
+      const convertedMapping = await Promise.all(
+        costMapping.map(async ({ model, cost }) => ({
+          model,
+          cost: await formatLocalizedCurrency(cost)
+        }))
+      );
+      setLocalizedCostMapping(convertedMapping);
+
+      const totalCost = costMapping.reduce((prev, curr) => prev + curr.cost, 0);
+      const convertedTotal = await formatLocalizedCurrency(totalCost);
+      setLocalizedTotal(convertedTotal);
+    };
+
+    if (costMapping.length > 0) {
+      convertCosts();
+    }
+  }, [costMapping, formatLocalizedCurrency]);
+
   return countTotalTokens ? (
     <div className='flex flex-col items-center gap-2'>
       <div className='relative overflow-x-auto shadow-md sm:rounded-lg'>
@@ -62,26 +87,22 @@ const TotalTokenCost = () => {
           <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
             <tr>
               <th className='px-4 py-2'>{t('model', { ns: 'model' })}</th>
-              <th className='px-4 py-2'>USD</th>
+              <th className='px-4 py-2'>{currentCurrency}</th>
             </tr>
           </thead>
           <tbody>
-            {costMapping.map(({ model, cost }) => (
+            {localizedCostMapping.map(({ model, cost }) => (
               <tr
                 key={model}
                 className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
               >
                 <td className='px-4 py-2'>{model}</td>
-                <td className='px-4 py-2'>{cost.toPrecision(3)}</td>
+                <td className='px-4 py-2'>{cost}</td>
               </tr>
             ))}
             <tr className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 font-bold'>
               <td className='px-4 py-2'>{t('total', { ns: 'main' })}</td>
-              <td className='px-4 py-2'>
-                {costMapping
-                  .reduce((prev, curr) => prev + curr.cost, 0)
-                  .toPrecision(3)}
-              </td>
+              <td className='px-4 py-2'>{localizedTotal}</td>
             </tr>
           </tbody>
         </table>
@@ -120,8 +141,10 @@ export const TotalTokenCostToggle = () => {
 export const TotalTokenCostDisplay = () => {
   const { t } = useTranslation();
   const totalTokenUsed = useStore((state) => state.totalTokenUsed);
+  const { formatLocalizedCurrency } = useLocalizedCurrency();
 
   const [totalCost, setTotalCost] = useState<number>(0);
+  const [localizedCost, setLocalizedCost] = useState<string>('');
 
   useEffect(() => {
     let updatedTotalCost = 0;
@@ -132,10 +155,19 @@ export const TotalTokenCostDisplay = () => {
     setTotalCost(updatedTotalCost);
   }, [totalTokenUsed]);
 
+  // 通貨変換を非同期で実行
+  useEffect(() => {
+    if (totalCost !== undefined) {
+      formatLocalizedCurrency(totalCost).then(setLocalizedCost).catch(() => {
+        setLocalizedCost(`$${totalCost.toPrecision(3)}`);
+      });
+    }
+  }, [totalCost, formatLocalizedCurrency]);
+
   return (
     <a className='flex py-2 px-2 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white text-sm'>
       <CalculatorIcon />
-      {`USD ${totalCost.toPrecision(3)}`}
+      {localizedCost || 'Loading...'}
     </a>
   );
 };

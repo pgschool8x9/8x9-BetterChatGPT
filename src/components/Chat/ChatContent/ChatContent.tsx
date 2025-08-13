@@ -163,7 +163,7 @@ const ChatContent = () => {
       </div>
 
       {/* 入力エリア（下部固定・オーバーレイ） */}
-      <div className='absolute bottom-0 left-0 right-0 bg-transparent border-t border-gray-200/30 dark:border-gray-700/30'>
+      <div className='absolute bottom-0 left-0 right-0 bg-transparent'>
         <div className='max-w-4xl mx-auto px-4 py-4 bg-transparent'>
           <Message
             role={inputRole}
