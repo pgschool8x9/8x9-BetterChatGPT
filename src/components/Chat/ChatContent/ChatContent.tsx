@@ -98,17 +98,17 @@ const ChatContent = () => {
   const { error } = useSubmit();
 
   return (
-    <div className='flex-1 flex flex-col overflow-hidden'>
-      {/* チャット履歴エリア（スクロール可能） */}
-      <div className='flex-1 overflow-hidden'>
+    <div className='flex-1 relative overflow-hidden'>
+      {/* チャット履歴エリア（全画面） */}
+      <div className='absolute inset-0'>
         <ScrollToBottom
-          className='h-full bg-gray-50 dark:bg-gray-800'
+          className='h-full bg-transparent'
           followButtonClassName='hidden'
         >
           <ScrollToBottomButton />
-          <div className='flex flex-col items-center text-sm bg-gray-50 dark:bg-gray-800'>
+          <div className='flex flex-col items-center text-sm bg-transparent'>
             <div
-              className='flex flex-col items-center text-sm bg-gray-50 dark:bg-gray-800 w-full'
+              className='flex flex-col items-center text-sm bg-transparent w-full'
               ref={saveRef}
             >
               <ChatTitle saveRef={saveRef} />
@@ -157,14 +157,14 @@ const ChatContent = () => {
                 </div>
               )}
             </div>
-            <div className='w-full h-24'></div>
+            <div className='w-full h-32'></div>
           </div>
         </ScrollToBottom>
       </div>
 
-      {/* 入力エリア（下部固定） */}
-      <div className='flex-shrink-0 bg-transparent border-t border-gray-200/30 dark:border-gray-700/30'>
-        <div className='max-w-4xl mx-auto px-4 py-4'>
+      {/* 入力エリア（下部固定・オーバーレイ） */}
+      <div className='absolute bottom-0 left-0 right-0 bg-transparent border-t border-gray-200/30 dark:border-gray-700/30'>
+        <div className='max-w-4xl mx-auto px-4 py-4 bg-transparent'>
           <Message
             role={inputRole}
             content={[{ type: 'text', text: '' } as TextContentInterface]}

@@ -12,12 +12,7 @@ const BaseButton = ({
   return (
     <div className='flex self-end lg:self-center justify-center gap-3 md:gap-4 visible'>
       <button
-        className='p-1 rounded-md hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200'
-        style={{ 
-          color: document.documentElement.classList.contains('dark') 
-            ? 'rgba(255, 255, 255, 0.7)' 
-            : 'rgba(0, 0, 0, 0.7)' 
-        }}
+        className='p-1 rounded-md hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200 text-current'
         onClick={onClick}
         {...buttonProps}
       >

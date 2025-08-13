@@ -123,8 +123,12 @@ const Message = React.memo(
               {/* ユーザー側のボタン */}
               {isUser && (
                 <div className="flex items-center gap-2 justify-end">
-                  <EditButton setIsEdit={setIsEdit} />
-                  <CopyButton onClick={handleCopy} />
+                  <div className="text-gray-700 dark:text-gray-300">
+                    <EditButton setIsEdit={setIsEdit} />
+                  </div>
+                  <div className="text-gray-700 dark:text-gray-300">
+                    <CopyButton onClick={handleCopy} />
+                  </div>
                 </div>
               )}
               
@@ -134,9 +138,13 @@ const Message = React.memo(
                   {!useStore.getState().generating &&
                     role === 'assistant' &&
                     messageIndex === lastMessageIndex && (
-                      <RefreshButton onClick={handleRefresh} />
+                      <div className="text-gray-700 dark:text-gray-300">
+                        <RefreshButton onClick={handleRefresh} />
+                      </div>
                     )}
-                  <CopyButton onClick={handleCopy} />
+                  <div className="text-gray-700 dark:text-gray-300">
+                    <CopyButton onClick={handleCopy} />
+                  </div>
                   {role === 'assistant' && currentModel && (
                     <span className="text-xs text-gray-600 dark:text-gray-200 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md">
                       {currentModel}

@@ -56,6 +56,7 @@ const EditView = ({
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   // imageUrl関連は不要（IndexedDB化により削除）
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
+  const [textRows, setTextRows] = useState(1);
   const textareaRef = React.createRef<HTMLTextAreaElement>();
   const generating = useStore((state) => state.generating);
   const setGenerating = useStore((state) => state.setGenerating);
@@ -408,6 +409,11 @@ const EditView = ({
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      
+      // 行数を計算
+      const lineHeight = 28; // leading-7 = 28px
+      const rows = Math.round(textareaRef.current.scrollHeight / lineHeight);
+      setTextRows(Math.max(1, rows));
     }
   }, [(_content[0] as TextContentInterface).text]);
 
@@ -415,6 +421,11 @@ const EditView = ({
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      
+      // 行数を計算
+      const lineHeight = 28; // leading-7 = 28px
+      const rows = Math.round(textareaRef.current.scrollHeight / lineHeight);
+      setTextRows(Math.max(1, rows));
     }
   }, []);
 
@@ -517,8 +528,8 @@ const EditView = ({
             <div className='flex-1'>
               <div className={`${
                 sticky
-                  ? 'py-2 md:py-3 px-2 md:px-4 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
-                  : 'py-2 px-4 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
+                  ? `py-2 md:py-3 px-4 md:px-6 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 ${textRows === 1 ? 'rounded-full' : 'rounded-[32px]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]`
+                  : `py-2 px-4 md:px-6 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 ${textRows === 1 ? 'rounded-full' : 'rounded-[32px]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]`
               } ${isDragOver ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''}`}>
                 <textarea
                   ref={textareaRef}
