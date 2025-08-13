@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PopupModal from '@components/PopupModal';
+import { version } from '../../../package.json';
 
 const MigrationButton = () => {
   const { t } = useTranslation(['main', 'migration'], { useSuspense: false });
@@ -46,6 +47,9 @@ const MigrationButton = () => {
           defaultValue: 'This will reset the version to 8 and trigger migrations.',ns: 'migration'
         }) as string}
       </p>
+      <div className="text-xs text-gray-400 mt-1">
+        Version: {version}
+      </div>
 
       {/* Use PopupModal with built-in buttons */}
       {isModalOpen && (

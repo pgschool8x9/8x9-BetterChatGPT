@@ -12,7 +12,6 @@ import {
 } from '@type/chat';
 
 import PopupModal from '@components/PopupModal';
-import TokenCount from '@components/TokenCount';
 import CommandPrompt from '../CommandPrompt';
 import { defaultModel } from '@constants/chat';
 import ImageIcon from '@icon/ImageIcon';
@@ -483,11 +482,7 @@ const EditView = ({
   return (
     <div className='relative'>
       <div
-        className={`w-full ${isDragOver ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''} ${
-          sticky
-            ? 'py-2 md:py-3 px-2 md:px-4 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
-            : ''
-        }`}
+        className='w-full'
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -495,35 +490,59 @@ const EditView = ({
         <div className='relative'>
           {/* ドラッグオーバー時のオーバーレイ */}
           {isDragOver && (
-            <div className='absolute inset-0 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 border-2 border-dashed border-blue-400 dark:border-blue-500 rounded-lg z-10'>
+            <div className='absolute inset-0 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 border-2 border-dashed border-blue-400 dark:border-blue-500 rounded-full z-10'>
               <div className='text-blue-600 dark:text-blue-400 font-medium'>
                 画像ファイルをドロップしてください
               </div>
             </div>
           )}
           
-          <div className='relative flex items-start'>
-            {/* 左側のボタン群 */}
-            <div className='absolute left-1 top-1/2 transform -translate-y-1/2 flex items-center gap-2 z-10'>
-              <div style={{ marginLeft: '-6px', marginRight: '-6px' }}>
-                <CommandPrompt _setContent={_setContent} />
-              </div>
+          {/* メッセージ入力エリアと左右ボタン */}
+          <div className='flex items-center gap-3'>
+            {/* 左側：カスタムプロンプトボタンと画像アップロードボタン */}
+            <div className='flex-shrink-0 flex items-center gap-2'>
+              <CommandPrompt _setContent={_setContent} />
               {modelTypes[model] == 'image' && (
                 <button
-                  className='btn btn-secondary h-8 w-8 p-1 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-600'
+                  className='btn btn-neutral w-10 h-10 p-0 flex items-center justify-center rounded-full'
                   onClick={handleUploadButtonClick}
-                  aria-label={'Upload Images'}
+                  aria-label='画像をアップロード'
                 >
-                  <ImageIcon className='w-4 h-4' />
+                  <ImageIcon className='w-5 h-5' />
                 </button>
               )}
             </div>
-
-            {/* 右側の送信ボタン */}
-            <div className='absolute right-1 top-1/2 transform -translate-y-1/2 z-10'>
+            
+            {/* 中央：メッセージ入力エリア */}
+            <div className='flex-1'>
+              <div className={`${
+                sticky
+                  ? 'py-2 md:py-3 px-2 md:px-4 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
+                  : 'py-2 px-4 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
+              } ${isDragOver ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''}`}>
+                <textarea
+                  ref={textareaRef}
+                  className='m-0 resize-none bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 w-full placeholder:text-gray-500/40'
+                  onChange={(e) => {
+                    _setContent((prev) => [
+                      { type: 'text', text: e.target.value },
+                      ...prev.slice(1),
+                    ]);
+                  }}
+                  value={(_content[0] as TextContentInterface).text}
+                  placeholder={t('submitPlaceholder') as string}
+                  onKeyDown={handleKeyDown}
+                  onPaste={handlePaste}
+                  rows={1}
+                ></textarea>
+              </div>
+            </div>
+            
+            {/* 右側：送信ボタン */}
+            <div className='flex-shrink-0'>
               {sticky && (
                 <button
-                  className={`btn h-8 w-8 p-1 flex items-center justify-center rounded-md ${
+                  className={`btn w-10 h-10 p-0 flex items-center justify-center rounded-full ${
                     generating ? 'btn-neutral' : 'btn-primary'
                   }`}
                   onClick={generating ? handleStopGenerating : handleGenerate}
@@ -537,7 +556,7 @@ const EditView = ({
                       viewBox='0 0 24 24'
                       strokeLinecap='round'
                       strokeLinejoin='round'
-                      className='h-4 w-4'
+                      className='h-5 w-5'
                       height='1em'
                       width='1em'
                       xmlns='http://www.w3.org/2000/svg'
@@ -545,40 +564,22 @@ const EditView = ({
                       <rect x='3' y='3' width='18' height='18' rx='2' ry='2'></rect>
                     </svg>
                   ) : (
-                    <SendIcon />
+                    <SendIcon className='w-5 h-5' />
                   )}
                 </button>
               )}
               {!sticky && (
                 <button
-                  className='btn btn-primary h-8 w-8 p-1 flex items-center justify-center rounded-md'
+                  className='btn btn-primary w-10 h-10 p-0 flex items-center justify-center rounded-full'
                   onClick={() => {
                     !generating && setIsModalOpen(true);
                   }}
                   aria-label="送信"
                 >
-                  <SendIcon />
+                  <SendIcon className='w-5 h-5' />
                 </button>
               )}
             </div>
-
-            <textarea
-              ref={textareaRef}
-              className={`m-0 resize-none rounded-lg bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 w-full placeholder:text-gray-500/40 pr-12 ${
-                modelTypes[model] == 'image' ? 'pl-20' : 'pl-12'
-              }`} // 右パディングを追加して送信ボタンのスペースを確保
-              onChange={(e) => {
-                _setContent((prev) => [
-                  { type: 'text', text: e.target.value },
-                  ...prev.slice(1),
-                ]);
-              }}
-              value={(_content[0] as TextContentInterface).text}
-              placeholder={t('submitPlaceholder') as string}
-              onKeyDown={handleKeyDown}
-              onPaste={handlePaste}
-              rows={1}
-            ></textarea>
           </div>
           
           {/* 画像プレビューエリア */}
@@ -677,7 +678,6 @@ const EditViewButtons = memo(
               </button>
             )}
           </div>
-          {sticky && advancedMode && <TokenCount />}
         </div>
       </div>
     );

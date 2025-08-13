@@ -12,7 +12,6 @@ import ApiPopup from '@components/ApiPopup';
 import Toast from '@components/Toast';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import VersionInfo from '@components/Footer/VersionInfo';
 import { initializeModels } from '@constants/modelLoader';
 import { migrateImagesFromLocalStorage } from '@utils/indexedDBManager';
 
@@ -111,7 +110,6 @@ function App() {
         <ApiPopup />
         <Toast />
         <ToastContainer />
-        <VersionInfo />
       </div>
     </div>
   );

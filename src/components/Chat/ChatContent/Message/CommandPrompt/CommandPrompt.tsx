@@ -43,8 +43,8 @@ const CommandPrompt = ({
   return (
     <div className='relative max-wd-sm' ref={dropDownRef}>
       <button
-        className='btn btn-neutral btn-small'
-        aria-label='prompt library'
+        className='btn btn-neutral w-10 h-10 p-0 flex items-center justify-center rounded-full text-sm font-medium'
+        aria-label='カスタムプロンプト'
         onClick={() => setDropDown(!dropDown)}
       >
         /

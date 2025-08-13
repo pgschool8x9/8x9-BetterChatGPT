@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 
 import useInitialiseNewChat from '@hooks/useInitialiseNewChat';
 
@@ -9,6 +9,10 @@ import EditIcon from '@icon/EditIcon';
 import TickIcon from '@icon/TickIcon';
 import useStore from '@store/store';
 import { formatNumber } from '@utils/chat';
+import countTokens from '@utils/messageUtils';
+import { modelCost } from '@constants/modelLoader';
+import { TotalTokenUsed, isTextContent, isImageContent } from '@type/chat';
+import { ModelOptions } from '@utils/modelReader';
 
 const ChatHistoryClass = {
   normal:
@@ -19,6 +23,30 @@ const ChatHistoryClass = {
     'absolute inset-y-0 right-0 w-8 z-10 bg-gradient-to-l from-gray-900 group-hover:from-gray-850',
   activeGradient:
     'absolute inset-y-0 right-0 w-8 z-10 bg-gradient-to-l from-gray-800',
+};
+
+const tokenCostToCost = (
+  tokenCost: TotalTokenUsed[ModelOptions],
+  model: ModelOptions
+) => {
+  if (!tokenCost) return 0;
+
+  const modelCostEntry = modelCost[model as keyof typeof modelCost];
+
+  if (!modelCostEntry) {
+    return -1;
+  }
+
+  const { prompt, completion, image } = modelCostEntry;
+  const completionCost =
+    (completion.price / completion.unit) * tokenCost.completionTokens;
+  const promptCost = (prompt.price / prompt.unit) * tokenCost.promptTokens;
+  const imageCost =
+    image && tokenCost.imageTokens
+      ? (image.price / image.unit) * (tokenCost.imageTokens ? 1 : 0)
+      : 0;
+
+  return completionCost + promptCost + imageCost;
 };
 
 const ChatHistory = React.memo(
@@ -44,11 +72,44 @@ const ChatHistory = React.memo(
     const setChats = useStore((state) => state.setChats);
     const active = useStore((state) => state.currentChatIndex === chatIndex);
     const generating = useStore((state) => state.generating);
+    const chats = useStore((state) => state.chats);
 
     const [isDelete, setIsDelete] = useState<boolean>(false);
     const [isEdit, setIsEdit] = useState<boolean>(false);
     const [_title, _setTitle] = useState<string>(title);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // トークン情報を計算
+    const tokenInfo = useMemo(() => {
+      if (!chats || !chats[chatIndex]) return null;
+      
+      const chat = chats[chatIndex];
+      const messages = chat.messages;
+      const model = chat.config.model;
+
+      const textPrompts = messages.filter(
+        (e) => Array.isArray(e.content) && e.content.some(isTextContent)
+      );
+      const imgPrompts = messages.filter(
+        (e) => Array.isArray(e.content) && e.content.some(isImageContent)
+      );
+      
+      const tokenCount = countTokens(textPrompts, model);
+      const imageTokenCount = countTokens(imgPrompts, model);
+      
+      const tokenCost: TotalTokenUsed[ModelOptions] = {
+        promptTokens: tokenCount,
+        completionTokens: 0,
+        imageTokens: imageTokenCount,
+      };
+      
+      const cost = tokenCostToCost(tokenCost, model as ModelOptions);
+      
+      return {
+        tokens: tokenCount,
+        cost: cost.toPrecision(3)
+      };
+    }, [chats, chatIndex]);
 
     const editTitle = () => {
       const updatedChats = JSON.parse(
@@ -156,23 +217,33 @@ const ChatHistory = React.memo(
           onChange={() => {}}
         />
         <ChatIcon />
-        <div
-          className='flex-1 text-ellipsis max-h-5 overflow-hidden break-all relative'
-          title={`${title}${chatSize ? ` (${formatNumber(chatSize)})` : ''}`}
-        >
-          {isEdit ? (
-            <input
-              type='text'
-              className='focus:outline-blue-600 text-sm border-none bg-transparent p-0 m-0 w-full'
-              value={_title}
-              onChange={(e) => {
-                _setTitle(e.target.value);
-              }}
-              onKeyDown={handleKeyDown}
-              ref={inputRef}
-            />
-          ) : (
-            `${title}${chatSize ? ` (${formatNumber(chatSize)})` : ''}`
+        <div className='flex-1 flex flex-col text-ellipsis overflow-hidden break-all relative'>
+          {/* 1行目: タイトル */}
+          <div 
+            className='text-sm leading-tight'
+            title={`${title}${chatSize ? ` (${formatNumber(chatSize)})` : ''}`}
+          >
+            {isEdit ? (
+              <input
+                type='text'
+                className='focus:outline-blue-600 text-sm border-none bg-transparent p-0 m-0 w-full'
+                value={_title}
+                onChange={(e) => {
+                  _setTitle(e.target.value);
+                }}
+                onKeyDown={handleKeyDown}
+                ref={inputRef}
+              />
+            ) : (
+              `${title}${chatSize ? ` (${formatNumber(chatSize)})` : ''}`
+            )}
+          </div>
+          
+          {/* 2行目: トークン情報 */}
+          {!isEdit && tokenInfo && (
+            <div className='text-xs text-gray-400 leading-tight mt-0.5'>
+              Tokens: {tokenInfo.tokens} (${tokenInfo.cost})
+            </div>
           )}
 
           {isEdit || (
