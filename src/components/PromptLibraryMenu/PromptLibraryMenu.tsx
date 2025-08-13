@@ -194,4 +194,5 @@ const PromptLibraryMenuPopUp = ({
   );
 };
 
+export { PromptLibraryMenuPopUp };
 export default PromptLibraryMenu;
