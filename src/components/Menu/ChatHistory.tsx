@@ -117,7 +117,7 @@ const ChatHistory = React.memo(
       
       return {
         tokens: tokenCount,
-        usdCost: typeof cost === 'number' ? cost : 0
+        usdCost: typeof cost === 'number' && cost >= 0 ? cost : 0
       };
     }, [chats, chatIndex]);
 
@@ -133,7 +133,7 @@ const ChatHistory = React.memo(
           setLocalizedCost(`$${tokenInfo.usdCost.toFixed(4)}`);
         });
       }
-    }, [tokenInfo, formatLocalizedCurrency, chatIndex]);
+    }, [tokenInfo?.usdCost, chatIndex, formatLocalizedCurrency]);
 
     const editTitle = () => {
       const updatedChats = JSON.parse(

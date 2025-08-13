@@ -132,20 +132,18 @@ const Message = React.memo(
                 </div>
               )}
               
-              {/* AI側のボタン */}
-              {!isUser && (
+              {/* AI側のボタン - メッセージ受信完了時のみ表示 */}
+              {!isUser && !useStore.getState().generating && role === 'assistant' && (
                 <div className="flex items-center gap-2 justify-start">
-                  {!useStore.getState().generating &&
-                    role === 'assistant' &&
-                    messageIndex === lastMessageIndex && (
-                      <div className="text-gray-700 dark:text-gray-300">
-                        <RefreshButton onClick={handleRefresh} />
-                      </div>
-                    )}
+                  {messageIndex === lastMessageIndex && (
+                    <div className="text-gray-700 dark:text-gray-300">
+                      <RefreshButton onClick={handleRefresh} />
+                    </div>
+                  )}
                   <div className="text-gray-700 dark:text-gray-300">
                     <CopyButton onClick={handleCopy} />
                   </div>
-                  {role === 'assistant' && currentModel && (
+                  {currentModel && (
                     <span className="text-xs text-gray-600 dark:text-gray-200 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md">
                       {currentModel}
                     </span>

@@ -31,8 +31,10 @@ const PromptLibraryMenu = () => {
 
 const PromptLibraryMenuPopUp = ({
   setIsModalOpen,
+  onPromptSelect,
 }: {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onPromptSelect?: (prompt: string) => void;
 }) => {
   const { t } = useTranslation();
 
@@ -109,13 +111,21 @@ const PromptLibraryMenuPopUp = ({
           {_prompts.map((prompt, index) => (
             <div
               key={prompt.id}
-              className='flex items-center border-b border-gray-500/50 mb-1 p-1'
+              className={`flex items-center border-b border-gray-500/50 mb-1 p-1 ${
+                onPromptSelect ? 'hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer' : ''
+              }`}
+              onClick={() => {
+                if (onPromptSelect) {
+                  onPromptSelect(prompt.prompt);
+                }
+              }}
             >
               <div className='sm:w-1/4 max-sm:flex-1'>
                 <textarea
                   className='m-0 resize-none rounded-lg bg-transparent overflow-y-hidden leading-7 p-1 focus:ring-1 focus:ring-blue w-full max-h-10 transition-all'
                   onFocus={handleOnFocus}
                   onBlur={handleOnBlur}
+                  onClick={(e) => onPromptSelect && e.stopPropagation()}
                   onChange={(e) => {
                     _setPrompts((prev) => {
                       const newPrompts = [...prev];
@@ -133,6 +143,7 @@ const PromptLibraryMenuPopUp = ({
                   className='m-0 resize-none rounded-lg bg-transparent overflow-y-hidden leading-7 p-1 focus:ring-1 focus:ring-blue w-full max-h-10 transition-all'
                   onFocus={handleOnFocus}
                   onBlur={handleOnBlur}
+                  onClick={(e) => onPromptSelect && e.stopPropagation()}
                   onChange={(e) => {
                     _setPrompts((prev) => {
                       const newPrompts = [...prev];
@@ -147,7 +158,10 @@ const PromptLibraryMenuPopUp = ({
               </div>
               <div
                 className='cursor-pointer'
-                onClick={() => deletePrompt(index)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deletePrompt(index);
+                }}
               >
                 <CrossIcon />
               </div>

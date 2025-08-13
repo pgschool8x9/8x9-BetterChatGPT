@@ -5,7 +5,8 @@
       "Bash(npx tsc:*)",
       "Bash(yarn tsc:*)",
       "Bash(git add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []

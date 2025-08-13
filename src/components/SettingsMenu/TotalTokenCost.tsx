@@ -22,7 +22,7 @@ const tokenCostToCost = (
   const modelCostEntry = modelCost[model as keyof typeof modelCost];
 
   if (!modelCostEntry) {
-    return -1; // Return -1 if the model does not exist in modelCost
+    return 0; // Return 0 if the model does not exist in modelCost
   }
 
   const { prompt, completion, image } = modelCostEntry;
@@ -149,7 +149,11 @@ export const TotalTokenCostDisplay = () => {
   useEffect(() => {
     let updatedTotalCost = 0;
     Object.entries(totalTokenUsed).forEach(([model, tokenCost]) => {
-      updatedTotalCost += tokenCostToCost(tokenCost, model as ModelOptions);
+      const cost = tokenCostToCost(tokenCost, model as ModelOptions);
+      // 負のコストは除外（モデルが見つからない場合など）
+      if (cost >= 0) {
+        updatedTotalCost += cost;
+      }
     });
 
     setTotalCost(updatedTotalCost);
@@ -159,7 +163,7 @@ export const TotalTokenCostDisplay = () => {
   useEffect(() => {
     if (totalCost !== undefined) {
       formatLocalizedCurrency(totalCost).then(setLocalizedCost).catch(() => {
-        setLocalizedCost(`$${totalCost.toPrecision(3)}`);
+        setLocalizedCost(`$${totalCost.toFixed(3)}`);
       });
     }
   }, [totalCost, formatLocalizedCurrency]);

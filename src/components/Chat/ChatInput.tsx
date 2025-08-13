@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import RefreshIcon from '@icon/RefreshIcon';
 import SendIcon from '@icon/SendIcon';
+import { PromptLibraryMenuPopUp } from '@components/PromptLibraryMenu/PromptLibraryMenu';
 
 const ChatInput = () => {
   return (
@@ -15,22 +16,62 @@ const ChatInput = () => {
 };
 
 const TextField = () => {
+  const [value, setValue] = useState<string>('');
+  const [showPromptModal, setShowPromptModal] = useState<boolean>(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 入力変更の処理
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    
+    // スラッシュコマンドの検出
+    if (newValue === '/') {
+      setShowPromptModal(true);
+      setValue(''); // スラッシュを削除
+      return;
+    }
+    
+    setValue(newValue);
+  };
+
+  // プロンプト選択後のコールバック
+  const handlePromptSelect = (selectedPrompt: string) => {
+    setValue(selectedPrompt);
+    setShowPromptModal(false);
+    textareaRef.current?.focus();
+  };
+
   return (
-    <div className='flex flex-col w-full py-2 flex-grow md:py-3 md:pl-4 relative border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'>
-      <textarea
-        tabIndex={0}
-        data-id='2557e994-6f98-4656-a955-7808084f8b8c'
-        rows={1}
-        className='m-0 w-full resize-none border-0 bg-transparent p-0 pl-2 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent md:pl-0'
-        style={{ maxHeight: '200px', height: '24px', overflowY: 'hidden' }}
-      ></textarea>
-      <button
-        className='absolute p-1 rounded-md text-gray-500 bottom-1.5 right-1 md:bottom-2.5 md:right-2 hover:bg-gray-100 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent'
-        aria-label='submit'
-      >
-        <SendIcon />
-      </button>
-    </div>
+    <>
+      <div className='flex flex-col w-full py-2 flex-grow md:py-3 md:pl-4 relative border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'>
+        <textarea
+          ref={textareaRef}
+          tabIndex={0}
+          data-id='2557e994-6f98-4656-a955-7808084f8b8c'
+          rows={1}
+          value={value}
+          onChange={handleInputChange}
+          placeholder='メッセージを入力... (/ でプロンプトを選択)'
+          className='m-0 w-full resize-none border-0 bg-transparent p-0 pl-2 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent md:pl-0'
+          style={{ maxHeight: '200px', height: '24px', overflowY: 'hidden' }}
+        />
+        
+        <button
+          className='absolute p-1 rounded-md text-gray-500 bottom-1.5 right-1 md:bottom-2.5 md:right-2 hover:bg-gray-100 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent'
+          aria-label='submit'
+        >
+          <SendIcon />
+        </button>
+      </div>
+      
+      {/* プロンプトライブラリモーダル */}
+      {showPromptModal && (
+        <PromptLibraryMenuPopUp 
+          setIsModalOpen={setShowPromptModal}
+          onPromptSelect={handlePromptSelect}
+        />
+      )}
+    </>
   );
 };
 

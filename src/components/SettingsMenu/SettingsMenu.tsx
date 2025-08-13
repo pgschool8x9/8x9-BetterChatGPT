@@ -68,9 +68,9 @@ const SettingsMenu = () => {
             </div>
             <TotalTokenCost />
             <StorageManager />
-            <div className='grid grid-cols-2 gap-3'>
+            <div className='grid grid-cols-1 gap-3'>
               <ChatConfigMenu />
-              <PromptLibraryMenu />
+              {/* <PromptLibraryMenu /> */}
             </div>
             <MigrationButton />
           </div>

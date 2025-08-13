@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useCallback } from 'react';
 
 // 言語コードから通貨コードへのマッピング
 export const LANGUAGE_CURRENCY_MAP: Record<string, string> = {
@@ -106,17 +107,11 @@ export const formatCurrency = (
     const formatLocale = locale || getLocaleFromCurrency(currency);
     
     // 小数点以下の桁数を通貨に応じて調整
-    const isIntegerCurrency = currency === 'JPY' || currency === 'KRW' || currency === 'VND';
+    const isIntegerCurrency = currency === 'KRW' || currency === 'VND'; // JPYを除外
     
-    // 小数点桁数の設定
-    let maxDigits = isIntegerCurrency ? 0 : 3; // 通常は最大3桁
-    let minDigits = isIntegerCurrency ? 0 : 2; // 最低2桁（通常金額の場合）
-    
-    // 小額の場合は整数通貨でも小数点を表示、最低桁数を0に
-    if (amount > 0 && amount < 0.1) {
-      maxDigits = 3;
-      minDigits = 0;
-    }
+    // 小数点桁数の設定（常に3桁表示）
+    let maxDigits = 3;
+    let minDigits = 3;
     
     return new Intl.NumberFormat(formatLocale, {
       style: 'currency',
@@ -128,15 +123,8 @@ export const formatCurrency = (
     console.error('Currency formatting error:', error, 'Amount:', amount, 'Currency:', currency);
     // フォールバック
     const symbol = getCurrencySymbol(currency);
-    const isIntegerCurrency = currency === 'JPY' || currency === 'KRW' || currency === 'VND';
-    let digits = isIntegerCurrency ? 0 : 3; // 通常は最大3桁
-    
-    // 小額の場合は整数通貨でも小数点を表示
-    if (amount > 0 && amount < 0.1) {
-      digits = 3;
-    }
-    
-    return `${symbol}${amount.toFixed(digits)}`;
+    // 常に小数点第3位まで表示
+    return `${symbol}${amount.toFixed(3)}`;
   }
 };
 
@@ -208,7 +196,7 @@ export const useLocalizedCurrency = () => {
   const currentLanguage = i18n.language;
   const currentCurrency = getCurrentCurrency(currentLanguage);
 
-  const formatLocalizedCurrency = async (usdAmount: number): Promise<string> => {
+  const formatLocalizedCurrency = useCallback(async (usdAmount: number): Promise<string> => {
     try {
       console.log('Debug - Input USD amount:', usdAmount, 'Target currency:', currentCurrency);
       
@@ -228,7 +216,7 @@ export const useLocalizedCurrency = () => {
       // フォールバック: USDで表示
       return `$${usdAmount.toFixed(4)}`;
     }
-  };
+  }, [currentCurrency, currentLanguage]);
 
   return {
     currentCurrency,

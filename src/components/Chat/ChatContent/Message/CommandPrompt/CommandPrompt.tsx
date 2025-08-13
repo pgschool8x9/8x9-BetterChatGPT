@@ -41,7 +41,7 @@ const CommandPrompt = ({
   }, [prompts]);
 
   return (
-    <div className='relative max-wd-sm' ref={dropDownRef}>
+    <div className='relative max-wd-sm hidden' ref={dropDownRef}>
       <button
         className='btn btn-neutral w-10 h-10 p-0 flex items-center justify-center rounded-full text-sm font-medium'
         aria-label='カスタムプロンプト'
