@@ -1,6 +1,10 @@
 import React from 'react';
 
-const SendIcon = () => {
+interface SendIconProps {
+  className?: string;
+}
+
+const SendIcon: React.FC<SendIconProps> = ({ className = 'h-4 w-4 mr-1' }) => {
   return (
     <svg
       stroke='currentColor'
@@ -9,7 +13,7 @@ const SendIcon = () => {
       viewBox='0 0 24 24'
       strokeLinecap='round'
       strokeLinejoin='round'
-      className='h-4 w-4 mr-1'
+      className={className}
       height='1em'
       width='1em'
       xmlns='http://www.w3.org/2000/svg'
