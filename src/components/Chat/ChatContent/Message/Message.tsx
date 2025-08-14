@@ -86,8 +86,8 @@ const Message = React.memo(
       <div className="w-full px-4 py-2 bg-white dark:bg-gray-900">
         <div
           className={`flex flex-col gap-3 ${hideSideMenu
-              ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
-              : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
+            ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
+            : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
             } mx-auto`}
         >
           <div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -113,7 +113,9 @@ const Message = React.memo(
                 color: 'transparent',
                 // より強力なブラウザ対応
                 MozBackgroundClip: 'text',
-                msBackgroundClip: 'text'
+                msBackgroundClip: 'text',
+                // 子要素への継承を強制
+                '--text-color': 'inherit',
               } as any : undefined}
             >
               {/* RoleSelector非表示化 */}

@@ -115,7 +115,12 @@ const ContentView = memo(
       : [];
     return (
       <>
-        <div className={`markdown w-full md:max-w-full break-words ${role === 'system' ? '' : 'prose dark:prose-invert'} dark share-gpt-message`}>
+        <div 
+          className={`markdown w-full md:max-w-full break-words prose dark:prose-invert dark share-gpt-message ${role === 'system' ? 'system-message-content' : ''}`}
+          style={role === 'system' ? {
+            color: 'inherit !important',
+          } : {}}
+        >
           {markdownMode ? (
             <ReactMarkdown
               remarkPlugins={[
@@ -138,13 +143,17 @@ const ContentView = memo(
                 code,
                 p,
               }}
+              style={role === 'system' ? { color: 'inherit' } : {}}
             >
               {inlineLatex
                 ? preprocessLaTeX(currentTextContent)
                 : currentTextContent}
             </ReactMarkdown>
           ) : (
-            <span className='whitespace-pre-wrap'>
+            <span 
+              className='whitespace-pre-wrap'
+              style={role === 'system' ? { color: 'inherit' } : {}}
+            >
               {highlightText(currentTextContent, searchHighlightTerm)}
             </span>
           )}
