@@ -147,6 +147,7 @@ const useSubmit = () => {
           text: '',
         } as TextContentInterface,
       ],
+      model: chats[currentChatIndex].config.model, // 使用したモデルを保存
     });
 
     setChats(updatedChats);

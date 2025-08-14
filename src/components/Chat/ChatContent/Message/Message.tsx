@@ -22,11 +22,13 @@ const Message = React.memo(
     content,
     messageIndex,
     sticky = false,
+    model,
   }: {
     role: Role;
     content: ContentInterface[],
     messageIndex: number;
     sticky?: boolean;
+    model?: ModelOptions;
   }) => {
     const hideSideMenu = useStore((state) => state.hideSideMenu);
     const advancedMode = useStore((state) => state.advancedMode);
@@ -60,10 +62,8 @@ const Message = React.memo(
       handleSubmit();
     };
 
-    // 現在のチャットのモデル名を取得
-    const currentModel = chats && chats[currentChatIndex] 
-      ? chats[currentChatIndex].config.model 
-      : null;
+    // メッセージ固有のモデル名を取得（assistantメッセージのみ）
+    const messageModel = role === 'assistant' && model ? model : null;
 
     // stickyの場合は入力エリア用のレイアウト
     if (sticky) {
@@ -146,9 +146,9 @@ const Message = React.memo(
                   <div className="text-gray-700 dark:text-gray-300">
                     <CopyButton onClick={handleCopy} />
                   </div>
-                  {currentModel && (
+                  {messageModel && (
                     <span className="text-xs text-gray-600 dark:text-gray-200 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md">
-                      {currentModel}
+                      {messageModel}
                     </span>
                   )}
                 </div>

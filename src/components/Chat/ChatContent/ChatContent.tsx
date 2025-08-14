@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import useStore from '@store/store';
 import { useTranslation } from 'react-i18next';
@@ -16,11 +16,26 @@ import countTokens, { limitMessageTokens } from '@utils/messageUtils';
 import { defaultModel, reduceMessagesToTotalToken } from '@constants/chat';
 import { toast } from 'react-toastify';
 
+// AI生成中メッセージの配列
+const generatingMessages = [
+  'AIが思考を巡らせています...',
+  '言葉を紡いでいます...',
+  'ニューラルネットワークが活動中...',
+  'アイデアが閃きつつある...',
+  '知識の海を探索中...',
+  'AIが一生懸命考えています...',
+  '最高の文章を錬成中...',
+  'ちょっとだけ待っててね...',
+  '創造の翼を広げています...',
+  'インスピレーション降臨中...'
+];
+
 const ChatContent = () => {
   const { t } = useTranslation();
   const inputRole = useStore((state) => state.inputRole);
   const setError = useStore((state) => state.setError);
   const setChats = useStore((state) => state.setChats);
+  const [currentGeneratingMessage, setCurrentGeneratingMessage] = useState('');
   const messages = useStore((state) =>
     state.chats &&
     state.chats.length > 0 &&
@@ -95,6 +110,14 @@ const ChatContent = () => {
     }
   }, [generating]);
 
+  // generating状態が変わった時にランダムメッセージを選択
+  useEffect(() => {
+    if (generating) {
+      const randomIndex = Math.floor(Math.random() * generatingMessages.length);
+      setCurrentGeneratingMessage(generatingMessages[randomIndex]);
+    }
+  }, [generating]);
+
   const { error } = useSubmit();
 
   return (
@@ -115,17 +138,79 @@ const ChatContent = () => {
               <ChatTitle saveRef={saveRef} />
               {/* NewMessageButton非表示化 */}
               {messagesLimited?.map(
-                (message, index) =>
-                  (advancedMode || index !== 0 || message.role !== 'system') && (
+                (message, index) => {
+                  // 生成中で最後のメッセージがassistantの場合は「思考中...」表示に置き換え
+                  const isLastMessage = index === messagesLimited.length - 1;
+                  const isGeneratingLastAssistant = generating && isLastMessage && message.role === 'assistant';
+                  
+                  return (advancedMode || index !== 0 || message.role !== 'system') && (
                     <React.Fragment key={index}>
-                      <Message
-                        role={message.role}
-                        content={message.content}
-                        messageIndex={index}
-                      />
+                      {isGeneratingLastAssistant ? (
+                        // 生成中の最後のassistantメッセージを「思考中...」表示に置き換え
+                        <div className="w-full px-4 py-2 bg-white dark:bg-gray-900">
+                          <div
+                            className={`flex flex-col gap-3 ${
+                              hideSideMenu
+                                ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
+                                : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
+                            } mx-auto`}
+                          >
+                            <div className="flex gap-3 justify-start">
+                              <div className="w-full md:max-w-[90%] rounded-2xl px-4 py-3 bg-transparent text-gray-900 dark:text-gray-100">
+                                <div className="flex items-center gap-2">
+                                  {/* 生成中アニメーション */}
+                                  <div className="flex space-x-1">
+                                    <div className="w-2 h-2 rounded-full animate-bounce" 
+                                         style={{
+                                           animationDelay: '0ms',
+                                           background: 'linear-gradient(45deg, #ff4757, #3742fa, #ff6b9d, #a55eea)',
+                                           backgroundSize: '300% 300%',
+                                           animation: 'bounce 1s infinite 0ms, rainbow 2s linear infinite'
+                                         }}></div>
+                                    <div className="w-2 h-2 rounded-full animate-bounce" 
+                                         style={{
+                                           animationDelay: '150ms',
+                                           background: 'linear-gradient(45deg, #ff4757, #3742fa, #ff6b9d, #a55eea)',
+                                           backgroundSize: '300% 300%',
+                                           animation: 'bounce 1s infinite 150ms, rainbow 2s linear infinite 0.3s'
+                                         }}></div>
+                                    <div className="w-2 h-2 rounded-full animate-bounce" 
+                                         style={{
+                                           animationDelay: '300ms',
+                                           background: 'linear-gradient(45deg, #ff4757, #3742fa, #ff6b9d, #a55eea)',
+                                           backgroundSize: '300% 300%',
+                                           animation: 'bounce 1s infinite 300ms, rainbow 2s linear infinite 0.6s'
+                                         }}></div>
+                                  </div>
+                                  <span className="font-medium text-base" 
+                                        style={{
+                                          background: 'linear-gradient(45deg, #ff4757, #3742fa, #ff6b9d, #a55eea)',
+                                          backgroundSize: '300% 300%',
+                                          WebkitBackgroundClip: 'text',
+                                          WebkitTextFillColor: 'transparent',
+                                          backgroundClip: 'text',
+                                          animation: 'rainbow 3s linear infinite'
+                                        }}>
+                                    {currentGeneratingMessage}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        // 通常のメッセージ表示
+                        <Message
+                          role={message.role}
+                          content={message.content}
+                          messageIndex={index}
+                          model={message.model}
+                        />
+                      )}
                       {/* NewMessageButton非表示化 */}
                     </React.Fragment>
-                  )
+                  );
+                }
               )}
             </div>
 

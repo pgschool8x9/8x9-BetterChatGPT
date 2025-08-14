@@ -87,11 +87,14 @@ const ChatHistory = React.memo(
       if (!chats || !chats[chatIndex]) return null;
       
       const chat = chats[chatIndex];
-      const model = chat.config.model;
+      
+      // 実際の使用履歴があるモデルを探す（現在のconfig.modelではなく）
+      const usedModels = chat.tokenUsed ? Object.keys(chat.tokenUsed) : [];
+      const actualModel = usedModels.length > 0 ? usedModels[0] : chat.config.model;
 
       // 実際の使用履歴があるかチェック
-      if (chat.tokenUsed && chat.tokenUsed[model]) {
-        const actualUsage = chat.tokenUsed[model];
+      if (chat.tokenUsed && chat.tokenUsed[actualModel]) {
+        const actualUsage = chat.tokenUsed[actualModel];
         // TypeScript型安全性のため、actualUsageの存在確認
         if (actualUsage) {
           const tokenCost: TotalTokenUsed[ModelOptions] = {
@@ -100,12 +103,12 @@ const ChatHistory = React.memo(
             imageTokens: actualUsage.imageTokens,
           };
           
-          const cost = tokenCostToCost(tokenCost, model as ModelOptions);
+          const cost = tokenCostToCost(tokenCost, actualModel as ModelOptions);
           console.log('Debug - Actual token usage:', {
             promptTokens: actualUsage.promptTokens,
             completionTokens: actualUsage.completionTokens,
             imageTokens: actualUsage.imageTokens,
-            model: model,
+            model: actualModel,
             rawCost: cost,
             source: 'actual_usage'
           });
@@ -127,8 +130,8 @@ const ChatHistory = React.memo(
         (e) => Array.isArray(e.content) && e.content.some(isImageContent)
       );
       
-      const tokenCount = countTokens(textPrompts, model);
-      const imageTokenCount = countTokens(imgPrompts, model);
+      const tokenCount = countTokens(textPrompts, actualModel);
+      const imageTokenCount = countTokens(imgPrompts, actualModel);
       
       const tokenCost: TotalTokenUsed[ModelOptions] = {
         promptTokens: tokenCount,
@@ -136,12 +139,12 @@ const ChatHistory = React.memo(
         imageTokens: imageTokenCount,
       };
       
-      const cost = tokenCostToCost(tokenCost, model as ModelOptions);
+      const cost = tokenCostToCost(tokenCost, actualModel as ModelOptions);
       console.log('Debug - Estimated token counts (fallback):', {
         promptTokens: tokenCount,
         completionTokens: 0,
         imageTokens: imageTokenCount,
-        model: model,
+        model: actualModel,
         rawCost: cost,
         source: 'estimated'
       });

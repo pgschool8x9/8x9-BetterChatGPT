@@ -596,12 +596,12 @@ const EditView = ({
                 {sticky && (
                   <button
                     className={`w-8 h-8 ml-2 p-0 flex items-center justify-center rounded-full transition-all duration-200 ${
-                      (_content[0] as TextContentInterface).text.trim().length > 0 
+                      (_content[0] as TextContentInterface).text.trim().length > 0 || generating
                         ? 'opacity-100 pointer-events-auto' 
                         : 'opacity-0 pointer-events-none'
                     } ${
                       generating 
-                        ? 'bg-red-500/60 hover:bg-red-500/80 text-red-600 dark:text-red-400' 
+                        ? 'bg-blue-500/60 hover:bg-blue-500/80 text-blue-600 dark:text-blue-400' 
                         : 'bg-black/80 dark:bg-white/80 hover:bg-gray-900/80 dark:hover:bg-white/80 text-white dark:text-black'
                     }`}
                     onClick={generating ? handleStopGenerating : handleGenerate}

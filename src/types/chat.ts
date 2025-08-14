@@ -46,6 +46,7 @@ export interface ContentInterface {
 export interface MessageInterface {
   role: Role;
   content: ContentInterface[];
+  model?: ModelOptions; // そのメッセージで使用されたモデル（assistant時に設定）
 }
 
 export interface ChatInterface {
