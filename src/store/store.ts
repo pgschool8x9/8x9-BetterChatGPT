@@ -128,8 +128,17 @@ const useStore = create<StoreState>()(
         return (state, error) => {
           if (error) {
             console.log('An error happened during hydration', error);
+            // エラー時もhydration完了を通知（初期化処理を実行するため）
+            window.dispatchEvent(new CustomEvent('zustand-hydrated', { 
+              detail: { state, error } 
+            }));
           } else {
             console.log('Hydration finished', state);
+            
+            // hydration完了を通知
+            window.dispatchEvent(new CustomEvent('zustand-hydrated', { 
+              detail: { state, error: null } 
+            }));
             
             // モバイル環境での強制的な状態チェック
             if (typeof window !== 'undefined' && 'ontouchstart' in window) {
