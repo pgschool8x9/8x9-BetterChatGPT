@@ -146,7 +146,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
 
   return chat ? (
     <>
-      <div className='sticky top-0 z-10 flex items-center justify-between w-full bg-white/40 dark:bg-gray-900/40 backdrop-blur-md px-2 md:px-4 py-2 md:py-3 text-gray-600 dark:text-gray-300'>
+      <div className='sticky top-0 z-10 flex items-center justify-between w-full bg-white/40 dark:bg-gray-900/40 backdrop-blur-md px-2 md:px-4 py-3 md:py-3 text-gray-600 dark:text-gray-300'>
         {/* ナビゲーションメニューボタン */}
         <button
           className='p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors mr-2 relative z-[1000]'
@@ -158,7 +158,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
 
         {/* タイトル部分 - チャット名またはモデル名 */}
         <div className='flex-1 min-w-0'>
-          <div className='text-base md:text-xl font-medium text-gray-900 dark:text-gray-100 truncate'>
+          <div className='text-xl font-medium text-gray-900 dark:text-gray-100 truncate'>
             {chat.title || `${getModelDisplayName(chat.config.model)}`}
           </div>
         </div>
@@ -189,7 +189,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
 
             {/* ダウンロードドロップダウン */}
             {isDownloadOpen && (
-              <div className='absolute right-0 mt-2 w-48 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] border border-black/10 dark:border-white/10 z-50'>
+              <div className='absolute right-0 mt-2 w-48 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] border border-black/10 dark:border-white/10 z-50' style={{backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)'}}>
                 <div className='p-2'>
                   <button
                     className='w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/30 dark:hover:bg-gray-600/30 rounded-md transition-colors'
@@ -252,14 +252,14 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
                 isConfigExpanded ? 'bg-gray-200 dark:bg-gray-600' : ''
               }`}
               onClick={() => setIsConfigExpanded(!isConfigExpanded)}
-              aria-label='設定を開く'
+              aria-label='モデル設定'
             >
               <SettingIcon className='w-5 h-5 fill-current' />
             </button>
 
             {/* コンパクトな設定ポップアップ */}
             {isConfigExpanded && (
-              <div className='absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] border border-black/10 dark:border-white/10 z-50 max-h-96 overflow-y-auto'>
+              <div className='absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] border border-black/10 dark:border-white/10 z-50 max-h-96 overflow-y-auto' style={{backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)'}}>
                 <div className='p-4 space-y-4'>
                   <ModelSelector
                     _model={_model}

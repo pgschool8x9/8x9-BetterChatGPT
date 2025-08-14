@@ -78,17 +78,7 @@ const Menu = () => {
             </nav>
           </div>
         </div>
-        <div
-          id='menu-close'
-          className={`${
-            hideSideMenu ? 'hidden' : ''
-          } md:hidden absolute z-[999] right-0 translate-x-full top-10 bg-gray-800 p-2 cursor-pointer hover:bg-gray-700 text-white`}
-          onClick={() => {
-            setHideSideMenu(true);
-          }}
-        >
-          <CrossIcon2 />
-        </div>
+        
         {/* デスクトップのフローティングメニューボタンを非表示 */}
         <div
           className='absolute top-0 right-0 h-full w-2 cursor-ew-resize'

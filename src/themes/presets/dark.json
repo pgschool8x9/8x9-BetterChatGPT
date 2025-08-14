@@ -1,0 +1,48 @@
+{
+  "id": "dark",
+  "name": "Dark Theme",
+  "description": "Elegant dark theme for comfortable viewing",
+  "author": "Better ChatGPT",
+  "version": "2.0.0",
+  "colors": {
+    "primary": "#60a5fa",
+    "secondary": "#94a3b8",
+    "accent": "#22d3ee",
+    
+    "background": "#0f172a",
+    "surface": "#1e293b",
+    "card": "#334155",
+    
+    "text": "#f1f5f9",
+    "textSecondary": "#cbd5e1",
+    "textMuted": "#64748b",
+    
+    "success": "#34d399",
+    "warning": "#fbbf24",
+    "error": "#f87171",
+    "info": "#60a5fa",
+    
+    "border": "#374151",
+    "divider": "#1f2937",
+    
+    "input": "#374151",
+    "inputBorder": "#4b5563",
+    "inputFocus": "#60a5fa",
+    
+    "button": "#3b82f6",
+    "buttonHover": "#2563eb",
+    "buttonText": "#ffffff",
+    
+    "hover": "#374151"
+  },
+  "gradients": {
+    "primary": "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)",
+    "background": "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
+    "surface": "linear-gradient(145deg, #1e293b 0%, #334155 100%)"
+  },
+  "shadows": {
+    "small": "0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2)",
+    "medium": "0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)",
+    "large": "0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)"
+  }
+}

@@ -557,13 +557,13 @@ const EditView = ({
           )}
           
           {/* メッセージ入力エリアと左右ボタン */}
-          <div className='flex items-center gap-3'>
+          <div className='flex items-center gap-1'>
             {/* 左側：カスタムプロンプトボタンと画像アップロードボタン */}
             <div className='flex-shrink-0 flex items-center gap-2'>
               <CommandPrompt _setContent={_setContent} />
               {isModelTypesReady && modelTypes[model] === 'image' && (
                 <button
-                  className='w-10 h-10 p-0 flex items-center justify-center rounded-full bg-white/40 dark:bg-gray-700/40 backdrop-blur-md hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
+                  className='w-11 h-11 p-0 flex items-center justify-center rounded-full bg-gray-300/40 dark:bg-gray-500/40 backdrop-blur-md hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
                   onClick={handleUploadButtonClick}
                   aria-label='画像をアップロード'
                 >
@@ -574,10 +574,11 @@ const EditView = ({
             
             {/* 中央：メッセージ入力エリア */}
             <div className='flex-1'>
-              <div className={`min-h-[2.5rem] flex items-center py-2 pl-4 md:pl-6 pr-2 bg-white/40 dark:bg-gray-700/40 backdrop-blur-md dark:text-white ${textRows === 1 ? 'rounded-full' : 'rounded-[1.25rem]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] ${isDragOver ? 'bg-blue-50/80 dark:bg-blue-900/40' : ''}`}>
+              <div className={`min-h-[2.5rem] flex items-center py-2 pl-4 md:pl-6 pr-2 bg-gray-300/40 dark:bg-gray-500/40 backdrop-blur-md dark:text-white ${textRows === 1 ? 'rounded-full' : 'rounded-[1.25rem]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] ${isDragOver ? 'bg-blue-50/80 dark:bg-blue-900/40' : ''}`}>
                 <textarea
                   ref={textareaRef}
-                  className='m-0 resize-none bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 flex-1 placeholder:text-gray-500/40'
+                  className='m-0 resize-none bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 flex-1 placeholder:text-black/40
+                  dark:placeholder:text-white/40'
                   onChange={(e) => {
                     _setContent((prev) => [
                       { type: 'text', text: e.target.value },

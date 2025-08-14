@@ -105,7 +105,8 @@ const ChatContent = () => {
           className='h-full bg-transparent'
           followButtonClassName='hidden'
         >
-          <ScrollToBottomButton />
+          {/* GUI的に邪魔なので非表示
+          <ScrollToBottomButton /> */}
           <div className='flex flex-col items-center text-sm bg-transparent'>
             <div
               className='flex flex-col items-center text-sm bg-transparent w-full'
