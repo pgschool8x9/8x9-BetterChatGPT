@@ -60,6 +60,9 @@ const EditView = ({
   const textareaRef = React.createRef<HTMLTextAreaElement>();
   const generating = useStore((state) => state.generating);
   const setGenerating = useStore((state) => state.setGenerating);
+  
+  // modelTypesの初期化状態を監視
+  const [isModelTypesReady, setIsModelTypesReady] = useState(false);
 
   const { t } = useTranslation();
 
@@ -435,6 +438,19 @@ const EditView = ({
     }
   }, []);
 
+  // modelTypesの初期化を監視
+  useEffect(() => {
+    const checkModelTypes = () => {
+      if (modelTypes && Object.keys(modelTypes).length > 0) {
+        setIsModelTypesReady(true);
+      } else {
+        // 少し待ってから再チェック
+        setTimeout(checkModelTypes, 100);
+      }
+    };
+    checkModelTypes();
+  }, []);
+
   // ドラッグ&ドロップ処理
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -519,7 +535,7 @@ const EditView = ({
             {/* 左側：カスタムプロンプトボタンと画像アップロードボタン */}
             <div className='flex-shrink-0 flex items-center gap-2'>
               <CommandPrompt _setContent={_setContent} />
-              {modelTypes[model] === 'image' && (
+              {isModelTypesReady && modelTypes[model] === 'image' && (
                 <button
                   className='btn btn-neutral w-10 h-10 p-0 flex items-center justify-center rounded-full'
                   onClick={handleUploadButtonClick}
@@ -567,18 +583,27 @@ const EditView = ({
                 >
                   {generating ? (
                     <svg
-                      stroke='currentColor'
-                      fill='none'
-                      strokeWidth='1.5'
-                      viewBox='0 0 24 24'
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
                       className='h-5 w-5'
-                      height='1em'
-                      width='1em'
                       xmlns='http://www.w3.org/2000/svg'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                      style={{
+                        animation: 'rotation 1s linear infinite'
+                      }}
                     >
-                      <rect x='3' y='3' width='18' height='18' rx='2' ry='2'></rect>
+                      <circle
+                        className='opacity-25'
+                        cx='12'
+                        cy='12'
+                        r='10'
+                        stroke='currentColor'
+                        strokeWidth='3'
+                      ></circle>
+                      <path
+                        className='opacity-75'
+                        fill='currentColor'
+                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z'
+                      ></path>
                     </svg>
                   ) : (
                     <SendIcon className='w-5 h-5' />
@@ -600,7 +625,7 @@ const EditView = ({
           </div>
           
           {/* 画像プレビューエリア */}
-          {modelTypes[model] === 'image' && (
+          {isModelTypesReady && modelTypes[model] === 'image' && (
             <ImagePreviewList
               content={_content}
               onRemoveImage={handleRemoveImage}
@@ -622,6 +647,7 @@ const EditView = ({
         _content={_content}
         fileInputRef={fileInputRef}
         model={model}
+        isModelTypesReady={isModelTypesReady}
       />
       {isModalOpen && (
         <PopupModal
@@ -660,6 +686,7 @@ const EditViewButtons = memo(
     _content: ContentInterface[];
     fileInputRef: React.MutableRefObject<null>;
     model: ModelOptions;
+    isModelTypesReady: boolean;
   }) => {
     const { t } = useTranslation();
     const generating = useStore.getState().generating;
@@ -668,7 +695,7 @@ const EditViewButtons = memo(
     return (
       <div>
         {/* IndexedDB化によりImageURL機能は不要になったため削除 */}
-        {modelTypes[model] === 'image' && (
+        {isModelTypesReady && modelTypes[model] === 'image' && (
           <>
             {/* Hidden file input */}
             <input
