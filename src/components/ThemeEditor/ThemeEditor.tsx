@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { themeManager, ThemeConfig, ThemeColors } from '@/themes';
+import { themeManager, ThemeConfig, ThemeColors } from '@themes/index';
 
 interface ColorInputProps {
   label: string;
