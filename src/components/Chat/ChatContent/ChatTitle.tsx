@@ -189,10 +189,10 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
 
             {/* ダウンロードドロップダウン */}
             {isDownloadOpen && (
-              <div className='absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-50'>
+              <div className='absolute right-0 mt-2 w-48 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] border border-black/10 dark:border-white/10 z-50'>
                 <div className='p-2'>
                   <button
-                    className='w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'
+                    className='w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/30 dark:hover:bg-gray-600/30 rounded-md transition-colors'
                     onClick={async () => {
                       setIsDownloadOpen(false);
                       if (saveRef && saveRef.current) {
@@ -208,7 +208,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
                     画像
                   </button>
                   <button
-                    className='w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'
+                    className='w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/30 dark:hover:bg-gray-600/30 rounded-md transition-colors'
                     onClick={async () => {
                       setIsDownloadOpen(false);
                       const chats = useStore.getState().chats;
@@ -227,7 +227,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
                     Markdown
                   </button>
                   <button
-                    className='w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'
+                    className='w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/30 dark:hover:bg-gray-600/30 rounded-md transition-colors'
                     onClick={async () => {
                       setIsDownloadOpen(false);
                       const chats = useStore.getState().chats;
@@ -259,7 +259,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
 
             {/* コンパクトな設定ポップアップ */}
             {isConfigExpanded && (
-              <div className='absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-50 max-h-96 overflow-y-auto'>
+              <div className='absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] border border-black/10 dark:border-white/10 z-50 max-h-96 overflow-y-auto'>
                 <div className='p-4 space-y-4'>
                   <ModelSelector
                     _model={_model}
