@@ -563,18 +563,18 @@ const EditView = ({
               <CommandPrompt _setContent={_setContent} />
               {isModelTypesReady && modelTypes[model] === 'image' && (
                 <button
-                  className='btn btn-neutral w-10 h-10 p-0 flex items-center justify-center rounded-full'
+                  className='w-10 h-10 p-0 flex items-center justify-center rounded-full bg-white/20 dark:bg-gray-700/20 backdrop-blur-md hover:bg-white/30 dark:hover:bg-gray-700/30 transition-colors shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
                   onClick={handleUploadButtonClick}
                   aria-label='画像をアップロード'
                 >
-                  <ImageIcon className='w-5 h-5' />
+                  <ImageIcon className='w-5 h-5 text-gray-700 dark:text-gray-300' />
                 </button>
               )}
             </div>
             
             {/* 中央：メッセージ入力エリア */}
             <div className='flex-1'>
-              <div className={`min-h-[2.5rem] flex items-center py-2 px-4 md:px-6 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 ${textRows === 1 ? 'rounded-full' : 'rounded-[1.25rem]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] ${isDragOver ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''}`}>
+              <div className={`min-h-[2.5rem] flex items-center py-2 px-4 md:px-6 bg-white/20 dark:bg-gray-700/20 backdrop-blur-md dark:text-white ${textRows === 1 ? 'rounded-full' : 'rounded-[1.25rem]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] ${isDragOver ? 'bg-blue-50/80 dark:bg-blue-900/40' : ''}`}>
                 <textarea
                   ref={textareaRef}
                   className='m-0 resize-none bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 w-full placeholder:text-gray-500/40'
@@ -597,8 +597,10 @@ const EditView = ({
             <div className='flex-shrink-0'>
               {sticky && (
                 <button
-                  className={`btn w-10 h-10 p-0 flex items-center justify-center rounded-full ${
-                    generating ? 'btn-neutral' : 'btn-primary'
+                  className={`w-10 h-10 p-0 flex items-center justify-center rounded-full backdrop-blur-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] transition-colors ${
+                    generating 
+                      ? 'bg-red-500/20 dark:bg-red-500/20 hover:bg-red-500/30 dark:hover:bg-red-500/30 text-red-600 dark:text-red-400' 
+                      : 'bg-blue-500/20 dark:bg-blue-500/20 hover:bg-blue-500/30 dark:hover:bg-blue-500/30 text-blue-600 dark:text-blue-400'
                   }`}
                   onClick={generating ? handleStopGenerating : handleGenerate}
                   aria-label={generating ? "停止" : "送信"}
@@ -634,7 +636,7 @@ const EditView = ({
               )}
               {!sticky && (
                 <button
-                  className='btn btn-primary w-10 h-10 p-0 flex items-center justify-center rounded-full'
+                  className='w-10 h-10 p-0 flex items-center justify-center rounded-full bg-blue-500/20 dark:bg-blue-500/20 hover:bg-blue-500/30 dark:hover:bg-blue-500/30 text-blue-600 dark:text-blue-400 backdrop-blur-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] transition-colors'
                   onClick={() => {
                     !generating && handleGenerate();
                   }}
