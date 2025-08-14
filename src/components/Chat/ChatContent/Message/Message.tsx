@@ -137,14 +137,29 @@ const Message = React.memo(
                   {t('systemRule')}
                 </div>
               )}
-              <MessageContent
-                role={role}
-                content={content}
-                messageIndex={messageIndex}
-                sticky={sticky}
-                isEdit={isEdit}
-                setIsEdit={setIsEdit}
-              />
+              <div
+                className={isSystem ? 'text-gray-900 dark:text-gray-100' : ''}
+                style={isSystem ? {
+                  // システムメッセージの内容部分に確実に見える色を強制適用
+                  color: '#111827 !important',
+                  // ダークモード検出とフォールバック
+                  ...(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches 
+                    ? { color: '#f9fafb !important' } 
+                    : {}),
+                  // 追加の視認性改善
+                  textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                  fontWeight: '500',
+                } as any : {}}
+              >
+                <MessageContent
+                  role={role}
+                  content={content}
+                  messageIndex={messageIndex}
+                  sticky={sticky}
+                  isEdit={isEdit}
+                  setIsEdit={setIsEdit}
+                />
+              </div>
             </div>
 
             {/* アバター削除 */}

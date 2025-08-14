@@ -137,10 +137,7 @@ const ChatContent = () => {
                 // チャット履歴が空の場合の初期メッセージ
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <h2 className="text-base font-normal text-gray-600 dark:text-gray-300">
-                      {t('learningMessage')}
-                    </h2>
-                    <h2 className="text-lg font-normal text-gray-600 dark:text-gray-300 py-2 italic">
+                    <h2 className="text-base font-normal text-gray-600 dark:text-gray-300 py-2 italic">
                       {randomMessage}
                     </h2>
                   </div>

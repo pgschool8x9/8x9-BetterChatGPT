@@ -20,6 +20,8 @@ export const createStorageGuard = (storageKey: string) => {
           lastKnownState = currentState;
           // セッションストレージにもバックアップ
           sessionStorage.setItem(`${storageKey}_backup`, currentState);
+          // モバイル用の追加バックアップ（より頻繁）
+          sessionStorage.setItem(`${storageKey}_mobile_backup_${Date.now()}`, currentState);
         }
       } catch (error) {
         console.warn('Storage guard backup failed:', error);
@@ -29,17 +31,33 @@ export const createStorageGuard = (storageKey: string) => {
     // 初回チェック
     checkAndBackup();
     
-    // 5秒ごとにチェック
-    const interval = setInterval(checkAndBackup, 5000);
+    // モバイルではより頻繁にチェック（2秒ごと）
+    const interval = setInterval(checkAndBackup, 2000);
     
-    // ページが隠れた時にもバックアップ
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        checkAndBackup();
-      }
+    // ページイベントリスナー追加
+    const events = ['visibilitychange', 'beforeunload', 'pagehide', 'focus', 'blur'];
+    const eventHandler = () => {
+      checkAndBackup();
+    };
+    
+    events.forEach(event => {
+      document.addEventListener(event, eventHandler);
     });
     
-    return () => clearInterval(interval);
+    // タッチイベントでもバックアップ（モバイル特有）
+    if ('ontouchstart' in window) {
+      document.addEventListener('touchstart', checkAndBackup, { passive: true });
+    }
+    
+    return () => {
+      clearInterval(interval);
+      events.forEach(event => {
+        document.removeEventListener(event, eventHandler);
+      });
+      if ('ontouchstart' in window) {
+        document.removeEventListener('touchstart', checkAndBackup);
+      }
+    };
   };
   
   // Pull-to-Refresh後の復旧
@@ -52,13 +70,28 @@ export const createStorageGuard = (storageKey: string) => {
       // 現在の状態が空または不正な場合
       if (!currentState || currentState === '{}' || currentState === 'null') {
         
-        // セッションストレージからの復旧を試行
+        // まずはセッションストレージからの復旧を試行
         const backup = sessionStorage.getItem(`${storageKey}_backup`);
         
         if (backup && backup !== '{}' && backup !== 'null') {
           console.log('Attempting mobile storage recovery from sessionStorage');
           localStorage.setItem(storageKey, backup);
           return true;
+        }
+        
+        // モバイル用タイムスタンプ付きバックアップから最新を復旧
+        const sessionKeys = Object.keys(sessionStorage);
+        const mobileBackupKeys = sessionKeys.filter(key => 
+          key.startsWith(`${storageKey}_mobile_backup_`)
+        ).sort().reverse(); // 最新順
+        
+        for (const key of mobileBackupKeys) {
+          const mobileBackup = sessionStorage.getItem(key);
+          if (mobileBackup && mobileBackup !== '{}' && mobileBackup !== 'null') {
+            console.log('Attempting mobile storage recovery from timestamped backup');
+            localStorage.setItem(storageKey, mobileBackup);
+            return true;
+          }
         }
         
         // 最後に知られた状態からの復旧を試行
