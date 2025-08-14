@@ -67,7 +67,7 @@ const Message = React.memo(
 
     const userMessageLines = getUserMessageLines();
     const userRoundedClass = isUser 
-      ? (userMessageLines === 1 ? 'rounded-full' : 'rounded-[1.25rem]')
+      ? (userMessageLines === 1 ? 'rounded-full' : 'rounded-xl md:rounded-[1.25rem]')
       : 'rounded-2xl';
     
     // ユーザーメッセージのpadding設定（入力エリアと同じ仕様）
