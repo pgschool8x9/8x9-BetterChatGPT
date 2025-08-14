@@ -20,7 +20,7 @@ export const DisplayChatSizeToggle = () => {
 
   return (
     <Toggle
-      label={t('チャットサイズを表示') as string}
+      label={t('displayChatSize') as string}
       isChecked={isChecked}
       setIsChecked={setIsChecked}
     />

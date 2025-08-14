@@ -79,11 +79,14 @@
     "Inspiration is arriving..."
   ],
   "systemRule": "System Rule",
-  "learningMessage": "考えるために学べ、ただの情報を使える知識に変えろ、その過程に知性が宿る",
+  "learningMessage": "Learn to think, turn mere information into usable knowledge, and intelligence will dwell in that process",
   "inspirationalMessages": [
-    "不正解は無意味を意味しない",
-    "才能も発展も人生もいざって時に退いたら終わりだ", 
-    "怖くない人生などその本質を欠く",
-    "きっと迷いの中に倫理がある"
-  ]
+    "Wrong answers don't mean meaninglessness",
+    "Talent, development, and life all end when you retreat at the crucial moment", 
+    "A life without fear lacks its essence",
+    "Surely ethics lies within confusion"
+  ],
+  "defaultSystemMessage": "Please follow the rules below when responding\n\n# Requirements\n- I am 13 years old, so please adjust your expressions and language accordingly\n- Provide innovative explanations in simple bullet points\n- Please speak in a friendly manner using emojis",
+  "systemMessagePlaceholder": "Enter system message (Enter for new line)",
+  "displayChatSize": "Display chat size"
 }

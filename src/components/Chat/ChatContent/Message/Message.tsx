@@ -117,7 +117,7 @@ const Message = React.memo(
                 // より強力なブラウザ対応
                 MozBackgroundClip: 'text',
                 msBackgroundClip: 'text'
-              } : undefined}
+              } as any : undefined}
             >
               {/* RoleSelector非表示化 */}
               {isSystem && (
@@ -132,7 +132,7 @@ const Message = React.memo(
                     color: 'transparent',
                     MozBackgroundClip: 'text',
                     msBackgroundClip: 'text'
-                  }}
+                  } as any}
                 >
                   {t('systemRule')}
                 </div>

@@ -16,14 +16,27 @@ const dateString =
   ('0' + date.getDate()).slice(-2);
 
 // default system message obtained using the following method: https://twitter.com/DeminDimin/status/1619935545144279040
-export const _defaultSystemMessage =
-  import.meta.env.VITE_DEFAULT_SYSTEM_MESSAGE ??
-  `以下のルールを守って対応してください
+export const getDefaultSystemMessage = () => {
+  const fallbackMessage = `Please follow the rules below when responding
 
-# 要件
-- 私は13才なので表現や言葉を合わせて接してください
-- 革新を突いた説明で箇条書きでシンプルに伝えてください
-- 絵文字を使って親しく話してください`;
+# Requirements
+- I am 13 years old, so please adjust your expressions and language accordingly
+- Provide innovative explanations in simple bullet points
+- Please speak in a friendly manner using emojis`;
+
+  if (import.meta.env.VITE_DEFAULT_SYSTEM_MESSAGE) {
+    return import.meta.env.VITE_DEFAULT_SYSTEM_MESSAGE;
+  }
+
+  // i18nが利用可能な場合は翻訳されたメッセージを使用
+  try {
+    return (window as any).i18n?.t?.('defaultSystemMessage') || fallbackMessage;
+  } catch {
+    return fallbackMessage;
+  }
+};
+
+export const _defaultSystemMessage = getDefaultSystemMessage();
 
 export const defaultApiVersion = '2024-04-01-preview';
 export const defaultModel = 'gpt-4o-mini';

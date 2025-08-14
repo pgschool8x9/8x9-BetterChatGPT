@@ -206,7 +206,7 @@ const DefaultSystemChat = ({
         onKeyDown={handleKeyDown}
         value={_systemMessage}
         rows={1}
-        placeholder="システムメッセージを入力してください（Enterで改行可能）"
+        placeholder={t('systemMessagePlaceholder')}
       ></textarea>
     </div>
   );
