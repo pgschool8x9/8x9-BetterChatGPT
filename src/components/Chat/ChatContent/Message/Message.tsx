@@ -8,6 +8,7 @@ import EditButton from './View/Button/EditButton';
 import RefreshButton from './View/Button/RefreshButton';
 
 import { ContentInterface, Role, ChatInterface, isTextContent } from '@type/chat';
+import { ModelOptions } from '@utils/modelReader';
 import RoleSelector from './RoleSelector';
 import useSubmit from '@hooks/useSubmit';
 
