@@ -674,6 +674,7 @@ const EditViewButtons = memo(
     _content,
     fileInputRef,
     model,
+    isModelTypesReady,
   }: {
     sticky?: boolean;
     handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
