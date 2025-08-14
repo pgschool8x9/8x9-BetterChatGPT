@@ -574,11 +574,7 @@ const EditView = ({
             
             {/* 中央：メッセージ入力エリア */}
             <div className='flex-1'>
-              <div className={`${
-                sticky
-                  ? `py-2 md:py-3 px-4 md:px-6 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 ${textRows === 1 ? 'rounded-full' : 'rounded-[32px]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]`
-                  : `py-2 px-4 md:px-6 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 ${textRows === 1 ? 'rounded-full' : 'rounded-[32px]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]`
-              } ${isDragOver ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''}`}>
+              <div className={`min-h-[2.5rem] flex items-center py-2 px-4 md:px-6 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 ${textRows === 1 ? 'rounded-full' : 'rounded-[1.25rem]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] ${isDragOver ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''}`}>
                 <textarea
                   ref={textareaRef}
                   className='m-0 resize-none bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 w-full placeholder:text-gray-500/40'
