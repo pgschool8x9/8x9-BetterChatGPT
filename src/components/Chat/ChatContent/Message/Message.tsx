@@ -67,7 +67,7 @@ const Message = React.memo(
 
     const userMessageLines = getUserMessageLines();
     const userRoundedClass = isUser 
-      ? (userMessageLines === 1 ? 'rounded-full' : 'rounded-xl md:rounded-[1.25rem]')
+      ? (userMessageLines === 1 ? 'rounded-full' : 'rounded-2xl')
       : 'rounded-2xl';
     
     // ユーザーメッセージのpadding設定（入力エリアと同じ仕様）
@@ -109,9 +109,9 @@ const Message = React.memo(
     }
 
     return (
-      <div className="w-full px-4 py-2 bg-white dark:bg-gray-900">
+      <div className="w-full px-4 py-1 bg-white dark:bg-gray-900">
         <div
-          className={`flex flex-col gap-3 ${hideSideMenu
+          className={`flex flex-col gap-1 ${hideSideMenu
             ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
             : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
             } mx-auto`}
