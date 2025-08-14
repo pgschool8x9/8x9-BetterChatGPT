@@ -85,26 +85,23 @@ const Message = React.memo(
     return (
       <div className="w-full px-4 py-2 bg-white dark:bg-gray-900">
         <div
-          className={`flex flex-col gap-3 ${
-            hideSideMenu
+          className={`flex flex-col gap-3 ${hideSideMenu
               ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
               : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
-          } mx-auto`}
+            } mx-auto`}
         >
           <div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
             {/* アバター削除 */}
-            
+
             {/* メッセージ吹き出し */}
-            <div 
-              className={`${
-                isUser ? 'max-w-[70%]' : 'w-full md:max-w-[90%]'
-              } rounded-2xl px-4 py-3 ${
-                isUser 
-                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm ml-auto mr-4' 
+            <div
+              className={`${isUser ? 'max-w-[70%]' : 'w-full md:max-w-[90%]'
+                } rounded-2xl px-4 py-3 ${isUser
+                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm ml-auto mr-4'
                   : isSystem
-                  ? ''
-                  : 'bg-transparent text-gray-900 dark:text-gray-100'
-              }`}
+                    ? ''
+                    : 'bg-transparent text-gray-900 dark:text-gray-100'
+                }`}
               style={isSystem ? {
                 background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
                 backgroundSize: '100% 100%',
@@ -120,37 +117,25 @@ const Message = React.memo(
               } as any : undefined}
             >
               {/* RoleSelector非表示化 */}
-              {isSystem && (
-                <div 
-                  className="text-lg mb-1 opacity-70 font-semibold"
-                  style={{
-                    background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
-                    backgroundSize: '100% 100%',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    color: 'transparent',
-                    MozBackgroundClip: 'text',
-                    msBackgroundClip: 'text'
-                  } as any}
-                >
-                  {t('systemRule')}
-                </div>
-              )}
               <div
                 className={isSystem ? 'text-gray-900 dark:text-gray-100' : ''}
                 style={isSystem ? {
-                  // システムメッセージの内容部分に確実に見える色を強制適用
-                  color: '#111827 !important',
-                  // ダークモード検出とフォールバック
-                  ...(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches 
-                    ? { color: '#f9fafb !important' } 
-                    : {}),
-                  // 追加の視認性改善
-                  textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                  background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
+                  backgroundSize: '100% 100%',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                  MozBackgroundClip: 'text',
+                  msBackgroundClip: 'text',
                   fontWeight: '500',
                 } as any : {}}
               >
+                {isSystem && (
+                  <div className="text-lg mb-1 opacity-70 font-semibold">
+                    {t('systemRule')}
+                  </div>
+                )}
                 <MessageContent
                   role={role}
                   content={content}
@@ -164,7 +149,7 @@ const Message = React.memo(
 
             {/* アバター削除 */}
           </div>
-          
+
           {/* ボタンエリア - メッセージ吹き出しの外側 */}
           <div className={`flex gap-3 ${isUser ? 'justify-end mr-8' : 'justify-start ml-4'}`}>
             <div className={`${isUser ? 'max-w-[70%] ml-auto' : 'w-full md:max-w-[90%]'}`}>
@@ -179,28 +164,28 @@ const Message = React.memo(
                   </div>
                 </div>
               )}
-              
+
               {/* AI側のボタン - メッセージ受信完了時のみ表示 */}
               {!isUser && role === 'assistant' && (
                 // 最後のメッセージで生成中の場合は非表示、それ以外は表示
                 messageIndex !== lastMessageIndex || !useStore.getState().generating
               ) && (
-                <div className="flex items-center gap-2 justify-start">
-                  {messageIndex === lastMessageIndex && (
+                  <div className="flex items-center gap-2 justify-start">
+                    {messageIndex === lastMessageIndex && (
+                      <div className="text-gray-700 dark:text-gray-300">
+                        <RefreshButton onClick={handleRefresh} />
+                      </div>
+                    )}
                     <div className="text-gray-700 dark:text-gray-300">
-                      <RefreshButton onClick={handleRefresh} />
+                      <CopyButton onClick={handleCopy} />
                     </div>
-                  )}
-                  <div className="text-gray-700 dark:text-gray-300">
-                    <CopyButton onClick={handleCopy} />
+                    {messageModel && (
+                      <span className="text-xs text-gray-600 dark:text-gray-200 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md">
+                        {messageModel}
+                      </span>
+                    )}
                   </div>
-                  {messageModel && (
-                    <span className="text-xs text-gray-600 dark:text-gray-200 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md">
-                      {messageModel}
-                    </span>
-                  )}
-                </div>
-              )}
+                )}
             </div>
           </div>
         </div>
