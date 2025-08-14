@@ -344,7 +344,8 @@ const useSubmit = () => {
         updateTotalTokenUsed(
           model,
           messages.slice(0, -1),
-          messages[messages.length - 1]
+          messages[messages.length - 1],
+          currentChatIndex
         );
       }
 
@@ -391,7 +392,7 @@ const useSubmit = () => {
           updateTotalTokenUsed(model, [message], {
             role: 'assistant',
             content: [{ type: 'text', text: title } as TextContentInterface],
-          });
+          }, currentChatIndex);
         }
       }
     } catch (e: unknown) {

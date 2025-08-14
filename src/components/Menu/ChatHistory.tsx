@@ -87,9 +87,36 @@ const ChatHistory = React.memo(
       if (!chats || !chats[chatIndex]) return null;
       
       const chat = chats[chatIndex];
-      const messages = chat.messages;
       const model = chat.config.model;
 
+      // 実際の使用履歴があるかチェック
+      if (chat.tokenUsed && chat.tokenUsed[model]) {
+        const actualUsage = chat.tokenUsed[model];
+        const tokenCost: TotalTokenUsed[ModelOptions] = {
+          promptTokens: actualUsage.promptTokens,
+          completionTokens: actualUsage.completionTokens,
+          imageTokens: actualUsage.imageTokens,
+        };
+        
+        const cost = tokenCostToCost(tokenCost, model as ModelOptions);
+        console.log('Debug - Actual token usage:', {
+          promptTokens: actualUsage.promptTokens,
+          completionTokens: actualUsage.completionTokens,
+          imageTokens: actualUsage.imageTokens,
+          model: model,
+          rawCost: cost,
+          source: 'actual_usage'
+        });
+        
+        const totalTokens = actualUsage.promptTokens + actualUsage.completionTokens + actualUsage.imageTokens;
+        return {
+          tokens: totalTokens,
+          usdCost: typeof cost === 'number' && cost >= 0 ? cost : 0
+        };
+      }
+
+      // フォールバック: 推定計算（既存チャット用）
+      const messages = chat.messages;
       const textPrompts = messages.filter(
         (e) => Array.isArray(e.content) && e.content.some(isTextContent)
       );
@@ -102,17 +129,18 @@ const ChatHistory = React.memo(
       
       const tokenCost: TotalTokenUsed[ModelOptions] = {
         promptTokens: tokenCount,
-        completionTokens: 0,
+        completionTokens: 0, // 推定では不明
         imageTokens: imageTokenCount,
       };
       
       const cost = tokenCostToCost(tokenCost, model as ModelOptions);
-      console.log('Debug - Token counts:', {
+      console.log('Debug - Estimated token counts (fallback):', {
         promptTokens: tokenCount,
         completionTokens: 0,
         imageTokens: imageTokenCount,
         model: model,
-        rawCost: cost
+        rawCost: cost,
+        source: 'estimated'
       });
       
       return {

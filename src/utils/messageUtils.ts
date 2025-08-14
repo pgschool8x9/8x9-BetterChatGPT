@@ -100,9 +100,13 @@ export const limitMessageTokens = (
 export const updateTotalTokenUsed = (
   model: ModelOptions,
   promptMessages: MessageInterface[],
-  completionMessage: MessageInterface
+  completionMessage: MessageInterface,
+  chatIndex?: number
 ) => {
   const setTotalTokenUsed = useStore.getState().setTotalTokenUsed;
+  const setChats = useStore.getState().setChats;
+  const chats = useStore.getState().chats;
+  
   const updatedTotalTokenUsed: TotalTokenUsed = JSON.parse(
     JSON.stringify(useStore.getState().totalTokenUsed)
   );
@@ -128,7 +132,7 @@ export const updateTotalTokenUsed = (
     imageTokens = 0,
   } = updatedTotalTokenUsed[model] ?? {};
 
-  // Update token counts
+  // Update global token counts
   updatedTotalTokenUsed[model] = {
     promptTokens: promptTokens + newPromptTokens,
     completionTokens: completionTokens + newCompletionTokens,
@@ -137,6 +141,40 @@ export const updateTotalTokenUsed = (
 
   // Set the updated token counts in the store
   setTotalTokenUsed(updatedTotalTokenUsed);
+
+  // Update individual chat token usage
+  if (typeof chatIndex === 'number' && chats && chats[chatIndex]) {
+    const updatedChats = JSON.parse(JSON.stringify(chats));
+    const chat = updatedChats[chatIndex];
+    
+    // Initialize tokenUsed if it doesn't exist
+    if (!chat.tokenUsed) {
+      chat.tokenUsed = {};
+    }
+    
+    // Destructure existing chat token counts or default to 0
+    const {
+      promptTokens: chatPromptTokens = 0,
+      completionTokens: chatCompletionTokens = 0,
+      imageTokens: chatImageTokens = 0,
+    } = chat.tokenUsed[model] ?? {};
+
+    // Update chat-specific token counts
+    chat.tokenUsed[model] = {
+      promptTokens: chatPromptTokens + newPromptTokens,
+      completionTokens: chatCompletionTokens + newCompletionTokens,
+      imageTokens: chatImageTokens + newImageTokens,
+    };
+
+    setChats(updatedChats);
+    
+    console.log(`Chat ${chatIndex} token usage updated for ${model}:`, {
+      newPromptTokens,
+      newCompletionTokens, 
+      newImageTokens,
+      totalForModel: chat.tokenUsed[model]
+    });
+  }
 };
 
 export default countTokens;

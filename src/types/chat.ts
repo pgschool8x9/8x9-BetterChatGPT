@@ -56,6 +56,13 @@ export interface ChatInterface {
   config: ConfigInterface;
   titleSet: boolean;
   imageDetail: ImageDetail;
+  tokenUsed?: {
+    [model in ModelOptions]?: {
+      promptTokens: number;
+      completionTokens: number;
+      imageTokens: number;
+    };
+  };
 }
 
 export interface ConfigInterface {

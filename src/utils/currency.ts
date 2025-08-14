@@ -37,28 +37,58 @@ interface ExchangeRateCache {
   baseCurrency: string;
 }
 
-let exchangeRateCache: ExchangeRateCache | null = null;
-const CACHE_DURATION = 1000 * 60 * 60; // 1時間
+const CACHE_KEY = 'exchangeRateCache';
+const CACHE_DURATION = 1000 * 60 * 60 * 24; // 24時間
+
+// キャッシュからデータを取得
+const getCachedRates = (): ExchangeRateCache | null => {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const data = JSON.parse(cached);
+      // キャッシュが有効かチェック
+      if (data.timestamp && Date.now() - data.timestamp < CACHE_DURATION) {
+        return data;
+      }
+    }
+  } catch (error) {
+    console.warn('キャッシュ読み込みエラー:', error);
+  }
+  return null;
+};
+
+// キャッシュにデータを保存
+const setCachedRates = (cache: ExchangeRateCache): void => {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  } catch (error) {
+    console.warn('キャッシュ保存エラー:', error);
+  }
+};
 
 // 為替レート取得
 export const fetchExchangeRates = async (): Promise<Record<string, number>> => {
   // キャッシュをチェック
-  if (exchangeRateCache && 
-      Date.now() - exchangeRateCache.timestamp < CACHE_DURATION) {
-    return exchangeRateCache.rates;
+  const cachedRates = getCachedRates();
+  if (cachedRates) {
+    console.log('為替レートをキャッシュから取得しました (有効期限まで:', Math.round((CACHE_DURATION - (Date.now() - cachedRates.timestamp)) / 1000 / 60 / 60), '時間)');
+    return cachedRates.rates;
   }
 
+  console.log('為替レートをAPIから取得しています...');
   try {
     // ExchangeRate-API (無料プラン)
     const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
     const data = await response.json();
     
     if (data.rates) {
-      exchangeRateCache = {
+      const newCache = {
         rates: data.rates,
         timestamp: Date.now(),
         baseCurrency: 'USD'
       };
+      setCachedRates(newCache);
+      console.log('為替レートを取得しキャッシュに保存しました (次回更新まで24時間)');
       return data.rates;
     }
   } catch (error) {
