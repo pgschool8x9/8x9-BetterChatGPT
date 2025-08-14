@@ -17,7 +17,7 @@ export default defineConfig({
       '@components/': new URL('./src/components/', import.meta.url).pathname,
       '@utils/': new URL('./src/utils/', import.meta.url).pathname,
       '@themes/': new URL('./src/themes/', import.meta.url).pathname,
-      '@src/': new URL('./src/routes/', import.meta.url).pathname,
+      '@src/': new URL('./src/', import.meta.url).pathname,
     },
   },
   base: './',
@@ -25,5 +25,15 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     strictPort: false,
+    // ネットワークアクセス時の最適化
+    hmr: {
+      host: 'localhost',
+      clientPort: 5176, // 現在のポートに合わせる
+    },
+    cors: true,
+    // ネットワーク経由での高速化
+    fs: {
+      strict: false,
+    },
   },
 });

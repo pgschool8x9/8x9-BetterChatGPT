@@ -4,6 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* システムメッセージのモバイル対応強制スタイル */
+.system-message-content.prose,
+.system-message-content.prose *,
+.system-message-wrapper.prose,
+.system-message-wrapper.prose * {
+  color: transparent !important;
+}
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);

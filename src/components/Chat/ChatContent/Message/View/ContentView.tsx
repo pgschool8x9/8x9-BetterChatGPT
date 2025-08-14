@@ -124,10 +124,10 @@ const ContentView = memo(
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
-            color: 'transparent !important',
+            color: 'transparent',
             MozBackgroundClip: 'text',
             msBackgroundClip: 'text',
-          } : {}}
+          } as React.CSSProperties : {}}
         >
           {markdownMode ? (
             <div style={role === 'system' ? {
@@ -136,10 +136,10 @@ const ContentView = memo(
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              color: 'transparent !important',
+              color: 'transparent',
               MozBackgroundClip: 'text',
               msBackgroundClip: 'text',
-            } : {}}>
+            } as React.CSSProperties : {}}>
               <ReactMarkdown
                 remarkPlugins={[
                   remarkGfm,
@@ -176,10 +176,10 @@ const ContentView = memo(
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
-                color: 'transparent !important',
+                color: 'transparent',
                 MozBackgroundClip: 'text',
                 msBackgroundClip: 'text',
-              } : {}}
+              } as React.CSSProperties : {}}
             >
               {highlightText(currentTextContent, searchHighlightTerm)}
             </span>
