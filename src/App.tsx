@@ -103,7 +103,7 @@ function App() {
   }, []);
 
   return (
-    <div className='overflow-hidden w-full h-full relative bg-gray-50 dark:bg-gray-800'>
+    <div className='overflow-hidden w-full h-full relative bg-white dark:bg-gray-900'>
       <Menu />
       <div className={`flex h-full flex-1 flex-col`}>
         <Chat />

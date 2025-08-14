@@ -61,7 +61,7 @@ const Menu = () => {
     <>
       <div
         id='menu'
-        className={`group/menu dark bg-gray-900 fixed md:inset-y-0 md:flex md:flex-col transition-transform z-[999] top-0 left-0 h-full max-md:w-3/4 ${
+        className={`group/menu dark bg-gray-800 fixed md:inset-y-0 md:flex md:flex-col transition-transform z-[999] top-0 left-0 h-full max-md:w-3/4 ${
           hideSideMenu ? 'translate-x-[-100%]' : 'translate-x-[0%]'
         }`}
         style={{ width: `${menuWidth}px` }}
@@ -82,7 +82,7 @@ const Menu = () => {
           id='menu-close'
           className={`${
             hideSideMenu ? 'hidden' : ''
-          } md:hidden absolute z-[999] right-0 translate-x-full top-10 bg-gray-900 p-2 cursor-pointer hover:bg-black text-white`}
+          } md:hidden absolute z-[999] right-0 translate-x-full top-10 bg-gray-800 p-2 cursor-pointer hover:bg-gray-700 text-white`}
           onClick={() => {
             setHideSideMenu(true);
           }}

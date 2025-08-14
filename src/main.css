@@ -28,6 +28,12 @@
     margin: 0;
   }
 
+  .light body,
+  .light html {
+    --tw-bg-opacity: 1;
+    background-color: #ffffff;
+  }
+
   .dark body,
   .dark html {
     --tw-bg-opacity: 1;

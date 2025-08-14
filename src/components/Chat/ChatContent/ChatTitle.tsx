@@ -146,7 +146,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
 
   return chat ? (
     <>
-      <div className='sticky top-0 z-10 flex items-center justify-between w-full border-b border-black/10 bg-gray-50 px-2 md:px-4 py-2 md:py-3 dark:border-gray-900/50 dark:bg-gray-700 text-gray-600 dark:text-gray-300'>
+      <div className='sticky top-0 z-10 flex items-center justify-between w-full bg-white/40 dark:bg-gray-900/40 backdrop-blur-md px-2 md:px-4 py-2 md:py-3 text-gray-600 dark:text-gray-300'>
         {/* ナビゲーションメニューボタン */}
         <button
           className='p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors mr-2 relative z-[1000]'

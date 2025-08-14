@@ -80,7 +80,7 @@ const Message = React.memo(
     }
 
     return (
-      <div className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800">
+      <div className="w-full px-4 py-2 bg-white dark:bg-gray-900">
         <div
           className={`flex flex-col gap-3 ${
             hideSideMenu
@@ -97,7 +97,7 @@ const Message = React.memo(
                 isUser ? 'max-w-[70%]' : 'w-full md:max-w-[90%]'
               } rounded-2xl px-4 py-3 ${
                 isUser 
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600 shadow-sm ml-auto mr-4' 
+                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm ml-auto mr-4' 
                   : isSystem
                   ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
                   : 'bg-transparent text-gray-900 dark:text-gray-100'
