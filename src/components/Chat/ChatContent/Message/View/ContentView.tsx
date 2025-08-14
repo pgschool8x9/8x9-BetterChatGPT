@@ -118,11 +118,28 @@ const ContentView = memo(
         <div 
           className={`markdown w-full md:max-w-full break-words prose dark:prose-invert dark share-gpt-message ${role === 'system' ? 'system-message-content' : ''}`}
           style={role === 'system' ? {
-            color: 'inherit !important',
+            // モバイル対応の強制的なグラデーション適用
+            background: 'var(--system-gradient, linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00)))',
+            backgroundSize: '100% 100%',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            color: 'transparent !important',
+            MozBackgroundClip: 'text',
+            msBackgroundClip: 'text',
           } : {}}
         >
           {markdownMode ? (
-            <div style={role === 'system' ? { color: 'inherit' } : {}}>
+            <div style={role === 'system' ? {
+              background: 'var(--system-gradient, linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00)))',
+              backgroundSize: '100% 100%',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent !important',
+              MozBackgroundClip: 'text',
+              msBackgroundClip: 'text',
+            } : {}}>
               <ReactMarkdown
                 remarkPlugins={[
                   remarkGfm,
@@ -153,7 +170,16 @@ const ContentView = memo(
           ) : (
             <span 
               className='whitespace-pre-wrap'
-              style={role === 'system' ? { color: 'inherit' } : {}}
+              style={role === 'system' ? {
+                background: 'var(--system-gradient, linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00)))',
+                backgroundSize: '100% 100%',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                color: 'transparent !important',
+                MozBackgroundClip: 'text',
+                msBackgroundClip: 'text',
+              } : {}}
             >
               {highlightText(currentTextContent, searchHighlightTerm)}
             </span>

@@ -17,8 +17,13 @@ export default defineConfig({
       '@components/': new URL('./src/components/', import.meta.url).pathname,
       '@utils/': new URL('./src/utils/', import.meta.url).pathname,
       '@themes/': new URL('./src/themes/', import.meta.url).pathname,
-      '@src/': new URL('./src/', import.meta.url).pathname,
+      '@src/': new URL('./src/routes/', import.meta.url).pathname,
     },
   },
   base: './',
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: false,
+  },
 });

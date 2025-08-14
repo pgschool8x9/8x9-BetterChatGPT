@@ -137,7 +137,7 @@ const Message = React.memo(
                 </div>
               )}
               <div
-                className={isSystem ? 'text-gray-900 dark:text-gray-100' : ''}
+                className={isSystem ? 'system-message-wrapper' : ''}
                 style={isSystem ? {
                   background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
                   backgroundSize: '100% 100%',
@@ -148,6 +148,8 @@ const Message = React.memo(
                   MozBackgroundClip: 'text',
                   msBackgroundClip: 'text',
                   fontWeight: '500',
+                  // 強制的な継承
+                  '--system-gradient': 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
                 } as any : {}}
               >
                 <MessageContent
