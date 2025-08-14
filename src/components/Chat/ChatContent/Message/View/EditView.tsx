@@ -420,12 +420,18 @@ const EditView = ({
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
       
-      // 行数を計算
-      const lineHeight = 28; // leading-7 = 28px
-      const rows = Math.round(textareaRef.current.scrollHeight / lineHeight);
-      setTextRows(Math.max(1, rows));
+      // モバイルデバイスでの初期化問題を修正
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|playbook|silk/i.test(navigator.userAgent);
+      if (isMobile) {
+        // モバイルでは強制的に単一行表示を維持
+        setTextRows(1);
+      } else {
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        const lineHeight = 28; // leading-7 = 28px
+        const rows = Math.round(textareaRef.current.scrollHeight / lineHeight);
+        setTextRows(Math.max(1, rows));
+      }
     }
   }, []);
 
@@ -513,7 +519,7 @@ const EditView = ({
             {/* 左側：カスタムプロンプトボタンと画像アップロードボタン */}
             <div className='flex-shrink-0 flex items-center gap-2'>
               <CommandPrompt _setContent={_setContent} />
-              {modelTypes[model] == 'image' && (
+              {modelTypes[model] === 'image' && (
                 <button
                   className='btn btn-neutral w-10 h-10 p-0 flex items-center justify-center rounded-full'
                   onClick={handleUploadButtonClick}
@@ -594,7 +600,7 @@ const EditView = ({
           </div>
           
           {/* 画像プレビューエリア */}
-          {modelTypes[model] == 'image' && (
+          {modelTypes[model] === 'image' && (
             <ImagePreviewList
               content={_content}
               onRemoveImage={handleRemoveImage}
@@ -662,7 +668,7 @@ const EditViewButtons = memo(
     return (
       <div>
         {/* IndexedDB化によりImageURL機能は不要になったため削除 */}
-        {modelTypes[model] == 'image' && (
+        {modelTypes[model] === 'image' && (
           <>
             {/* Hidden file input */}
             <input
