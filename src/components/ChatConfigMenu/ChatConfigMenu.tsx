@@ -206,7 +206,7 @@ const DefaultSystemChat = ({
         onKeyDown={handleKeyDown}
         value={_systemMessage}
         rows={1}
-        placeholder={t('systemMessagePlaceholder')}
+        placeholder={t('systemMessagePlaceholder') as string}
       ></textarea>
     </div>
   );
