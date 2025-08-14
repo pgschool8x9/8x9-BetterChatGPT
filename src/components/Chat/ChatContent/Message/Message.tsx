@@ -49,6 +49,32 @@ const Message = React.memo(
     const isUser = role === 'user';
     const isSystem = role === 'system';
 
+    // ユーザーメッセージの行数を判定（安全なアプローチ）
+    const getUserMessageLines = () => {
+      try {
+        if (!isUser || !content || !content[0]) return 1;
+        const firstContent = content[0];
+        if (firstContent && 'type' in firstContent && firstContent.type === 'text' && 'text' in firstContent) {
+          const textContent = String(firstContent.text || '');
+          return textContent.split('\n').length;
+        }
+        return 1;
+      } catch (error) {
+        console.warn('Error calculating message lines:', error);
+        return 1;
+      }
+    };
+
+    const userMessageLines = getUserMessageLines();
+    const userRoundedClass = isUser 
+      ? (userMessageLines === 1 ? 'rounded-full' : 'rounded-[1.25rem]')
+      : 'rounded-2xl';
+    
+    // ユーザーメッセージのpadding設定（入力エリアと同じ仕様）
+    const userPaddingClass = isUser 
+      ? (userMessageLines === 1 ? 'px-4 md:px-6' : 'px-4 md:px-6')
+      : 'px-4 py-3';
+
     // ボタンハンドラー
     const currentTextContent = isTextContent(content[0]) ? content[0].text : '';
     const handleCopy = () => {
@@ -96,7 +122,7 @@ const Message = React.memo(
             {/* メッセージ吹き出し */}
             <div
               className={`${isUser ? 'max-w-[70%]' : 'w-full md:max-w-[90%]'
-                } rounded-2xl px-4 py-3 ${isUser
+                } ${userRoundedClass} ${userPaddingClass} ${isUser
                   ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm ml-auto mr-4'
                   : isSystem
                     ? ''
