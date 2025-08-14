@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import useStore from '@store/store';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,10 @@ import { toast } from 'react-toastify';
 const ChatContent = () => {
   const { t } = useTranslation();
   const inputRole = useStore((state) => state.inputRole);
+  
+  // ランダムメッセージ配列をlocaleから取得
+  const inspirationalMessages = t('inspirationalMessages', { returnObjects: true }) as string[];
+  
   const setError = useStore((state) => state.setError);
   const setChats = useStore((state) => state.setChats);
   const [currentGeneratingMessage, setCurrentGeneratingMessage] = useState('');
@@ -31,6 +35,11 @@ const ChatContent = () => {
       : []
   );
   const currentChatIndex = useStore((state) => state.currentChatIndex);
+  
+  // ランダムメッセージを選択（チャットが空の時のみ新しく選択）
+  const randomMessage = useMemo(() => {
+    return inspirationalMessages[Math.floor(Math.random() * inspirationalMessages.length)];
+  }, [currentChatIndex, messages?.length]);
   const stickyIndex = useStore((state) =>
     state.chats &&
     state.chats.length > 0 &&
@@ -124,8 +133,22 @@ const ChatContent = () => {
             >
               <ChatTitle saveRef={saveRef} />
               {/* NewMessageButton非表示化 */}
-              {messagesLimited?.map(
-                (message, index) => {
+              {(!messages || messages.length === 0 || (messages.length === 1 && messages[0].role === 'system')) ? (
+                // チャット履歴が空の場合の初期メッセージ
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <h2 className="text-base font-normal text-gray-600 dark:text-gray-300">
+                      {t('learningMessage')}
+                    </h2>
+                    <h2 className="text-lg font-normal text-gray-600 dark:text-gray-300 py-2 italic">
+                      {randomMessage}
+                    </h2>
+                  </div>
+                </div>
+              ) : (
+                // 既存のチャット履歴表示
+                messagesLimited.map(
+                  (message, index) => {
                   // 生成中で最後のメッセージがassistantの場合は「思考中...」表示に置き換え
                   const isLastMessage = index === messagesLimited.length - 1;
                   const isGeneratingLastAssistant = generating && isLastMessage && message.role === 'assistant';
@@ -198,6 +221,7 @@ const ChatContent = () => {
                     </React.Fragment>
                   );
                 }
+              )
               )}
             </div>
 

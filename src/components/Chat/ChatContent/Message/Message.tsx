@@ -102,21 +102,40 @@ const Message = React.memo(
                 isUser 
                   ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm ml-auto mr-4' 
                   : isSystem
-                  ? 'text-white'
+                  ? ''
                   : 'bg-transparent text-gray-900 dark:text-gray-100'
               }`}
               style={isSystem ? {
                 background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
-                backgroundSize: '100% ,300%',
+                backgroundSize: '100% 100%',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
-                fontWeight: '500'
+                fontWeight: '500',
+                // スマホ対応のフォールバック
+                color: 'transparent',
+                // より強力なブラウザ対応
+                MozBackgroundClip: 'text',
+                msBackgroundClip: 'text'
               } : undefined}
             >
               {/* RoleSelector非表示化 */}
               {isSystem && (
-                <div className="text-lg mb-1 opacity-70 font-semibold">{t('systemRule')}</div>
+                <div 
+                  className="text-lg mb-1 opacity-70 font-semibold"
+                  style={{
+                    background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
+                    backgroundSize: '100% 100%',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                    MozBackgroundClip: 'text',
+                    msBackgroundClip: 'text'
+                  }}
+                >
+                  {t('systemRule')}
+                </div>
               )}
               <MessageContent
                 role={role}

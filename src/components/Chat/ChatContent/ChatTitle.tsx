@@ -158,7 +158,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
 
         {/* タイトル部分 - チャット名またはモデル名 */}
         <div className='flex-1 min-w-0'>
-          <div className='text-xl font-medium text-gray-900 dark:text-gray-100 truncate'>
+          <div className='text-lg font-medium text-gray-900 dark:text-gray-100 truncate'>
             {chat.title || `${getModelDisplayName(chat.config.model)}`}
           </div>
         </div>

@@ -62,9 +62,9 @@ const SettingsMenu = () => {
               <div className='flex flex-col gap-3'>
                 <AutoFetchModelsToggle />
                 <AutoTitleToggle />
-                <EnterToSubmitToggle />
-                <InlineLatexToggle />
                 <AdvancedModeToggle />
+                <InlineLatexToggle />
+                <EnterToSubmitToggle />
               </div>
               <LanguageSelector />
               <ThemeSwitcher />

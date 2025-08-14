@@ -78,5 +78,12 @@
     "Spreading creative wings...",
     "Inspiration is arriving..."
   ],
-  "systemRule": "System Rule"
+  "systemRule": "System Rule",
+  "learningMessage": "考えるために学べ、ただの情報を使える知識に変えろ、その過程に知性が宿る",
+  "inspirationalMessages": [
+    "不正解は無意味を意味しない",
+    "才能も発展も人生もいざって時に退いたら終わりだ", 
+    "怖くない人生などその本質を欠く",
+    "きっと迷いの中に倫理がある"
+  ]
 }

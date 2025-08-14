@@ -121,6 +121,29 @@ const useStore = create<StoreState>()(
         }
         return persistedState as StoreState;
       },
+      // モバイルでのPull-to-Refresh問題対策
+      onRehydrateStorage: (state) => {
+        console.log('Hydration starts for mobile persistence');
+        
+        return (state, error) => {
+          if (error) {
+            console.log('An error happened during hydration', error);
+          } else {
+            console.log('Hydration finished', state);
+            
+            // モバイル環境での強制的な状態チェック
+            if (typeof window !== 'undefined' && 'ontouchstart' in window) {
+              setTimeout(() => {
+                const currentState = useStore.getState();
+                console.log('Mobile state check:', {
+                  chats: currentState.chats?.length || 0,
+                  totalTokenUsed: Object.keys(currentState.totalTokenUsed || {}).length
+                });
+              }, 100);
+            }
+          }
+        };
+      },
     }
   )
 );
