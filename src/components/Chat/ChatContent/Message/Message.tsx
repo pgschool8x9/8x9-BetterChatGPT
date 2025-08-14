@@ -119,23 +119,6 @@ const Message = React.memo(
               } as any : undefined}
             >
               {/* RoleSelector非表示化 */}
-              {isSystem && (
-                <div
-                  className="text-lg mb-1 opacity-70 font-semibold"
-                  style={{
-                    background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
-                    backgroundSize: '100% 100%',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    color: 'transparent',
-                    MozBackgroundClip: 'text',
-                    msBackgroundClip: 'text'
-                  } as any}
-                >
-                  {t('systemRule')}
-                </div>
-              )}
               <div
                 className={isSystem ? 'system-message-wrapper' : ''}
                 style={isSystem ? {
