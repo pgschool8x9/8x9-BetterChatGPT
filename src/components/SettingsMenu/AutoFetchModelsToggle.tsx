@@ -20,7 +20,7 @@ const AutoFetchModelsToggle = () => {
 
   return (
     <Toggle
-      label={t('学習モデルを自動取得') as string}
+      label={t('autoFetchModels') as string}
       isChecked={isChecked}
       setIsChecked={setIsChecked}
     />

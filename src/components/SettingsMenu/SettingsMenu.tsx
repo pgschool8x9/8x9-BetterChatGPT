@@ -47,7 +47,7 @@ const SettingsMenu = () => {
         >
           <div className='p-6 border-b border-gray-200 dark:border-gray-600 flex flex-col items-center gap-4'>
             <div className='flex flex-col items-center gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg w-full'>
-              <div className='text-sm font-semibold text-gray-900 dark:text-gray-300'>チャット機能</div>
+              <div className='text-sm font-semibold text-gray-900 dark:text-gray-300'>{t('chatFeatures')}</div>
               
               {/* API設定とチャット設定ボタンを水平に配置 */}
               <div className='flex gap-3'>
@@ -55,7 +55,7 @@ const SettingsMenu = () => {
                   className='btn btn-neutral'
                   onClick={() => setIsApiModalOpen(true)}
                 >
-                  API設定
+{t('apiSettings')}
                 </button>
                 <ChatConfigMenu />
               </div>

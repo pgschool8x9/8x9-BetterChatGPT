@@ -81,15 +81,15 @@ const StorageManager = () => {
 
   return (
     <div className='flex flex-col items-center gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg'>
-      <div className='text-sm font-semibold text-gray-900 dark:text-gray-300'>ストレージ管理</div>
+      <div className='text-sm font-semibold text-gray-900 dark:text-gray-300'>{t('storageManagement')}</div>
       
       <div className='w-full'>
         <div className='space-y-1 text-sm mb-2 text-gray-900 dark:text-gray-300'>
           <div className='text-center'>
-            <span>合計使用量: {(storageUsage.usedMB + (storageUsage.indexedDBUsedMB || 0)).toFixed(2)} MB</span>
+            <span>{t('totalUsage')}: {(storageUsage.usedMB + (storageUsage.indexedDBUsedMB || 0)).toFixed(2)} MB</span>
           </div>
           <div className='text-xs text-gray-500 dark:text-gray-400 text-center'>
-            <span>チャット履歴: {storageUsage.usedMB} MB / 画像: {storageUsage.indexedDBUsedMB || 0} MB</span>
+            <span>{t('chatHistory')}: {storageUsage.usedMB} MB / {t('images')}: {storageUsage.indexedDBUsedMB || 0} MB</span>
           </div>
         </div>
         
@@ -101,7 +101,7 @@ const StorageManager = () => {
         </div>
         
         <div className='text-center text-sm mt-1 text-gray-900 dark:text-gray-300'>
-          <span>{storageUsage.usagePercent}% 使用中</span>
+          <span>{storageUsage.usagePercent}% {t('inUse')}</span>
         </div>
       </div>
 
@@ -111,7 +111,7 @@ const StorageManager = () => {
           disabled={isLoading}
           className='btn btn-neutral btn-warning'
         >
-          🗑️ 全ての画像ファイルを削除
+🗑️ {t('deleteAllImages')}
         </button>
         
         <button
@@ -119,7 +119,7 @@ const StorageManager = () => {
           disabled={isLoading}
           className='btn btn-neutral'
         >
-          会話をクリア
+{t('clearConversation')}
         </button>
       </div>
 

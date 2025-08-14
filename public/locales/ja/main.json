@@ -43,5 +43,28 @@
   "cloneChat": "チャットのコピーを作成",
   "cloned": "完了しました",
   "enterToSubmit": "Enterキーを押して送信",
-  "submitPlaceholder": "メッセージを入力..."
+  "submitPlaceholder": "メッセージを入力...",
+  "chatFeatures": "チャット機能",
+  "apiSettings": "API設定",
+  "autoFetchModels": "学習モデルを自動取得",
+  "displayMath": "数式を表示",
+  "costManagement": "コスト管理",
+  "storageManagement": "ストレージ管理",
+  "totalUsage": "合計使用量",
+  "chatHistory": "チャット履歴",
+  "images": "画像",
+  "inUse": "使用中",
+  "deleteAllImages": "全ての画像ファイルを削除",
+  "generatingMessages": [
+    "AIが思考を巡らせています...",
+    "言葉を紡いでいます...",
+    "ニューラルネットワークが活動中...",
+    "アイデアが閃きつつある...",
+    "知識の海を探索中...",
+    "AIが一生懸命考えています...",
+    "最高の文章を錬成中...",
+    "ちょっとだけ待っててね...",
+    "創造の翼を広げています...",
+    "インスピレーション降臨中..."
+  ]
 }

@@ -16,20 +16,6 @@ import countTokens, { limitMessageTokens } from '@utils/messageUtils';
 import { defaultModel, reduceMessagesToTotalToken } from '@constants/chat';
 import { toast } from 'react-toastify';
 
-// AI生成中メッセージの配列
-const generatingMessages = [
-  'AIが思考を巡らせています...',
-  '言葉を紡いでいます...',
-  'ニューラルネットワークが活動中...',
-  'アイデアが閃きつつある...',
-  '知識の海を探索中...',
-  'AIが一生懸命考えています...',
-  '最高の文章を錬成中...',
-  'ちょっとだけ待っててね...',
-  '創造の翼を広げています...',
-  'インスピレーション降臨中...'
-];
-
 const ChatContent = () => {
   const { t } = useTranslation();
   const inputRole = useStore((state) => state.inputRole);
@@ -113,10 +99,11 @@ const ChatContent = () => {
   // generating状態が変わった時にランダムメッセージを選択
   useEffect(() => {
     if (generating) {
+      const generatingMessages = t('generatingMessages', { returnObjects: true }) as string[];
       const randomIndex = Math.floor(Math.random() * generatingMessages.length);
       setCurrentGeneratingMessage(generatingMessages[randomIndex]);
     }
-  }, [generating]);
+  }, [generating, t]);
 
   const { error } = useSubmit();
 

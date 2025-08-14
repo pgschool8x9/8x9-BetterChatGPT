@@ -82,7 +82,7 @@ const TotalTokenCost = () => {
 
   return countTotalTokens ? (
     <div className='flex flex-col items-center gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg'>
-      <div className='text-sm font-semibold text-gray-900 dark:text-gray-300'>コスト管理</div>
+      <div className='text-sm font-semibold text-gray-900 dark:text-gray-300'>{t('costManagement')}</div>
       
       <div className='w-full'>
         <div className='relative overflow-x-auto shadow-md sm:rounded-lg'>
