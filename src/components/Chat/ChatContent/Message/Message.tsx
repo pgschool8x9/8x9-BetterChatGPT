@@ -133,7 +133,10 @@ const Message = React.memo(
               )}
               
               {/* AI側のボタン - メッセージ受信完了時のみ表示 */}
-              {!isUser && !useStore.getState().generating && role === 'assistant' && (
+              {!isUser && role === 'assistant' && (
+                // 最後のメッセージで生成中の場合は非表示、それ以外は表示
+                messageIndex !== lastMessageIndex || !useStore.getState().generating
+              ) && (
                 <div className="flex items-center gap-2 justify-start">
                   {messageIndex === lastMessageIndex && (
                     <div className="text-gray-700 dark:text-gray-300">

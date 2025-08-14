@@ -23,6 +23,6 @@
     "description": "-2.0から2.0の数値。正の値は、テキスト内での新しいトークンの既存の頻度に基づいて新しいトークンにペナルティを課し、同じ行をそのまま繰り返す可能性を減らします。（デフォルト：0）"
   },
   "defaultChatConfig": "チャット設定",
-  "defaultSystemMessage": "デフォルトシステムメッセージ",
+  "defaultSystemMessage": "システムメッセージ",
   "resetToDefault": "デフォルトにリセット"
 }

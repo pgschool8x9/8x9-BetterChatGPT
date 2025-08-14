@@ -12,9 +12,7 @@ import InlineLatexToggle from './InlineLatexToggle';
 import PromptLibraryMenu from '@components/PromptLibraryMenu';
 import ChatConfigMenu from '@components/ChatConfigMenu';
 import EnterToSubmitToggle from './EnterToSubmitToggle';
-import TotalTokenCost, { TotalTokenCostToggle } from './TotalTokenCost';
-import DisplayChatSizeToggle from './DisplayChatSizeToggle';
-import MigrationButton from './MigrationButton';
+import TotalTokenCost from './TotalTokenCost';
 import AutoFetchModelsToggle from './AutoFetchModelsToggle';
 import StorageManager from './StorageManager';
 import ApiMenu from '@components/ApiMenu';
@@ -48,31 +46,31 @@ const SettingsMenu = () => {
           cancelButton={false}
         >
           <div className='p-6 border-b border-gray-200 dark:border-gray-600 flex flex-col items-center gap-4'>
-            {/* API設定ボタン - 一番上に配置 */}
-            <button
-              className='btn btn-neutral'
-              onClick={() => setIsApiModalOpen(true)}
-            >
-              APIキーを設定
-            </button>
-            <LanguageSelector />
-            <ThemeSwitcher />
-            <div className='flex flex-col gap-3'>
-              <EnterToSubmitToggle />
-              <InlineLatexToggle />
-              <AdvancedModeToggle />
-              <TotalTokenCostToggle />
-              <DisplayChatSizeToggle />
-              <AutoFetchModelsToggle />
-              <AutoTitleToggle />
+            <div className='flex flex-col items-center gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg w-full'>
+              <div className='text-sm font-semibold text-gray-900 dark:text-gray-300'>チャット機能</div>
+              
+              {/* API設定とチャット設定ボタンを水平に配置 */}
+              <div className='flex gap-3'>
+                <button
+                  className='btn btn-neutral'
+                  onClick={() => setIsApiModalOpen(true)}
+                >
+                  API設定
+                </button>
+                <ChatConfigMenu />
+              </div>
+              <div className='flex flex-col gap-3'>
+                <AutoFetchModelsToggle />
+                <AutoTitleToggle />
+                <EnterToSubmitToggle />
+                <InlineLatexToggle />
+                <AdvancedModeToggle />
+              </div>
+              <LanguageSelector />
+              <ThemeSwitcher />
             </div>
             <TotalTokenCost />
             <StorageManager />
-            <div className='grid grid-cols-1 gap-3'>
-              <ChatConfigMenu />
-              {/* <PromptLibraryMenu /> */}
-            </div>
-            <MigrationButton />
           </div>
         </PopupModal>
       )}

@@ -11,7 +11,6 @@ import {
   TextContentInterface,
 } from '@type/chat';
 
-import PopupModal from '@components/PopupModal';
 import CommandPrompt from '../CommandPrompt';
 import { defaultModel } from '@constants/chat';
 import ImageIcon from '@icon/ImageIcon';
@@ -53,7 +52,6 @@ const EditView = ({
   });
 
   const [_content, _setContent] = useState<ContentInterface[]>(content);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   // imageUrl関連は不要（IndexedDB化により削除）
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const [textRows, setTextRows] = useState(1);
@@ -63,6 +61,7 @@ const EditView = ({
   
   // modelTypesの初期化状態を監視
   const [isModelTypesReady, setIsModelTypesReady] = useState(false);
+  
 
   const { t } = useTranslation();
 
@@ -250,14 +249,40 @@ const EditView = ({
   const handleStopGenerating = () => {
     if (modelStreamSupport[model]) {
       setGenerating(false);
-      // キャンセル時に空のアシスタントメッセージを削除
-      cleanupEmptyAssistantMessage();
+      // キャンセル時に空のアシスタントメッセージのみ削除（ユーザーメッセージは残す）
+      cleanupEmptyAssistantMessageOnly();
     } else {
       const confirmMessage = t('stopNonStreamGenerationWarning');
       if (window.confirm(confirmMessage)) {
         setGenerating(false);
-        // キャンセル時に空のアシスタントメッセージを削除
-        cleanupEmptyAssistantMessage();
+        // キャンセル時に空のアシスタントメッセージのみ削除（ユーザーメッセージは残す）
+        cleanupEmptyAssistantMessageOnly();
+      }
+    }
+  };
+  
+  const cleanupEmptyAssistantMessageOnly = () => {
+    const chats = useStore.getState().chats;
+    if (chats && chats[currentChatIndex]) {
+      const messages = chats[currentChatIndex].messages;
+      const updatedChats: ChatInterface[] = JSON.parse(JSON.stringify(chats));
+      let hasChanges = false;
+      
+      // 最後のメッセージが空のアシスタントメッセージの場合のみ削除
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage && lastMessage.role === 'assistant') {
+        const textContent = lastMessage.content[0] as TextContentInterface;
+        const isEmpty = !textContent || 
+                       !textContent.text || 
+                       textContent.text.trim() === '';
+        if (isEmpty) {
+          updatedChats[currentChatIndex].messages.pop();
+          hasChanges = true;
+        }
+      }
+      
+      if (hasChanges) {
+        setChats(updatedChats);
       }
     }
   };
@@ -451,6 +476,7 @@ const EditView = ({
     checkModelTypes();
   }, []);
 
+
   // ドラッグ&ドロップ処理
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -614,7 +640,7 @@ const EditView = ({
                 <button
                   className='btn btn-primary w-10 h-10 p-0 flex items-center justify-center rounded-full'
                   onClick={() => {
-                    !generating && setIsModalOpen(true);
+                    !generating && handleGenerate();
                   }}
                   aria-label="送信"
                 >
@@ -641,7 +667,6 @@ const EditView = ({
         handleRemoveImage={handleRemoveImage}
         handleGenerate={handleGenerate}
         handleSave={handleSave}
-        setIsModalOpen={setIsModalOpen}
         setIsEdit={setIsEdit}
         _setContent={_setContent}
         _content={_content}
@@ -649,14 +674,6 @@ const EditView = ({
         model={model}
         isModelTypesReady={isModelTypesReady}
       />
-      {isModalOpen && (
-        <PopupModal
-          setIsModalOpen={setIsModalOpen}
-          title={t('warning') as string}
-          message={t('clearMessageWarning') as string}
-          handleConfirm={handleGenerate}
-        />
-      )}
     </div>
   );
 };
@@ -668,7 +685,6 @@ const EditViewButtons = memo(
     handleRemoveImage,
     handleGenerate,
     handleSave,
-    setIsModalOpen,
     setIsEdit,
     _setContent,
     _content,
@@ -681,7 +697,6 @@ const EditViewButtons = memo(
     handleRemoveImage: (index: number) => void;
     handleGenerate: () => void;
     handleSave: () => void;
-    setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     _setContent: React.Dispatch<React.SetStateAction<ContentInterface[]>>;
     _content: ContentInterface[];

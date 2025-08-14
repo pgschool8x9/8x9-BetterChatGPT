@@ -81,32 +81,37 @@ const TotalTokenCost = () => {
   }, [costMapping, formatLocalizedCurrency]);
 
   return countTotalTokens ? (
-    <div className='flex flex-col items-center gap-2'>
-      <div className='relative overflow-x-auto shadow-md sm:rounded-lg'>
-        <table className='w-full text-sm text-left text-gray-500 dark:text-gray-400'>
-          <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
-            <tr>
-              <th className='px-4 py-2'>{t('model', { ns: 'model' })}</th>
-              <th className='px-4 py-2'>{currentCurrency}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {localizedCostMapping.map(({ model, cost }) => (
-              <tr
-                key={model}
-                className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-              >
-                <td className='px-4 py-2'>{model}</td>
-                <td className='px-4 py-2'>{cost}</td>
+    <div className='flex flex-col items-center gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg'>
+      <div className='text-sm font-semibold text-gray-900 dark:text-gray-300'>コスト管理</div>
+      
+      <div className='w-full'>
+        <div className='relative overflow-x-auto shadow-md sm:rounded-lg'>
+          <table className='w-full text-sm text-left text-gray-500 dark:text-gray-400'>
+            <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
+              <tr>
+                <th className='px-4 py-2'>{t('model', { ns: 'model' })}</th>
+                <th className='px-4 py-2'>{currentCurrency}</th>
               </tr>
-            ))}
-            <tr className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 font-bold'>
-              <td className='px-4 py-2'>{t('total', { ns: 'main' })}</td>
-              <td className='px-4 py-2'>{localizedTotal}</td>
-            </tr>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {localizedCostMapping.map(({ model, cost }) => (
+                <tr
+                  key={model}
+                  className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                >
+                  <td className='px-4 py-2'>{model}</td>
+                  <td className='px-4 py-2'>{cost}</td>
+                </tr>
+              ))}
+              <tr className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 font-bold'>
+                <td className='px-4 py-2'>{t('total', { ns: 'main' })}</td>
+                <td className='px-4 py-2'>{localizedTotal}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+      
       <div className='btn btn-neutral cursor-pointer' onClick={resetCost}>
         {t('resetCost', { ns: 'main' })}
       </div>
