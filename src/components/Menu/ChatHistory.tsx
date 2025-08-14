@@ -92,27 +92,30 @@ const ChatHistory = React.memo(
       // 実際の使用履歴があるかチェック
       if (chat.tokenUsed && chat.tokenUsed[model]) {
         const actualUsage = chat.tokenUsed[model];
-        const tokenCost: TotalTokenUsed[ModelOptions] = {
-          promptTokens: actualUsage.promptTokens,
-          completionTokens: actualUsage.completionTokens,
-          imageTokens: actualUsage.imageTokens,
-        };
-        
-        const cost = tokenCostToCost(tokenCost, model as ModelOptions);
-        console.log('Debug - Actual token usage:', {
-          promptTokens: actualUsage.promptTokens,
-          completionTokens: actualUsage.completionTokens,
-          imageTokens: actualUsage.imageTokens,
-          model: model,
-          rawCost: cost,
-          source: 'actual_usage'
-        });
-        
-        const totalTokens = actualUsage.promptTokens + actualUsage.completionTokens + actualUsage.imageTokens;
-        return {
-          tokens: totalTokens,
-          usdCost: typeof cost === 'number' && cost >= 0 ? cost : 0
-        };
+        // TypeScript型安全性のため、actualUsageの存在確認
+        if (actualUsage) {
+          const tokenCost: TotalTokenUsed[ModelOptions] = {
+            promptTokens: actualUsage.promptTokens,
+            completionTokens: actualUsage.completionTokens,
+            imageTokens: actualUsage.imageTokens,
+          };
+          
+          const cost = tokenCostToCost(tokenCost, model as ModelOptions);
+          console.log('Debug - Actual token usage:', {
+            promptTokens: actualUsage.promptTokens,
+            completionTokens: actualUsage.completionTokens,
+            imageTokens: actualUsage.imageTokens,
+            model: model,
+            rawCost: cost,
+            source: 'actual_usage'
+          });
+          
+          const totalTokens = actualUsage.promptTokens + actualUsage.completionTokens + actualUsage.imageTokens;
+          return {
+            tokens: totalTokens,
+            usdCost: typeof cost === 'number' && cost >= 0 ? cost : 0
+          };
+        }
       }
 
       // フォールバック: 推定計算（既存チャット用）
