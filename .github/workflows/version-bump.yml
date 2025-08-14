@@ -1,0 +1,101 @@
+name: Auto Version Bump
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'バージョンアップの種類'
+        required: true
+        default: 'minor'
+        type: choice
+        options:
+        - patch  # 1.21.0 → 1.21.1 (バグ修正)
+        - minor  # 1.21.0 → 1.22.0 (新機能)
+        - major  # 1.21.0 → 2.0.0 (破壊的変更)
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '🔖 バージョンアップ')"
+    
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Node.js設定
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 依存関係インストール
+        run: npm ci
+
+      - name: コミットメッセージから変更種別を判定
+        id: commit-analysis
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "コミットメッセージ: $COMMIT_MSG"
+          
+          if [[ $COMMIT_MSG =~ ^BREAKING|^feat!|^fix! ]]; then
+            echo "version_type=major" >> $GITHUB_OUTPUT
+            echo "判定結果: major (破壊的変更)"
+          elif [[ $COMMIT_MSG =~ ^feat ]]; then
+            echo "version_type=minor" >> $GITHUB_OUTPUT
+            echo "判定結果: minor (新機能)"
+          else
+            echo "version_type=patch" >> $GITHUB_OUTPUT
+            echo "判定結果: patch (バグ修正・改善)"
+          fi
+
+      - name: バージョンアップ実行
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # 手動実行時は入力値、自動実行時は判定結果を使用
+          VERSION_TYPE=${{ github.event.inputs.version_type || steps.commit-analysis.outputs.version_type }}
+          echo "適用するバージョンタイプ: $VERSION_TYPE"
+          
+          # 現在のバージョンを取得
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "現在のバージョン: $CURRENT_VERSION"
+          
+          # package.jsonのバージョン更新（タグは作成しない）
+          npm version $VERSION_TYPE --no-git-tag-version
+          
+          # 更新されたバージョンを取得
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "新しいバージョン: $NEW_VERSION"
+          
+          # コミットとタグを作成
+          git add package.json package-lock.json
+          git commit -m "🔖 バージョンアップ: v$NEW_VERSION"
+          git tag "v$NEW_VERSION"
+          
+          # リモートにプッシュ
+          git push origin main
+          git push origin "v$NEW_VERSION"
+          
+          echo "✅ バージョンアップが完了しました: $CURRENT_VERSION → $NEW_VERSION"
+
+      - name: リリースノート作成
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.new_version }}
+          release_name: Release v${{ steps.version.outputs.new_version }}
+          body: |
+            ## 変更内容
+            - 自動バージョンアップ: ${{ steps.commit-analysis.outputs.version_type }}
+            
+            ### コミット履歴
+            ${{ github.event.head_commit.message }}
+          draft: false
+          prerelease: false

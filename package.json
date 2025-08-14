@@ -36,7 +36,13 @@
     "electron": "concurrently -k \"BROWSER=none yarn dev\" \"wait-on tcp:5173 && electron .\"",
     "pack": "yarn build && electron-builder --dir",
     "make": "yarn build && electron-builder",
-    "debug": "concurrently -k \"cross-env BROWSER=none yarn dev\" \"wait-on tcp:5173 && electron --inspect=5858 .\""
+    "debug": "concurrently -k \"cross-env BROWSER=none yarn dev\" \"wait-on tcp:5173 && electron --inspect=5858 .\"",
+    "version:patch": "npm version patch",
+    "version:minor": "npm version minor",
+    "version:major": "npm version major",
+    "version:check": "node -p \"'Current version: ' + require('./package.json').version\"",
+    "version:bump": "node scripts/bump-version.js",
+    "postversion": "git push && git push --tags"
   },
   "build": {
     "appId": "better-chatgpt",
