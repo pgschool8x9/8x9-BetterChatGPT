@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import useStore from '@store/store';
+import { useTranslation } from 'react-i18next';
 
 import Avatar from './Avatar';
 import MessageContent from './MessageContent';
@@ -31,6 +32,7 @@ const Message = React.memo(
     sticky?: boolean;
     model?: ModelOptions;
   }) => {
+    const { t } = useTranslation();
     const hideSideMenu = useStore((state) => state.hideSideMenu);
     const advancedMode = useStore((state) => state.advancedMode);
     const currentChatIndex = useStore((state) => state.currentChatIndex);
@@ -100,11 +102,22 @@ const Message = React.memo(
                 isUser 
                   ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm ml-auto mr-4' 
                   : isSystem
-                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                  ? 'text-white'
                   : 'bg-transparent text-gray-900 dark:text-gray-100'
               }`}
+              style={isSystem ? {
+                background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
+                backgroundSize: '100% ,300%',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                fontWeight: '500'
+              } : undefined}
             >
               {/* RoleSelector非表示化 */}
+              {isSystem && (
+                <div className="text-lg mb-1 opacity-70 font-semibold">{t('systemRule')}</div>
+              )}
               <MessageContent
                 role={role}
                 content={content}

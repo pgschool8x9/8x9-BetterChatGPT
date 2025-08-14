@@ -170,8 +170,24 @@ const DefaultSystemChat = ({
   };
 
   const handleOnBlur = (e: React.FocusEvent<HTMLTextAreaElement, Element>) => {
-    e.target.style.height = 'auto';
-    e.target.style.maxHeight = '2.5rem';
+    // ブラー時は高さを維持して、最低の高さのみ設定
+    if (e.target.scrollHeight <= 40) {
+      e.target.style.height = '2.5rem';
+      e.target.style.maxHeight = '2.5rem';
+    } else {
+      e.target.style.maxHeight = `${Math.min(e.target.scrollHeight, 200)}px`;
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      // Enterキーで改行を許可
+      e.stopPropagation();
+      // textareaの高さを自動調整
+      setTimeout(() => {
+        handleInput(e as any);
+      }, 0);
+    }
   };
 
   return (
@@ -187,8 +203,10 @@ const DefaultSystemChat = ({
           _setSystemMessage(e.target.value);
         }}
         onInput={handleInput}
+        onKeyDown={handleKeyDown}
         value={_systemMessage}
         rows={1}
+        placeholder="システムメッセージを入力してください（Enterで改行可能）"
       ></textarea>
     </div>
   );
