@@ -156,38 +156,26 @@ export const TotalTokenCostDisplay = () => {
   const isMobile = typeof window !== 'undefined' && 
     ('ontouchstart' in window || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
 
-  // モバイルでのhydration完了を待つ
+  // hydration完了を待つ
   useEffect(() => {
-    if (isMobile) {
-      // モバイルの場合、少し遅延してhydrationを完了させる
-      const timeout = setTimeout(() => {
-        setIsHydrated(true);
-      }, 500);
-      return () => clearTimeout(timeout);
-    } else {
+    const handleHydration = () => {
       setIsHydrated(true);
-    }
-  }, [isMobile]);
+    };
 
-  // モバイルでのデータ復旧を試行
-  useEffect(() => {
-    if (isMobile && isHydrated && (!totalTokenUsed || Object.keys(totalTokenUsed).length === 0)) {
-      // バックアップからのデータ復旧を試行
-      try {
-        const backup = sessionStorage.getItem('free-chat-gpt_backup');
-        if (backup) {
-          const parsedBackup = JSON.parse(backup);
-          if (parsedBackup.totalTokenUsed && Object.keys(parsedBackup.totalTokenUsed).length > 0) {
-            console.log('Attempting to restore cost data from backup');
-            // ストアを直接更新（モバイル復旧用）
-            useStore.getState().setTotalTokenUsed(parsedBackup.totalTokenUsed);
-          }
-        }
-      } catch (error) {
-        console.warn('Failed to restore cost data from backup:', error);
-      }
+    // すでにhydratedかチェック
+    const currentData = useStore.getState().totalTokenUsed;
+    if (currentData && Object.keys(currentData).length > 0) {
+      setIsHydrated(true);
+    } else {
+      // hydration完了イベントを待つ
+      window.addEventListener('zustand-hydrated', handleHydration);
     }
-  }, [isMobile, isHydrated, totalTokenUsed]);
+
+    return () => {
+      window.removeEventListener('zustand-hydrated', handleHydration);
+    };
+  }, []);
+
 
   useEffect(() => {
     let updatedTotalCost = 0;
@@ -214,7 +202,7 @@ export const TotalTokenCostDisplay = () => {
   return (
     <a className='flex py-2 px-2 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white text-sm'>
       <CalculatorIcon />
-      {isMobile && !isHydrated ? 'Loading...' : (localizedCost || (totalCost === 0 ? '$0.000' : 'Loading...'))}
+      {!isHydrated ? 'Loading...' : (localizedCost || (totalCost === 0 ? '$0.000' : 'Loading...'))}
     </a>
   );
 };
