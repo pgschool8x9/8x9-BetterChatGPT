@@ -122,33 +122,34 @@ const ContentView = memo(
           } : {}}
         >
           {markdownMode ? (
-            <ReactMarkdown
-              remarkPlugins={[
-                remarkGfm,
-                [remarkMath, { singleDollarTextMath: inlineLatex }],
-              ]}
-              rehypePlugins={[
-                rehypeKatex,
-                [
-                  rehypeHighlight,
-                  {
-                    detect: true,
-                    ignoreMissing: true,
-                    subset: codeLanguageSubset,
-                  },
-                ],
-              ]}
-              linkTarget='_new'
-              components={{
-                code,
-                p,
-              }}
-              style={role === 'system' ? { color: 'inherit' } : {}}
-            >
-              {inlineLatex
-                ? preprocessLaTeX(currentTextContent)
-                : currentTextContent}
-            </ReactMarkdown>
+            <div style={role === 'system' ? { color: 'inherit' } : {}}>
+              <ReactMarkdown
+                remarkPlugins={[
+                  remarkGfm,
+                  [remarkMath, { singleDollarTextMath: inlineLatex }],
+                ]}
+                rehypePlugins={[
+                  rehypeKatex,
+                  [
+                    rehypeHighlight,
+                    {
+                      detect: true,
+                      ignoreMissing: true,
+                      subset: codeLanguageSubset,
+                    },
+                  ],
+                ]}
+                linkTarget='_new'
+                components={{
+                  code,
+                  p,
+                }}
+              >
+                {inlineLatex
+                  ? preprocessLaTeX(currentTextContent)
+                  : currentTextContent}
+              </ReactMarkdown>
+            </div>
           ) : (
             <span 
               className='whitespace-pre-wrap'
