@@ -14,6 +14,7 @@ import {
   isImageContent,
   isTextContent,
   TotalTokenUsed,
+  MessageInterface,
 } from '@type/chat';
 import { updateTotalTokenUsed } from '@utils/messageUtils';
 import { ModelOptions } from '@utils/modelReader';
@@ -204,10 +205,10 @@ const ChatHistoryList = () => {
             // ChatHistory.tsxの既存ロジックと同様の推定計算
             const messages = chat.messages;
             const textPrompts = messages.filter(
-              (e) => Array.isArray(e.content) && e.content.some(isTextContent)
+              (e: MessageInterface) => Array.isArray(e.content) && e.content.some(isTextContent)
             );
             const imgPrompts = messages.filter(
-              (e) => Array.isArray(e.content) && e.content.some(isImageContent)
+              (e: MessageInterface) => Array.isArray(e.content) && e.content.some(isImageContent)
             );
             
             // 同期的にcountTokensを実行
