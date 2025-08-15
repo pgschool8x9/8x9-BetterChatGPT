@@ -42,10 +42,7 @@ const EditView = ({
       state.chats.length > 0 &&
       state.currentChatIndex >= 0 &&
       state.currentChatIndex < state.chats.length;
-    if (!isInitialised) {
-      currentChatIndex = 0;
-      setCurrentChatIndex(0);
-    }
+    // レンダリング中の状態更新を削除（useEffectに移動）
     return isInitialised
       ? state.chats![state.currentChatIndex].config.model
       : defaultModel;
@@ -190,11 +187,17 @@ const EditView = ({
     ) {
       return;
     }
+    const chats = useStore.getState().chats;
+    if (!chats || chats.length === 0 || currentChatIndex < 0 || currentChatIndex >= chats.length) {
+      console.error('Invalid chats state or currentChatIndex in handleSave:', { chats, currentChatIndex });
+      return;
+    }
+    
     const originalChats: ChatInterface[] = JSON.parse(
-      JSON.stringify(useStore.getState().chats)
+      JSON.stringify(chats)
     );
     const updatedChats: ChatInterface[] = JSON.parse(
-      JSON.stringify(useStore.getState().chats)
+      JSON.stringify(chats)
     );
     const updatedMessages = updatedChats[currentChatIndex].messages;
 
@@ -330,11 +333,17 @@ const EditView = ({
       return;
     }
 
+    const chats = useStore.getState().chats;
+    if (!chats || chats.length === 0 || currentChatIndex < 0 || currentChatIndex >= chats.length) {
+      console.error('Invalid chats state or currentChatIndex:', { chats, currentChatIndex });
+      return;
+    }
+
     const originalChats: ChatInterface[] = JSON.parse(
-      JSON.stringify(useStore.getState().chats)
+      JSON.stringify(chats)
     );
     const updatedChats: ChatInterface[] = JSON.parse(
-      JSON.stringify(useStore.getState().chats)
+      JSON.stringify(chats)
     );
     const updatedMessages = updatedChats[currentChatIndex].messages;
 
@@ -432,6 +441,21 @@ const EditView = ({
       toast.error('ペーストした画像の保存に失敗しました');
     }
   };
+
+  // チャットインデックスの初期化チェック
+  useEffect(() => {
+    const chats = useStore.getState().chats;
+    const currentIndex = useStore.getState().currentChatIndex;
+    const isInitialised =
+      chats &&
+      chats.length > 0 &&
+      currentIndex >= 0 &&
+      currentIndex < chats.length;
+    
+    if (!isInitialised && chats && chats.length > 0) {
+      setCurrentChatIndex(0);
+    }
+  }, []); // 初回のみ実行
 
   useEffect(() => {
     if (textareaRef.current) {

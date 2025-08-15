@@ -17,6 +17,7 @@ import {
   MessageInterface,
 } from '@type/chat';
 import { updateTotalTokenUsed } from '@utils/messageUtils';
+import countTokens from '@utils/messageUtils';
 import { ModelOptions } from '@utils/modelReader';
 
 const ChatHistoryList = () => {
@@ -212,7 +213,6 @@ const ChatHistoryList = () => {
             );
             
             // 同期的にcountTokensを実行
-            const { default: countTokens } = require('@utils/messageUtils');
             const tokenCount = countTokens(textPrompts, model);
             const imageTokenCount = countTokens(imgPrompts, model);
             

@@ -4,6 +4,9 @@ import { useCallback } from 'react';
 // 言語コードから通貨コードへのマッピング
 export const LANGUAGE_CURRENCY_MAP: Record<string, string> = {
   'ja': 'JPY',      // 日本語 → 日本円
+  'ja_jp': 'JPY',   // 日本語(アンダースコア) → 日本円
+  'ja-jp': 'JPY',   // 日本語(小文字ハイフン) → 日本円
+  'ja-JP': 'JPY',   // 日本語(大文字ハイフン) → 日本円
   'en': 'USD',      // 英語 → 米ドル
   'en-US': 'USD',   // 英語(US) → 米ドル
   'en-GB': 'GBP',   // 英語(UK) → 英ポンド
@@ -108,12 +111,24 @@ export const fetchExchangeRates = async (): Promise<Record<string, number>> => {
     RON: 4.6,
     MYR: 4.7,
     VND: 24000
-  };
+  }
 };
 
 // 現在の言語に基づいて通貨コードを取得
-export const getCurrentCurrency = (language: string): string => {
-  return LANGUAGE_CURRENCY_MAP[language] || DEFAULT_CURRENCY;
+export const getCurrentCurrency = (language: string): string => {  
+  // 完全一致をチェック
+  if (LANGUAGE_CURRENCY_MAP[language]) {
+    const currency = LANGUAGE_CURRENCY_MAP[language];
+    return currency;
+  }
+  
+  // 部分一致をチェック（ja_jp → ja など）
+  const languageBase = language.split(/[-_]/)[0];
+  if (LANGUAGE_CURRENCY_MAP[languageBase]) {
+    const currency = LANGUAGE_CURRENCY_MAP[languageBase];
+    return currency;
+  }  
+  return DEFAULT_CURRENCY;
 };
 
 // 通貨フォーマット

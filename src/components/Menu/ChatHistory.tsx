@@ -74,7 +74,7 @@ const ChatHistory = React.memo(
     const active = useStore((state) => state.currentChatIndex === chatIndex);
     const generating = useStore((state) => state.generating);
     const chats = useStore((state) => state.chats);
-    const { formatLocalizedCurrency } = useLocalizedCurrency();
+    const { formatLocalizedCurrency, currentLanguage, currentCurrency } = useLocalizedCurrency();
 
     const [isDelete, setIsDelete] = useState<boolean>(false);
     const [isEdit, setIsEdit] = useState<boolean>(false);
@@ -149,7 +149,7 @@ const ChatHistory = React.memo(
           setLocalizedCost(`$${tokenInfo.usdCost.toFixed(4)}`);
         });
       }
-    }, [tokenInfo?.usdCost, chatIndex, formatLocalizedCurrency]);
+    }, [tokenInfo?.usdCost, chatIndex, currentLanguage, currentCurrency]);
 
     const editTitle = () => {
       const updatedChats = JSON.parse(

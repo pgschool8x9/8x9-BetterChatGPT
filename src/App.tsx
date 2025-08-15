@@ -106,6 +106,17 @@ function App() {
     // hydration完了を待つ
     window.addEventListener('zustand-hydrated', handleHydration);
     
+    // 既にhydration完了している場合の対応
+    const checkIfAlreadyHydrated = () => {
+      const chats = useStore.getState().chats;
+      if (chats !== undefined) {
+        handleHydration();
+      }
+    };
+    
+    // 少し待ってからチェック
+    setTimeout(checkIfAlreadyHydrated, 100);
+    
     // クリーンアップ
     return () => {
       window.removeEventListener('zustand-hydrated', handleHydration);

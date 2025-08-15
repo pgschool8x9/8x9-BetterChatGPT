@@ -59,26 +59,19 @@ const TotalTokenCost = () => {
     setCostMapping(updatedCostMapping);
   }, [totalTokenUsed]);
 
-  // 通貨変換を非同期で実行
+  // USD固定表示に変更（為替取得を無効化）
   useEffect(() => {
-    const convertCosts = async () => {
-      const convertedMapping = await Promise.all(
-        costMapping.map(async ({ model, cost }) => ({
-          model,
-          cost: await formatLocalizedCurrency(cost)
-        }))
-      );
+    if (costMapping.length > 0) {
+      const convertedMapping = costMapping.map(({ model, cost }) => ({
+        model,
+        cost: `$${cost.toFixed(3)}`
+      }));
       setLocalizedCostMapping(convertedMapping);
 
       const totalCost = costMapping.reduce((prev, curr) => prev + curr.cost, 0);
-      const convertedTotal = await formatLocalizedCurrency(totalCost);
-      setLocalizedTotal(convertedTotal);
-    };
-
-    if (costMapping.length > 0) {
-      convertCosts();
+      setLocalizedTotal(`$${totalCost.toFixed(3)}`);
     }
-  }, [costMapping, formatLocalizedCurrency]);
+  }, [costMapping]);
 
   return countTotalTokens ? (
     <div className='flex flex-col items-center gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg'>
@@ -90,7 +83,7 @@ const TotalTokenCost = () => {
             <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
               <tr>
                 <th className='px-4 py-2'>{t('model', { ns: 'model' })}</th>
-                <th className='px-4 py-2'>{currentCurrency}</th>
+                <th className='px-4 py-2'>USD</th>
               </tr>
             </thead>
             <tbody>
@@ -146,7 +139,7 @@ export const TotalTokenCostToggle = () => {
 export const TotalTokenCostDisplay = () => {
   const { t } = useTranslation();
   const totalTokenUsed = useStore((state) => state.totalTokenUsed);
-  const { formatLocalizedCurrency } = useLocalizedCurrency();
+  const { formatLocalizedCurrency, currentLanguage, currentCurrency } = useLocalizedCurrency();
 
   const [totalCost, setTotalCost] = useState<number>(0);
   const [localizedCost, setLocalizedCost] = useState<string>('');
@@ -197,7 +190,7 @@ export const TotalTokenCostDisplay = () => {
         setLocalizedCost(`$${totalCost.toFixed(3)}`);
       });
     }
-  }, [totalCost, formatLocalizedCurrency]);
+  }, [totalCost, currentLanguage, currentCurrency]);
 
   return (
     <a className='flex py-2 px-2 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white text-sm'>

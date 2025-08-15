@@ -20,11 +20,33 @@ export const createStorageGuard = (storageKey: string) => {
           lastKnownState = currentState;
           // セッションストレージにもバックアップ
           sessionStorage.setItem(`${storageKey}_backup`, currentState);
-          // モバイル用の追加バックアップ（より頻繁）
+          
+          // タイムスタンプ付きバックアップの容量制御
+          const sessionKeys = Object.keys(sessionStorage);
+          const mobileBackupKeys = sessionKeys.filter(key => 
+            key.startsWith(`${storageKey}_mobile_backup_`)
+          ).sort();
+          
+          // 古いバックアップを削除（最新5個のみ保持）
+          if (mobileBackupKeys.length >= 5) {
+            for (let i = 0; i < mobileBackupKeys.length - 4; i++) {
+              sessionStorage.removeItem(mobileBackupKeys[i]);
+            }
+          }
+          
+          // 新しいバックアップを作成
           sessionStorage.setItem(`${storageKey}_mobile_backup_${Date.now()}`, currentState);
         }
       } catch (error) {
         console.warn('Storage guard backup failed:', error);
+        // 容量超過の場合、古いバックアップを全削除
+        if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+          const sessionKeys = Object.keys(sessionStorage);
+          const mobileBackupKeys = sessionKeys.filter(key => 
+            key.startsWith(`${storageKey}_mobile_backup_`)
+          );
+          mobileBackupKeys.forEach(key => sessionStorage.removeItem(key));
+        }
       }
     };
     

@@ -59,7 +59,12 @@ const ContentView = memo(
     const currentChatIndex = useStore((state) => state.currentChatIndex);
     const setChats = useStore((state) => state.setChats);
     const lastMessageIndex = useStore((state) =>
-      state.chats ? state.chats[state.currentChatIndex].messages.length - 1 : 0
+      state.chats && 
+      state.chats.length > 0 && 
+      state.currentChatIndex >= 0 && 
+      state.currentChatIndex < state.chats.length
+        ? state.chats[state.currentChatIndex].messages.length - 1 
+        : 0
     );
     const inlineLatex = useStore((state) => state.inlineLatex);
     const markdownMode = useStore((state) => state.markdownMode);

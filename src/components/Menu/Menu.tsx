@@ -20,14 +20,27 @@ const Menu = () => {
   const isResizing = useRef<boolean>(false);
 
   useEffect(() => {
+    // 初期状態でモバイル表示の場合はメニューを隠す
     if (window.innerWidth < 768) setHideSideMenu(true);
-    window.addEventListener('resize', () => {
-      if (
-        windowWidthRef.current !== window.innerWidth &&
-        window.innerWidth < 768
-      )
-        setHideSideMenu(true);
-    });
+    
+    const handleResize = () => {
+      if (windowWidthRef.current !== window.innerWidth) {
+        if (window.innerWidth < 768) {
+          // モバイル表示：メニューを隠す
+          setHideSideMenu(true);
+        } else {
+          // デスクトップ表示：メニューを表示
+          setHideSideMenu(false);
+        }
+        windowWidthRef.current = window.innerWidth;
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const handleMouseDown = () => {

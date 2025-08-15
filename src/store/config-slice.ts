@@ -61,7 +61,7 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
   menuWidth: _defaultMenuWidth,
   displayChatSize: _defaultDisplayChatSize,
   defaultImageDetail: _defaultImageDetail,
-  autoFetchModels: true,
+  autoFetchModels: false,
   setOpenConfig: (openConfig: boolean) => {
     set((prev: ConfigSlice) => ({
       ...prev,

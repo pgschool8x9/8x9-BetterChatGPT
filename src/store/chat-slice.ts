@@ -20,6 +20,7 @@ export interface ChatSlice {
 export const createChatSlice: StoreSlice<ChatSlice> = (set, get) => {
   return {
     messages: [],
+    chats: [],
     currentChatIndex: -1,
     generating: false,
     error: '',
