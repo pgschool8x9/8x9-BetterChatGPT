@@ -730,20 +730,6 @@ const EditViewButtons = memo(
           </>
         )}
 
-        {/* TokenCountとキャンセルボタンエリア */}
-        <div className='flex justify-between items-center mt-2'>
-          <div className='flex-1'>
-            {!sticky && (
-              <button
-                className='btn btn-neutral'
-                onClick={() => setIsEdit(false)}
-                aria-label={t('cancel') as string}
-              >
-                {t('cancel')}
-              </button>
-            )}
-          </div>
-        </div>
       </div>
     );
   }

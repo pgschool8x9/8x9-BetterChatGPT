@@ -104,14 +104,6 @@ const ChatHistory = React.memo(
           };
           
           const cost = tokenCostToCost(tokenCost, actualModel as ModelOptions);
-          console.log('Debug - Actual token usage:', {
-            promptTokens: actualUsage.promptTokens,
-            completionTokens: actualUsage.completionTokens,
-            imageTokens: actualUsage.imageTokens,
-            model: actualModel,
-            rawCost: cost,
-            source: 'actual_usage'
-          });
           
           const totalTokens = actualUsage.promptTokens + actualUsage.completionTokens + actualUsage.imageTokens;
           return {
@@ -140,14 +132,6 @@ const ChatHistory = React.memo(
       };
       
       const cost = tokenCostToCost(tokenCost, actualModel as ModelOptions);
-      console.log('Debug - Estimated token counts (fallback):', {
-        promptTokens: tokenCount,
-        completionTokens: 0,
-        imageTokens: imageTokenCount,
-        model: actualModel,
-        rawCost: cost,
-        source: 'estimated'
-      });
       
       return {
         tokens: tokenCount,
@@ -158,12 +142,10 @@ const ChatHistory = React.memo(
     // 通貨変換を非同期で実行
     useEffect(() => {
       if (tokenInfo?.usdCost !== undefined) {
-        console.log('Debug - USD Cost:', tokenInfo.usdCost, 'for chat index:', chatIndex);
         formatLocalizedCurrency(tokenInfo.usdCost).then((formatted) => {
-          console.log('Debug - Formatted Cost:', formatted);
           setLocalizedCost(formatted);
         }).catch((error) => {
-          console.error('Debug - Currency formatting error:', error);
+          console.error('Currency formatting error:', error);
           setLocalizedCost(`$${tokenInfo.usdCost.toFixed(4)}`);
         });
       }

@@ -187,7 +187,7 @@ const ContentView = memo(
         </div>
         {/* チャット履歴に画像を表示 */}
         {validImageContents.length > 0 && (
-          <div className='flex flex-wrap gap-2 sm:gap-3 mt-3'>
+          <div className='flex flex-wrap gap-2 sm:gap-3 mb-3'>
             {validImageContents.map((image, index) => (
               <div key={index} className='image-container w-full sm:max-w-sm'>
                 <div className='border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow'>

@@ -13,13 +13,17 @@ import {
   FolderCollection,
   isImageContent,
   isTextContent,
+  TotalTokenUsed,
 } from '@type/chat';
+import { updateTotalTokenUsed } from '@utils/messageUtils';
+import { ModelOptions } from '@utils/modelReader';
 
 const ChatHistoryList = () => {
   const currentChatIndex = useStore((state) => state.currentChatIndex);
   const displayChatSize = useStore((state) => state.displayChatSize);
   const setChats = useStore((state) => state.setChats);
   const setFolders = useStore((state) => state.setFolders);
+  const hideSideMenu = useStore((state) => state.hideSideMenu);
   const chatTitles = useStore(
     (state) => state.chats?.map((chat) => chat.title),
     shallow
@@ -178,6 +182,60 @@ const ChatHistoryList = () => {
     filterRef.current = filter;
     updateFolders();
   }, [filter]);
+
+  // メニューが開かれた時にトークン・コスト計算を実行（一瞬で完了）
+  useEffect(() => {
+    if (!hideSideMenu) {
+      const chats = useStore.getState().chats;
+      if (chats && chats.length > 0) {
+        // 各チャットのトークン使用情報が不足している場合は再計算
+        const updatedChats = JSON.parse(JSON.stringify(chats));
+        let hasUpdates = false;
+        
+        for (let i = 0; i < updatedChats.length; i++) {
+          const chat = updatedChats[i];
+          const model = chat.config.model as ModelOptions;
+          
+          // tokenUsedが存在しない、または空の場合は推定計算
+          if (!chat.tokenUsed || !chat.tokenUsed[model] || 
+              (chat.tokenUsed[model].promptTokens === 0 && 
+               chat.tokenUsed[model].completionTokens === 0)) {
+            
+            // ChatHistory.tsxの既存ロジックと同様の推定計算
+            const messages = chat.messages;
+            const textPrompts = messages.filter(
+              (e) => Array.isArray(e.content) && e.content.some(isTextContent)
+            );
+            const imgPrompts = messages.filter(
+              (e) => Array.isArray(e.content) && e.content.some(isImageContent)
+            );
+            
+            // 同期的にcountTokensを実行
+            const { default: countTokens } = require('@utils/messageUtils');
+            const tokenCount = countTokens(textPrompts, model);
+            const imageTokenCount = countTokens(imgPrompts, model);
+            
+            // tokenUsedを初期化または更新
+            if (!chat.tokenUsed) {
+              chat.tokenUsed = {};
+            }
+            
+            chat.tokenUsed[model] = {
+              promptTokens: tokenCount,
+              completionTokens: 0, // 推定では不明
+              imageTokens: imageTokenCount,
+            };
+            
+            hasUpdates = true;
+          }
+        }
+        
+        if (hasUpdates) {
+          useStore.getState().setChats(updatedChats);
+        }
+      }
+    }
+  }, [hideSideMenu]);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     if (e.dataTransfer) {

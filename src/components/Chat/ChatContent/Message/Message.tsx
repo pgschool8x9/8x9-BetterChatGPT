@@ -49,30 +49,57 @@ const Message = React.memo(
     const isUser = role === 'user';
     const isSystem = role === 'system';
 
-    // ユーザーメッセージの行数を判定（安全なアプローチ）
-    const getUserMessageLines = () => {
+    // ユーザーメッセージの折り返し予測と画像有無を判定
+    const getUserMessageInfo = () => {
       try {
-        if (!isUser || !content || !content[0]) return 1;
+        if (!isUser || !content) return { isShort: true, hasImage: false };
+        
+        // 画像があるかチェック
+        const hasImage = content.some(item => item.type === 'image_url');
+        
+        // テキストの長さと改行をチェック
         const firstContent = content[0];
+        let isShort = true;
         if (firstContent && 'type' in firstContent && firstContent.type === 'text' && 'text' in firstContent) {
           const textContent = String(firstContent.text || '');
-          return textContent.split('\n').length;
+          // 改行があるか、30文字以上（折り返し可能性が高い）の場合は複数行扱い
+          const hasLineBreak = textContent.includes('\n');
+          const isLongText = textContent.length > 30;
+          isShort = !hasLineBreak && !isLongText;
         }
-        return 1;
+        
+        return { isShort, hasImage };
       } catch (error) {
-        console.warn('Error calculating message lines:', error);
-        return 1;
+        console.warn('Error calculating message info:', error);
+        return { isShort: true, hasImage: false };
       }
     };
 
-    const userMessageLines = getUserMessageLines();
+    const userMessageInfo = getUserMessageInfo();
+    // ユーザーメッセージの角丸設定（3条件）
     const userRoundedClass = isUser 
-      ? (userMessageLines === 1 ? 'rounded-full' : 'rounded-[16px]')
+      ? (() => {
+          if (userMessageInfo.hasImage) {
+            return 'rounded-[24px]'; // 画像あり
+          } else if (userMessageInfo.isShort) {
+            return 'rounded-full'; // 単行（短文）
+          } else {
+            return 'rounded-[18px]'; // 複数行（長文・改行あり）
+          }
+        })()
       : 'rounded-2xl';
     
-    // ユーザーメッセージのpadding設定（上下なしでコンパクト）
+    // ユーザーメッセージのpadding設定（3条件）
     const userPaddingClass = isUser 
-      ? (userMessageLines === 1 ? 'px-4 md:px-6' : 'px-4 md:px-6')
+      ? (() => {
+          if (userMessageInfo.hasImage) {
+            return 'px-4 py-2'; // 画像あり
+          } else if (userMessageInfo.isShort) {
+            return 'px-3'; // 単行（短文）
+          } else {
+            return 'px-2'; // 複数行（長文・改行あり）
+          }
+        })()
       : 'px-4 py-1';
 
     // ボタンハンドラー
@@ -109,7 +136,7 @@ const Message = React.memo(
     }
 
     return (
-      <div className="w-full px-4 py-1 bg-white dark:bg-gray-900">
+      <div className="w-full px-1 py-1 bg-white dark:bg-gray-900">
         <div
           className={`flex flex-col gap-1 ${hideSideMenu
             ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
@@ -182,7 +209,7 @@ const Message = React.memo(
               {isUser && (
                 <div className="flex items-center gap-2 justify-end">
                   <div className="text-gray-700 dark:text-gray-300">
-                    <EditButton setIsEdit={setIsEdit} />
+                    <EditButton setIsEdit={setIsEdit} isEdit={isEdit} />
                   </div>
                   <div className="text-gray-700 dark:text-gray-300">
                     <CopyButton onClick={handleCopy} />

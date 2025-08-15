@@ -71,11 +71,8 @@ export const fetchExchangeRates = async (): Promise<Record<string, number>> => {
   // キャッシュをチェック
   const cachedRates = getCachedRates();
   if (cachedRates) {
-    console.log('為替レートをキャッシュから取得しました (有効期限まで:', Math.round((CACHE_DURATION - (Date.now() - cachedRates.timestamp)) / 1000 / 60 / 60), '時間)');
     return cachedRates.rates;
   }
-
-  console.log('為替レートをAPIから取得しています...');
   try {
     // ExchangeRate-API (無料プラン)
     const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
@@ -88,7 +85,6 @@ export const fetchExchangeRates = async (): Promise<Record<string, number>> => {
         baseCurrency: 'USD'
       };
       setCachedRates(newCache);
-      console.log('為替レートを取得しキャッシュに保存しました (次回更新まで24時間)');
       return data.rates;
     }
   } catch (error) {
@@ -228,21 +224,16 @@ export const useLocalizedCurrency = () => {
 
   const formatLocalizedCurrency = useCallback(async (usdAmount: number): Promise<string> => {
     try {
-      console.log('Debug - Input USD amount:', usdAmount, 'Target currency:', currentCurrency);
-      
       if (usdAmount === 0) {
         return formatCurrency(0, currentCurrency, currentLanguage);
       }
       
       const convertedAmount = await convertUsdToCurrency(usdAmount, currentCurrency);
-      console.log('Debug - Converted amount:', convertedAmount);
-      
       const formatted = formatCurrency(convertedAmount, currentCurrency, currentLanguage);
-      console.log('Debug - Formatted:', formatted);
       
       return formatted;
     } catch (error) {
-      console.error('Debug - formatLocalizedCurrency error:', error);
+      console.error('formatLocalizedCurrency error:', error);
       // フォールバック: USDで表示
       return `$${usdAmount.toFixed(4)}`;
     }

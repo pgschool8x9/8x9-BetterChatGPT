@@ -190,7 +190,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
 
             {/* ダウンロードドロップダウン */}
             {isDownloadOpen && (
-              <div className='absolute right-0 mt-6 w-48 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] border border-black/10 dark:border-white/10 z-[100]'>
+              <div className='fixed right-2 mt-6 w-48 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] border border-black/10 dark:border-white/10 z-[9999]'>
                 <div className='p-2'>
                   <button
                     className='w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/30 dark:hover:bg-gray-600/30 rounded-md transition-colors'
