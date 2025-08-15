@@ -67,13 +67,13 @@ const Message = React.memo(
 
     const userMessageLines = getUserMessageLines();
     const userRoundedClass = isUser 
-      ? (userMessageLines === 1 ? 'rounded-full' : 'rounded-2xl')
+      ? (userMessageLines === 1 ? 'rounded-full' : 'rounded-[16px]')
       : 'rounded-2xl';
     
-    // ユーザーメッセージのpadding設定（入力エリアと同じ仕様）
+    // ユーザーメッセージのpadding設定（上下なしでコンパクト）
     const userPaddingClass = isUser 
       ? (userMessageLines === 1 ? 'px-4 md:px-6' : 'px-4 md:px-6')
-      : 'px-4 py-3';
+      : 'px-4 py-1';
 
     // ボタンハンドラー
     const currentTextContent = isTextContent(content[0]) ? content[0].text : '';

@@ -251,7 +251,7 @@ const p = memo(
     const textContent = typeof props?.children === 'string' ? props.children : String(props?.children || '');
     
     return (
-      <p className='whitespace-pre-wrap'>
+      <p className='whitespace-pre-wrap m-2'>
         {searchHighlightTerm ? highlightText(textContent, searchHighlightTerm) : props?.children}
       </p>
     );
