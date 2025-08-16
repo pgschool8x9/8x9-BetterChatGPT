@@ -89,6 +89,13 @@ jobs:
           
           echo "✅ バージョンアップが完了しました: $CURRENT_VERSION → $NEW_VERSION"
 
+      - name: Deploy ワークフローをトリガー
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: deploy-after-version-bump
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+
       - name: リリースノート作成
         uses: softprops/action-gh-release@v1
         env:
