@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PopupModal from '@components/PopupModal';
-import { ConfigInterface, ImageDetail, Verbosity, ReasoningEffort } from '@type/chat';
+import { ConfigInterface, ImageDetail, Verbosity, ReasoningEffort, ReasoningSummary } from '@type/chat';
 import Select from 'react-select';
 import { modelOptions, modelMaxToken } from '@constants/modelLoader';
 import { ModelOptions } from '@utils/modelReader';

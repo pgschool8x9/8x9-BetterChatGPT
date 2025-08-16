@@ -15,6 +15,9 @@ export const verbosityOptions: Verbosity[] = ['low', 'medium', 'high'];
 export type ReasoningEffort = 'minimal' | 'low' | 'medium' | 'high';
 export const reasoningEffortOptions: ReasoningEffort[] = ['minimal', 'low', 'medium', 'high'];
 
+export type ReasoningSummary = 'none' | 'detailed' | 'auto';
+export const reasoningSummaryOptions: ReasoningSummary[] = ['none', 'detailed', 'auto'];
+
 export type Role = 'user' | 'assistant' | 'system';
 export const roles: Role[] = ['user', 'assistant', 'system'];
 
