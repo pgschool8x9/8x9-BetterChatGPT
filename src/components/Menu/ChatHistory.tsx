@@ -17,9 +17,9 @@ import { useLocalizedCurrency } from '@utils/currency';
 
 const ChatHistoryClass = {
   normal:
-    'flex py-2 px-2 items-center gap-3 relative rounded-md bg-gray-800 hover:bg-gray-850 break-all hover:pr-4 group transition-opacity',
+    'flex py-2 px-3 items-center gap-3 relative rounded-md bg-gray-800 hover:bg-gray-850 break-all hover:pr-4 group transition-opacity',
   active:
-    'flex py-2 px-2 items-center gap-3 relative rounded-md break-all pr-14 bg-gray-900 hover:bg-gray-850 group transition-opacity',
+    'flex py-2 px-3 items-center gap-3 relative rounded-md break-all pr-14 bg-gray-900 hover:bg-gray-850 group transition-opacity',
   normalGradient:
     'absolute inset-y-0 right-0 w-8 z-10 bg-gradient-to-l from-gray-800 group-hover:from-gray-850',
   activeGradient:
@@ -59,6 +59,8 @@ const ChatHistory = React.memo(
     setSelectedChats,
     lastSelectedIndex,
     setLastSelectedIndex,
+    isSelectionMode,
+    onLongPress,
   }: {
     title: string;
     chatIndex: number;
@@ -67,6 +69,8 @@ const ChatHistory = React.memo(
     setSelectedChats: (indices: number[]) => void;
     lastSelectedIndex: number | null;
     setLastSelectedIndex: (index: number) => void;
+    isSelectionMode: boolean;
+    onLongPress: (chatIndex: number) => void;
   }) => {
     const initialiseNewChat = useInitialiseNewChat();
     const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
@@ -81,6 +85,8 @@ const ChatHistory = React.memo(
     const [_title, _setTitle] = useState<string>(title);
     const [localizedCost, setLocalizedCost] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);
+    const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const startPosRef = useRef<{ x: number; y: number } | null>(null);
 
     // トークン情報を計算
     const tokenInfo = useMemo(() => {
@@ -231,9 +237,79 @@ const ChatHistory = React.memo(
       }
     };
 
+    const clearLongPressTimer = () => {
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
+    };
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+      const touch = e.touches[0];
+      startPosRef.current = { x: touch.clientX, y: touch.clientY };
+      
+      longPressTimerRef.current = setTimeout(() => {
+        onLongPress(chatIndex);
+      }, 500);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+      if (!startPosRef.current) return;
+      
+      const touch = e.touches[0];
+      const deltaX = Math.abs(touch.clientX - startPosRef.current.x);
+      const deltaY = Math.abs(touch.clientY - startPosRef.current.y);
+      
+      if (deltaX > 10 || deltaY > 10) {
+        clearLongPressTimer();
+      }
+    };
+
+    const handleTouchEnd = () => {
+      clearLongPressTimer();
+      startPosRef.current = null;
+    };
+
+    const handleMouseDown = (e: React.MouseEvent) => {
+      if (e.button !== 0) return; // 左クリックのみ
+      
+      startPosRef.current = { x: e.clientX, y: e.clientY };
+      
+      longPressTimerRef.current = setTimeout(() => {
+        onLongPress(chatIndex);
+      }, 500);
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+      if (!startPosRef.current) return;
+      
+      const deltaX = Math.abs(e.clientX - startPosRef.current.x);
+      const deltaY = Math.abs(e.clientY - startPosRef.current.y);
+      
+      if (deltaX > 10 || deltaY > 10) {
+        clearLongPressTimer();
+      }
+    };
+
+    const handleMouseUp = () => {
+      clearLongPressTimer();
+      startPosRef.current = null;
+    };
+
+    const handleMouseLeave = () => {
+      clearLongPressTimer();
+      startPosRef.current = null;
+    };
+
     useEffect(() => {
       if (inputRef && inputRef.current) inputRef.current.focus();
     }, [isEdit]);
+
+    useEffect(() => {
+      return () => {
+        clearLongPressTimer();
+      };
+    }, []);
 
     return (
       <a
@@ -245,17 +321,26 @@ const ChatHistory = React.memo(
             : 'cursor-pointer opacity-100'
         } ${selectedChats.includes(chatIndex) ? 'bg-blue-500' : ''}`}
         onClick={() => {
-          if (!generating) setCurrentChatIndex(chatIndex);
+          if (!generating && !isSelectionMode) setCurrentChatIndex(chatIndex);
         }}
         draggable
         onDragStart={handleDragStart}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
       >
-        <input
-          type='checkbox'
-          checked={selectedChats.includes(chatIndex)}
-          onClick={handleCheckboxClick}
-          onChange={() => {}}
-        />
+        {isSelectionMode && (
+          <input
+            type='checkbox'
+            checked={selectedChats.includes(chatIndex)}
+            onClick={handleCheckboxClick}
+            onChange={() => {}}
+          />
+        )}
         <div className='flex-1 flex flex-col text-ellipsis overflow-hidden break-all relative'>
           {/* 1行目: タイトル */}
           <div 
@@ -295,7 +380,7 @@ const ChatHistory = React.memo(
             />
           )}
         </div>
-        {active && (
+        {active && !isSelectionMode && (
           <div className='absolute flex right-1 z-10 text-gray-300 visible'>
             {isDelete || isEdit ? (
               <>

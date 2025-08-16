@@ -29,6 +29,8 @@ const ChatFolder = ({
   setSelectedChats,
   lastSelectedIndex,
   setLastSelectedIndex,
+  isSelectionMode,
+  onLongPress,
 }: {
   folderChats: ChatHistoryInterface[];
   folderId: string;
@@ -36,6 +38,8 @@ const ChatFolder = ({
   setSelectedChats: (indices: number[]) => void;
   lastSelectedIndex: number | null;
   setLastSelectedIndex: (index: number) => void;
+  isSelectionMode: boolean;
+  onLongPress: (chatIndex: number) => void;
 }) => {
   const folderName = useStore((state) => state.folders[folderId]?.name);
   const isExpanded = useStore((state) => state.folders[folderId]?.expanded);
@@ -321,6 +325,8 @@ const ChatFolder = ({
               setSelectedChats={setSelectedChats}
               lastSelectedIndex={lastSelectedIndex}
               setLastSelectedIndex={setLastSelectedIndex}
+              isSelectionMode={isSelectionMode}
+              onLongPress={onLongPress}
             />
           ))}
       </div>

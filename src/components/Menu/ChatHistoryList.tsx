@@ -5,6 +5,9 @@ import { shallow } from 'zustand/shallow';
 import ChatFolder from './ChatFolder';
 import ChatHistory from './ChatHistory';
 import ChatSearch from './ChatSearch';
+import DeleteIcon from '@icon/DeleteIcon';
+import CrossIcon from '@icon/CrossIcon';
+import useInitialiseNewChat from '@hooks/useInitialiseNewChat';
 
 import {
   ChatHistoryInterface,
@@ -21,10 +24,12 @@ import countTokens from '@utils/messageUtils';
 import { ModelOptions } from '@utils/modelReader';
 
 const ChatHistoryList = () => {
+  const initialiseNewChat = useInitialiseNewChat();
   const currentChatIndex = useStore((state) => state.currentChatIndex);
   const displayChatSize = useStore((state) => state.displayChatSize);
   const setChats = useStore((state) => state.setChats);
   const setFolders = useStore((state) => state.setFolders);
+  const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
   const hideSideMenu = useStore((state) => state.hideSideMenu);
   const chatTitles = useStore(
     (state) => state.chats?.map((chat) => chat.title),
@@ -43,6 +48,7 @@ const ChatHistoryList = () => {
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
     null
   );
+  const [isSelectionMode, setIsSelectionMode] = useState<boolean>(false);
 
   const chatsRef = useRef<ChatInterface[]>(useStore.getState().chats || []);
   const foldersRef = useRef<FolderCollection>(useStore.getState().folders);
@@ -268,6 +274,52 @@ const ChatHistoryList = () => {
     setIsHover(false);
   };
 
+  const handleLongPress = (chatIndex: number) => {
+    setIsSelectionMode(true);
+    setSelectedChats([chatIndex]);
+    setLastSelectedIndex(chatIndex);
+  };
+
+  const resetSelectionMode = () => {
+    setIsSelectionMode(false);
+    setSelectedChats([]);
+    setLastSelectedIndex(null);
+  };
+
+  const deleteSelectedChats = () => {
+    const updatedChats = JSON.parse(
+      JSON.stringify(useStore.getState().chats)
+    );
+    selectedChats
+      .sort((a, b) => b - a)
+      .forEach((index) => {
+        updatedChats.splice(index, 1);
+      });
+    
+    if (updatedChats.length > 0) {
+      setCurrentChatIndex(0);
+      setChats(updatedChats);
+    } else {
+      initialiseNewChat();
+    }
+    
+    resetSelectionMode();
+  };
+
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isSelectionMode) {
+        resetSelectionMode();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isSelectionMode]);
+
   return (
     <div
       className={`flex-col flex-1 overflow-y-auto hide-scroll-bar border-b border-white/20 ${
@@ -279,6 +331,28 @@ const ChatHistoryList = () => {
       onDragEnd={handleDragEnd}
     >
       <ChatSearch filter={filter} setFilter={setFilter} />
+      {isSelectionMode && (
+        <div className='flex items-center px-3 py-2 bg-indigo-500/20 text-white text-sm rounded-md mb-2'>
+          <span className='flex-1'>{selectedChats.length}件選択中</span>
+          <div className='flex items-center gap-2 ml-auto'>
+            <button
+              onClick={deleteSelectedChats}
+              className='text-white hover:text-red-200'
+              disabled={selectedChats.length === 0}
+              aria-label='選択したチャットを削除'
+            >
+              <DeleteIcon />
+            </button>
+            <button
+              onClick={resetSelectionMode}
+              className='text-white hover:text-gray-200 p-1'
+              aria-label='選択モードを終了'
+            >
+              <CrossIcon />
+            </button>
+          </div>
+        </div>
+      )}
       <div className='flex flex-col gap-2 text-gray-100 text-sm'>
         {Object.keys(chatFolders).map((folderId) => (
           <ChatFolder
@@ -289,6 +363,8 @@ const ChatHistoryList = () => {
             setSelectedChats={setSelectedChats}
             lastSelectedIndex={lastSelectedIndex}
             setLastSelectedIndex={setLastSelectedIndex}
+            isSelectionMode={isSelectionMode}
+            onLongPress={handleLongPress}
           />
         ))}
         {noChatFolders.map(({ title, index, id, chatSize }) => (
@@ -301,6 +377,8 @@ const ChatHistoryList = () => {
             setSelectedChats={setSelectedChats}
             lastSelectedIndex={lastSelectedIndex}
             setLastSelectedIndex={setLastSelectedIndex}
+            isSelectionMode={isSelectionMode}
+            onLongPress={handleLongPress}
           />
         ))}
       </div>
