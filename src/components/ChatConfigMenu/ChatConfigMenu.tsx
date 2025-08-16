@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useStore from '@store/store';
 import { useTranslation } from 'react-i18next';
 
@@ -186,6 +186,17 @@ const DefaultSystemChat = ({
   _setSystemMessage: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const { t } = useTranslation('model');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 初期表示時にテキストサイズに合わせてエリアサイズを調整
+  useEffect(() => {
+    if (textareaRef.current && _systemMessage) {
+      const textarea = textareaRef.current;
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+      textarea.style.maxHeight = `${Math.min(textarea.scrollHeight, 200)}px`;
+    }
+  }, [_systemMessage]);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.target.style.height = 'auto';
@@ -226,6 +237,7 @@ const DefaultSystemChat = ({
         {t('defaultSystemMessage')}
       </div>
       <textarea
+        ref={textareaRef}
         className='my-2 mx-0 px-2 resize-none rounded-lg bg-transparent overflow-y-hidden leading-7 p-1 border border-gray-400/50 focus:ring-1 focus:ring-blue w-full max-h-10 transition-all'
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}

@@ -261,7 +261,7 @@ const ChatHistory = React.memo(
           {/* 1行目: タイトル */}
           <div 
             className='text-sm leading-tight'
-            title={`${title}${chatSize ? ` (${formatNumber(chatSize)})` : ''}`}
+            title={title}
           >
             {isEdit ? (
               <input
@@ -275,7 +275,7 @@ const ChatHistory = React.memo(
                 ref={inputRef}
               />
             ) : (
-              `${title}${chatSize ? ` (${formatNumber(chatSize)})` : ''}`
+              title
             )}
           </div>
           
