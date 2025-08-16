@@ -19,6 +19,9 @@ jobs:
   version-bump:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '🔖 バージョンアップ')"
+    permissions:
+      contents: write
+      pull-requests: write
     
     steps:
       - name: チェックアウト
