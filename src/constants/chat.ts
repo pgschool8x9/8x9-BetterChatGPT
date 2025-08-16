@@ -51,6 +51,9 @@ export const _defaultChatConfig: ConfigInterface = {
   presence_penalty: 0,
   top_p: 1,
   frequency_penalty: 0,
+  // GPT-5系専用パラメータのデフォルト値
+  verbosity: 'medium',
+  reasoning_effort: 'minimal',
 };
 
 export const generateDefaultChat = (

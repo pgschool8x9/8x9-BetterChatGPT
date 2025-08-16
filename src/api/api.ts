@@ -6,6 +6,11 @@ import {
 import { isAzureEndpoint } from '@utils/api';
 import { ModelOptions } from '@utils/modelReader';
 
+// GPT-5系モデルかどうかを判定する関数
+const isGPT5Model = (model: ModelOptions): boolean => {
+  return model.includes('gpt-5');
+};
+
 export const getChatCompletion = async (
   endpoint: string,
   messages: MessageInterface[],
@@ -50,14 +55,33 @@ export const getChatCompletion = async (
   }
   endpoint = endpoint.trim();
 
+  // GPT-5系パラメータを除外した基本config
+  const { verbosity, reasoning_effort, ...baseConfig } = config;
+
+  // リクエストボディを構築
+  let requestBody: any = {
+    messages,
+    ...baseConfig,
+    max_tokens: undefined,
+  };
+
+  // GPT-5系モデルの場合のみ、専用パラメータを追加
+  if (isGPT5Model(config.model)) {
+    requestBody = {
+      ...requestBody,
+      response_format: {
+        type: "text"
+      },
+      verbosity: verbosity || "medium",
+      reasoning_effort: reasoning_effort || "minimal"
+    };
+  }
+
+
   const response = await fetch(endpoint, {
     method: 'POST',
     headers,
-    body: JSON.stringify({
-      messages,
-      ...config,
-      max_tokens: undefined,
-    }),
+    body: JSON.stringify(requestBody),
   });
   if (!response.ok) throw new Error(await response.text());
 
@@ -105,15 +129,35 @@ export const getChatCompletionStream = async (
     }
   }
   endpoint = endpoint.trim();
+
+  // GPT-5系パラメータを除外した基本config
+  const { verbosity, reasoning_effort, ...baseConfig } = config;
+
+  // リクエストボディを構築
+  let requestBody: any = {
+    messages,
+    ...baseConfig,
+    max_tokens: undefined,
+    stream: true,
+  };
+
+  // GPT-5系モデルの場合のみ、専用パラメータを追加
+  if (isGPT5Model(config.model)) {
+    requestBody = {
+      ...requestBody,
+      response_format: {
+        type: "text"
+      },
+      verbosity: verbosity || "medium",
+      reasoning_effort: reasoning_effort || "minimal"
+    };
+  }
+
+
   const response = await fetch(endpoint, {
     method: 'POST',
     headers,
-    body: JSON.stringify({
-      messages,
-      ...config,
-      max_tokens: undefined,
-      stream: true,
-    }),
+    body: JSON.stringify(requestBody),
   });
   if (response.status === 404 || response.status === 405) {
     const text = await response.text();

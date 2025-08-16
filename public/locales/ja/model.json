@@ -24,5 +24,21 @@
   },
   "defaultChatConfig": "チャット設定",
   "defaultSystemMessage": "システムメッセージ",
-  "resetToDefault": "デフォルトにリセット"
+  "resetToDefault": "デフォルトにリセット",
+  "verbosity": {
+    "label": "簡潔さ",
+    "description": "メッセージの簡潔さを調整するパラメータです。lowは簡潔、highは詳細な説明を提供します。(デフォルト：medium)",
+    "low": "low",
+    "medium": "medium",
+    "high": "high"
+  },
+  "reasoningEffort": {
+    "label": "思考の深さ",
+    "description": "思考する深さを調整するパラメータです。minimalは即答、highは深く思考します。深く思考するほど時間を要しレスポンスが遅くなります。普段はminimalでレスポンスを重視し、深く思考したい時だけhighにする利用法を推奨します(デフォルト：minimal)",
+    "minimal": "minimal",
+    "low": "low", 
+    "medium": "medium",
+    "high": "high"
+  },
+  "gpt5Exclusive": "(GPT-5系専用)"
 }

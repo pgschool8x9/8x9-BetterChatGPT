@@ -12,6 +12,8 @@ import {
   PresencePenaltySlider,
   TemperatureSlider,
   TopPSlider,
+  VerbositySelector,
+  ReasoningEffortSelector,
 } from '@components/ConfigMenu/ConfigMenu';
 
 import {
@@ -20,7 +22,12 @@ import {
   _defaultSystemMessage,
 } from '@constants/chat';
 import { ModelOptions } from '@utils/modelReader';
-import { ImageDetail } from '@type/chat';
+import { ImageDetail, Verbosity, ReasoningEffort } from '@type/chat';
+
+// GPT-5系モデルかどうかを判定する関数
+const isGPT5Model = (model: ModelOptions): boolean => {
+  return model.includes('gpt-5');
+};
 
 const ChatConfigMenu = () => {
   const { t } = useTranslation('model');
@@ -69,6 +76,14 @@ const ChatConfigPopup = ({
   const [_imageDetail, _setImageDetail] = useState<ImageDetail>(
     useStore.getState().defaultImageDetail
   );
+  
+  // GPT-5系専用パラメータの状態変数
+  const [_verbosity, _setVerbosity] = useState<Verbosity>(
+    config.verbosity || 'medium'
+  );
+  const [_reasoningEffort, _setReasoningEffort] = useState<ReasoningEffort>(
+    config.reasoning_effort || 'minimal'
+  );
 
   const { t } = useTranslation('model');
 
@@ -80,6 +95,8 @@ const ChatConfigPopup = ({
       top_p: _topP,
       presence_penalty: _presencePenalty,
       frequency_penalty: _frequencyPenalty,
+      verbosity: _verbosity,
+      reasoning_effort: _reasoningEffort,
     });
     setDefaultSystemMessage(_systemMessage);
     setDefaultImageDetail(_imageDetail);
@@ -93,9 +110,10 @@ const ChatConfigPopup = ({
     _setTopP(_defaultChatConfig.top_p);
     _setPresencePenalty(_defaultChatConfig.presence_penalty);
     _setFrequencyPenalty(_defaultChatConfig.frequency_penalty);
+    _setVerbosity(_defaultChatConfig.verbosity || 'medium');
+    _setReasoningEffort(_defaultChatConfig.reasoning_effort || 'minimal');
     _setImageDetail(_defaultImageDetail);
     _setSystemMessage(_defaultSystemMessage);
-    _setImageDetail(_defaultImageDetail);
   };
 
   return (
@@ -114,6 +132,18 @@ const ChatConfigPopup = ({
           _setModel={_setModel}
           _label={t('model')}
         />
+        {isGPT5Model(_model) && (
+          <>
+            <VerbositySelector
+              _verbosity={_verbosity}
+              _setVerbosity={_setVerbosity}
+            />
+            <ReasoningEffortSelector
+              _reasoningEffort={_reasoningEffort}
+              _setReasoningEffort={_setReasoningEffort}
+            />
+          </>
+        )}
         <MaxTokenSlider
           _maxToken={_maxToken}
           _setMaxToken={_setMaxToken}

@@ -56,6 +56,13 @@ const EditView = ({
   const generating = useStore((state) => state.generating);
   const setGenerating = useStore((state) => state.setGenerating);
   
+  // チャット切り替え時に入力エリアをリセット (stickyの場合のみ)
+  useEffect(() => {
+    if (sticky) {
+      _setContent([{ type: 'text', text: '' }]);
+    }
+  }, [currentChatIndex, sticky]);
+  
   // modelTypesの初期化状態を監視
   const [isModelTypesReady, setIsModelTypesReady] = useState(false);
   

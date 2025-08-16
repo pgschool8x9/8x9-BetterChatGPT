@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import RefreshIcon from '@icon/RefreshIcon';
 import SendIcon from '@icon/SendIcon';
 import { PromptLibraryMenuPopUp } from '@components/PromptLibraryMenu/PromptLibraryMenu';
+import useStore from '@store/store';
 
 const ChatInput = () => {
   return (
@@ -19,6 +20,12 @@ const TextField = () => {
   const [value, setValue] = useState<string>('');
   const [showPromptModal, setShowPromptModal] = useState<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const currentChatIndex = useStore((state) => state.currentChatIndex);
+
+  // チャット切り替え時に入力エリアをクリア
+  useEffect(() => {
+    setValue('');
+  }, [currentChatIndex]);
 
   // 入力変更の処理
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

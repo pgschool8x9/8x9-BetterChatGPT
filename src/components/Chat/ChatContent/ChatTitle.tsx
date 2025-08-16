@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { shallow } from 'zustand/shallow';
 import useStore from '@store/store';
-import ConfigMenu, { ModelSelector, MaxTokenSlider, TemperatureSlider, TopPSlider, PresencePenaltySlider, FrequencyPenaltySlider, ImageDetailSelector } from '@components/ConfigMenu/ConfigMenu';
+import ConfigMenu, { ModelSelector, MaxTokenSlider, TemperatureSlider, TopPSlider, PresencePenaltySlider, FrequencyPenaltySlider, ImageDetailSelector, VerbositySelector, ReasoningEffortSelector } from '@components/ConfigMenu/ConfigMenu';
 import PopupModal from '@components/PopupModal';
 import SettingIcon from '@icon/SettingIcon';
 import ChatIcon from '@icon/ChatIcon';
@@ -12,7 +12,7 @@ import MarkdownIcon from '@icon/MarkdownIcon';
 import JsonIcon from '@icon/JsonIcon';
 import MenuIcon from '@icon/MenuIcon';
 import PlusIcon from '@icon/PlusIcon';
-import { ChatInterface, ConfigInterface, ImageDetail } from '@type/chat';
+import { ChatInterface, ConfigInterface, ImageDetail, Verbosity, ReasoningEffort } from '@type/chat';
 import { _defaultChatConfig } from '@constants/chat';
 import {
   chatToMarkdown,
@@ -23,6 +23,11 @@ import {
 import downloadFile from '@utils/downloadFile';
 import { ModelOptions } from '@utils/modelReader';
 import useAddChat from '@hooks/useAddChat';
+
+// GPT-5系モデルかどうかを判定する関数
+const isGPT5Model = (model: ModelOptions): boolean => {
+  return model.includes('gpt-5');
+};
 
 const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivElement> }) => {
   const { t } = useTranslation('model');
@@ -57,6 +62,10 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
   const [_topP, _setTopP] = useState<number>(chat?.config?.top_p || 1);
   const [_frequencyPenalty, _setFrequencyPenalty] = useState<number>(chat?.config?.frequency_penalty || 0);
   const [_imageDetail, _setImageDetail] = useState<ImageDetail>(chat?.imageDetail || 'auto');
+  
+  // GPT-5系専用パラメータの状態変数
+  const [_verbosity, _setVerbosity] = useState<Verbosity>(chat?.config?.verbosity || 'medium');
+  const [_reasoningEffort, _setReasoningEffort] = useState<ReasoningEffort>(chat?.config?.reasoning_effort || 'minimal');
 
   const setConfig = (config: ConfigInterface) => {
     const updatedChats: ChatInterface[] = JSON.parse(
@@ -123,6 +132,8 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
         presence_penalty: _presencePenalty,
         top_p: _topP,
         frequency_penalty: _frequencyPenalty,
+        verbosity: _verbosity,
+        reasoning_effort: _reasoningEffort,
       });
       setImageDetail(_imageDetail);
     }
@@ -133,7 +144,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
     if (chat && isConfigExpanded) {
       handleConfigChange();
     }
-  }, [_maxToken, _model, _temperature, _presencePenalty, _topP, _frequencyPenalty, _imageDetail, isConfigExpanded]);
+  }, [_maxToken, _model, _temperature, _presencePenalty, _topP, _frequencyPenalty, _imageDetail, _verbosity, _reasoningEffort, isConfigExpanded]);
 
   // for migrating from old ChatInterface to new ChatInterface (with config)
   useEffect(() => {
@@ -267,6 +278,18 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
                     _setModel={_setModel}
                     _label={t('model')}
                   />
+                  {isGPT5Model(_model) && (
+                    <>
+                      <VerbositySelector
+                        _verbosity={_verbosity}
+                        _setVerbosity={_setVerbosity}
+                      />
+                      <ReasoningEffortSelector
+                        _reasoningEffort={_reasoningEffort}
+                        _setReasoningEffort={_setReasoningEffort}
+                      />
+                    </>
+                  )}
                   <MaxTokenSlider
                     _maxToken={_maxToken}
                     _setMaxToken={_setMaxToken}

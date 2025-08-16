@@ -1,11 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PopupModal from '@components/PopupModal';
-import { ConfigInterface, ImageDetail } from '@type/chat';
+import { ConfigInterface, ImageDetail, Verbosity, ReasoningEffort } from '@type/chat';
 import Select from 'react-select';
 import { modelOptions, modelMaxToken } from '@constants/modelLoader';
 import { ModelOptions } from '@utils/modelReader';
 import useStore from '@store/store';
+
+// GPT-5系モデルかどうかを判定する関数
+const isGPT5Model = (model: ModelOptions): boolean => {
+  return model.includes('gpt-5');
+};
 
 // テーマに応じたカスタムスタイルを生成する関数
 const getCustomStyles = () => {
@@ -72,6 +77,15 @@ const ConfigMenu = ({
     config.frequency_penalty
   );
   const [_imageDetail, _setImageDetail] = useState<ImageDetail>(imageDetail);
+  
+  // GPT-5系専用パラメータの状態変数
+  const [_verbosity, _setVerbosity] = useState<Verbosity>(
+    config.verbosity || 'medium'
+  );
+  const [_reasoningEffort, _setReasoningEffort] = useState<ReasoningEffort>(
+    config.reasoning_effort || 'minimal'
+  );
+  
   const { t } = useTranslation('model');
 
   const handleConfirm = () => {
@@ -82,6 +96,8 @@ const ConfigMenu = ({
       presence_penalty: _presencePenalty,
       top_p: _topP,
       frequency_penalty: _frequencyPenalty,
+      verbosity: _verbosity,
+      reasoning_effort: _reasoningEffort,
     });
     setImageDetail(_imageDetail);
     setIsModalOpen(false);
@@ -100,6 +116,18 @@ const ConfigMenu = ({
           _setModel={_setModel}
           _label={t('Model')}
         />
+        {isGPT5Model(_model) && (
+          <>
+            <VerbositySelector
+              _verbosity={_verbosity}
+              _setVerbosity={_setVerbosity}
+            />
+            <ReasoningEffortSelector
+              _reasoningEffort={_reasoningEffort}
+              _setReasoningEffort={_setReasoningEffort}
+            />
+          </>
+        )}
         <MaxTokenSlider
           _maxToken={_maxToken}
           _setMaxToken={_setMaxToken}
@@ -172,7 +200,7 @@ export const ModelSelector = ({
           _setModel(selectedOption?.value as ModelOptions)
         }
         options={modelOptionsFormatted}
-        className='basic-single'
+        className='basic-single py-2'
         classNamePrefix='select'
         styles={getCustomStyles()}
       />
@@ -199,7 +227,7 @@ export const MaxTokenSlider = ({
   }, [_model]);
 
   return (
-    <div>
+    <div className='mt-5 pt-5 border-t border-gray-500'>
       <label className='block text-sm font-medium text-gray-900 dark:text-white'>
         {t('token.label')}: {_maxToken}
       </label>
@@ -382,7 +410,126 @@ export const ImageDetailSelector = ({
           _setImageDetail(selectedOption?.value as ImageDetail)
         }
         options={imageDetailOptions}
-        className='basic-single'
+        className='basic-single py-2'
+        classNamePrefix='select'
+        styles={getCustomStyles()}
+      />
+    </div>
+  );
+};
+
+// GPT-5系専用パラメータセレクター
+export const VerbositySelector = ({
+  _verbosity,
+  _setVerbosity,
+}: {
+  _verbosity: Verbosity;
+  _setVerbosity: React.Dispatch<React.SetStateAction<Verbosity>>;
+}) => {
+  const { t } = useTranslation('model');
+
+  const verbosityOptions = [
+    { value: 'low', label: t('verbosity.low') },
+    { value: 'medium', label: t('verbosity.medium') },
+    { value: 'high', label: t('verbosity.high') },
+  ];
+
+  return (
+    <div className='mt-5 pt-5 border-t border-gray-500'>
+      <label className='block text-sm font-medium text-gray-900 dark:text-white'>
+        {t('verbosity.label')} {t('gpt5Exclusive')}
+      </label>
+      <div className='min-w-fit text-gray-500 dark:text-gray-300 text-sm mt-2'>
+        {t('verbosity.description')}
+      </div>
+      <Select
+        value={verbosityOptions.find(
+          (option) => option.value === _verbosity
+        )}
+        onChange={(selectedOption) =>
+          _setVerbosity(selectedOption?.value as Verbosity)
+        }
+        options={verbosityOptions}
+        className='basic-single py-2'
+        classNamePrefix='select'
+        styles={getCustomStyles()}
+      />
+    </div>
+  );
+};
+
+export const ReasoningEffortSelector = ({
+  _reasoningEffort,
+  _setReasoningEffort,
+}: {
+  _reasoningEffort: ReasoningEffort;
+  _setReasoningEffort: React.Dispatch<React.SetStateAction<ReasoningEffort>>;
+}) => {
+  const { t } = useTranslation('model');
+
+  const reasoningEffortOptions = [
+    { value: 'minimal', label: t('reasoningEffort.minimal') },
+    { value: 'low', label: t('reasoningEffort.low') },
+    { value: 'medium', label: t('reasoningEffort.medium') },
+    { value: 'high', label: t('reasoningEffort.high') },
+  ];
+
+  return (
+    <div className='mt-5 pt-5 border-t border-gray-500'>
+      <label className='block text-sm font-medium text-gray-900 dark:text-white'>
+        {t('reasoningEffort.label')} {t('gpt5Exclusive')}
+      </label>
+      <div className='min-w-fit text-gray-500 dark:text-gray-300 text-sm mt-2'>
+        {t('reasoningEffort.description')}
+      </div>
+      <Select
+        value={reasoningEffortOptions.find(
+          (option) => option.value === _reasoningEffort
+        )}
+        onChange={(selectedOption) =>
+          _setReasoningEffort(selectedOption?.value as ReasoningEffort)
+        }
+        options={reasoningEffortOptions}
+        className='basic-single py-2'
+        classNamePrefix='select'
+        styles={getCustomStyles()}
+      />
+    </div>
+  );
+};
+
+export const ReasoningSummarySelector = ({
+  _reasoningSummary,
+  _setReasoningSummary,
+}: {
+  _reasoningSummary: ReasoningSummary;
+  _setReasoningSummary: React.Dispatch<React.SetStateAction<ReasoningSummary>>;
+}) => {
+  const { t } = useTranslation('model');
+
+  const reasoningSummaryOptions = [
+    { value: 'none', label: t('reasoningSummary.none') },
+    { value: 'detailed', label: t('reasoningSummary.detailed') },
+    { value: 'auto', label: t('reasoningSummary.auto') },
+  ];
+
+  return (
+    <div className='mt-5 pt-5 border-t border-gray-500'>
+      <label className='block text-sm font-medium text-gray-900 dark:text-white'>
+        {t('reasoningSummary.label')} {t('gpt5Exclusive')}
+      </label>
+      <div className='min-w-fit text-gray-500 dark:text-gray-300 text-sm mt-2'>
+        {t('reasoningSummary.description')}
+      </div>
+      <Select
+        value={reasoningSummaryOptions.find(
+          (option) => option.value === _reasoningSummary
+        )}
+        onChange={(selectedOption) =>
+          _setReasoningSummary(selectedOption?.value as ReasoningSummary)
+        }
+        options={reasoningSummaryOptions}
+        className='basic-single py-2'
         classNamePrefix='select'
         styles={getCustomStyles()}
       />

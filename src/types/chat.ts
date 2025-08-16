@@ -7,6 +7,14 @@ import { Theme } from './theme';
 export type Content = 'text' | 'image_url';
 export type ImageDetail = 'low' | 'high' | 'auto';
 export const imageDetails: ImageDetail[] = ['low', 'high', 'auto'];
+
+// GPT-5系専用パラメータ
+export type Verbosity = 'low' | 'medium' | 'high';
+export const verbosityOptions: Verbosity[] = ['low', 'medium', 'high'];
+
+export type ReasoningEffort = 'minimal' | 'low' | 'medium' | 'high';
+export const reasoningEffortOptions: ReasoningEffort[] = ['minimal', 'low', 'medium', 'high'];
+
 export type Role = 'user' | 'assistant' | 'system';
 export const roles: Role[] = ['user', 'assistant', 'system'];
 
@@ -73,6 +81,9 @@ export interface ConfigInterface {
   presence_penalty: number;
   top_p: number;
   frequency_penalty: number;
+  // GPT-5系専用パラメータ
+  verbosity?: Verbosity;
+  reasoning_effort?: ReasoningEffort;
 }
 
 export interface ChatHistoryInterface {

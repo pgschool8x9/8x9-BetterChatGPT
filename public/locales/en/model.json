@@ -56,5 +56,21 @@
     "customLabel": "(custom)",
     "streamSupported": "Stream Support",
     "streamSupportedDescription": "Enable streaming for real-time response generation"
-  }
+  },
+  "verbosity": {
+    "label": "Response Verbosity",
+    "description": "Controls the level of detail in responses. Low provides concise answers, medium provides standard detail, high provides comprehensive responses.",
+    "low": "Low",
+    "medium": "Medium", 
+    "high": "High"
+  },
+  "reasoningEffort": {
+    "label": "Reasoning Effort",
+    "description": "Adjusts the depth of reasoning process. Minimal uses basic reasoning, low uses light reasoning, medium uses standard reasoning, high uses deep reasoning.",
+    "minimal": "Minimal",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "gpt5Exclusive": "(GPT-5 only)"
 }
