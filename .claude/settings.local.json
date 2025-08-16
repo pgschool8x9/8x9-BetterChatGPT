@@ -9,7 +9,9 @@
       "Bash(npm run dev:*)",
       "Bash(mkdir:*)",
       "Bash(node:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": [],

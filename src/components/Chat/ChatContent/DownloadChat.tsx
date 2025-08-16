@@ -20,6 +20,7 @@ const DownloadChat = React.memo(
   ({ saveRef }: { saveRef: React.RefObject<HTMLDivElement> }) => {
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
     return (
       <>
         <button
@@ -43,6 +44,7 @@ const DownloadChat = React.memo(
                 aria-label='image'
                 onClick={async () => {
                   if (saveRef && saveRef.current) {
+                    setIsModalOpen(false);
                     const imgData = await htmlToImg(saveRef.current);
                     downloadImg(
                       imgData,

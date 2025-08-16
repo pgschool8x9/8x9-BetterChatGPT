@@ -34,6 +34,19 @@
   content: none !important;
 }
 
+/* print-mode時のシステムメッセージスタイル修正 - html2canvas対応 */
+.print-mode .system-message-content,
+.print-mode .system-message-content *,
+.print-mode .system-message-wrapper,
+.print-mode .system-message-wrapper * {
+  background: none !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
+  color: #ffffff !important; /* システムメッセージ用の代替色 */
+  font-weight: 600 !important;
+}
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);

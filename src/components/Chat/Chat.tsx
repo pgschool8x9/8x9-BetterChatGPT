@@ -25,9 +25,9 @@ const Chat = () => {
       }
     },
   }, {
-    minSwipeDistance: 10, // スワイプ距離を長めに設定
-    maxSwipeTime: 400,     // スワイプ時間を少し長めに設定
-    maxVerticalMovement: 10, // 縦方向の許容範囲を広めに設定
+    minSwipeDistance: 20, // スワイプ距離
+    maxSwipeTime: 400,     // スワイプ時間
+    maxVerticalMovement: 50, // 縦方向の許容範囲
   });
 
   // タッチイベントをDOMに直接追加
