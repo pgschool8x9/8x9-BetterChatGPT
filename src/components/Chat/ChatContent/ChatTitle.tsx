@@ -178,7 +178,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
         {/* 右端のボタン群 */}
         <div className='flex items-center gap-1 md:gap-2'>
           {/* 新しいチャットボタン（全レスポンシブサイズで表示） */}
-          <button
+          {/* <button
             className={`p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
               generating ? 'cursor-not-allowed opacity-40' : ''
             }`}
@@ -188,7 +188,7 @@ const ChatTitle = React.memo(({ saveRef }: { saveRef?: React.RefObject<HTMLDivEl
             aria-label='新しいチャット'
           >
             <PlusIcon className='w-5 h-5' />
-          </button>
+          </button> */}
           {/* ダウンロードボタン */}
           <div className='relative' ref={downloadRef}>
             <button
