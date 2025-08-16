@@ -57,6 +57,7 @@ jobs:
           fi
 
       - name: バージョンアップ実行
+        id: version-update
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -75,6 +76,7 @@ jobs:
           # 更新されたバージョンを取得
           NEW_VERSION=$(node -p "require('./package.json').version")
           echo "新しいバージョン: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           
           # コミットとタグを作成
           git add package.json package-lock.json
@@ -88,12 +90,12 @@ jobs:
           echo "✅ バージョンアップが完了しました: $CURRENT_VERSION → $NEW_VERSION"
 
       - name: リリースノート作成
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.version.outputs.new_version }}
-          release_name: Release v${{ steps.version.outputs.new_version }}
+          tag_name: v${{ steps.version-update.outputs.new_version }}
+          name: Release v${{ steps.version-update.outputs.new_version }}
           body: |
             ## 変更内容
             - 自動バージョンアップ: ${{ steps.commit-analysis.outputs.version_type }}
