@@ -22,6 +22,11 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: チェックアウト
@@ -89,12 +94,26 @@ jobs:
           
           echo "✅ バージョンアップが完了しました: $CURRENT_VERSION → $NEW_VERSION"
 
-      - name: Deploy ワークフローをトリガー
-        uses: peter-evans/repository-dispatch@v3
+      - name: Build and Deploy to GitHub Pages
+        run: |
+          # 依存関係のインストール
+          yarn install
+          
+          # ビルド実行
+          yarn build
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.GCLIENT }}
+      
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          event-type: deploy-after-version-bump
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
 
       - name: リリースノート作成
         uses: softprops/action-gh-release@v1
