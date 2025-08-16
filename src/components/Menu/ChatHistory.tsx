@@ -256,7 +256,6 @@ const ChatHistory = React.memo(
           onClick={handleCheckboxClick}
           onChange={() => {}}
         />
-        <ChatIcon />
         <div className='flex-1 flex flex-col text-ellipsis overflow-hidden break-all relative'>
           {/* 1行目: タイトル */}
           <div 

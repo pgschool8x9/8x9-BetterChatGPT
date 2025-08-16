@@ -604,8 +604,8 @@ const EditView = ({
             </div>
             
             {/* 中央：メッセージ入力エリア */}
-            <div className='flex-1'>
-              <div className={`min-h-[2.5rem] flex items-center py-2 pl-4 md:pl-6 pr-2 bg-gray-300/40 dark:bg-gray-500/40 backdrop-blur-md dark:text-white ${textRows === 1 ? 'rounded-full' : 'rounded-[1.25rem]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] ${isDragOver ? 'bg-blue-50/80 dark:bg-blue-900/40' : ''}`}>
+            <div className='flex-1 relative'>
+              <div className={`min-h-[2.5rem] flex items-${textRows === 1 ? 'center' : 'end'} py-2 pl-4 md:pl-6 pr-12 bg-gray-300/40 dark:bg-gray-500/40 backdrop-blur-md dark:text-white ${textRows === 1 ? 'rounded-full' : 'rounded-[1.25rem]'} shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] ${isDragOver ? 'bg-blue-50/80 dark:bg-blue-900/40' : ''}`}>
                 <textarea
                   ref={textareaRef}
                   className='m-0 resize-none bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 flex-1 placeholder:text-black/40
@@ -622,67 +622,75 @@ const EditView = ({
                   onPaste={handlePaste}
                   rows={1}
                 ></textarea>
-                
-                {/* 送信ボタン（入力エリア内の右端） */}
-                {sticky && (
-                  <button
-                    className={`w-8 h-8 ml-2 p-0 flex items-center justify-center rounded-full transition-all duration-200 ${
-                      (_content[0] as TextContentInterface).text.trim().length > 0 || generating
-                        ? 'opacity-100 pointer-events-auto' 
-                        : 'opacity-0 pointer-events-none'
-                    } ${
-                      generating 
-                        ? 'bg-blue-500/60 hover:bg-blue-500/80 text-blue-600 dark:text-blue-400' 
-                        : 'bg-black/80 dark:bg-white/80 hover:bg-gray-900/80 dark:hover:bg-white/80 text-white dark:text-black'
-                    }`}
-                    onClick={generating ? handleStopGenerating : handleGenerate}
-                    aria-label={generating ? "停止" : "送信"}
-                  >
-                    {generating ? (
-                      <svg
-                        className='h-4 w-4'
-                        xmlns='http://www.w3.org/2000/svg'
-                        fill='none'
-                        viewBox='0 0 24 24'
-                        style={{
-                          animation: 'rotation 1s linear infinite'
-                        }}
-                      >
-                        <circle
-                          className='opacity-25'
-                          cx='12'
-                          cy='12'
-                          r='10'
-                          stroke='currentColor'
-                          strokeWidth='3'
-                        ></circle>
-                        <path
-                          className='opacity-75'
-                          fill='currentColor'
-                          d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z'
-                        ></path>
-                      </svg>
-                    ) : (
-                      <SendIcon className='w-4 h-4' />
-                    )}
-                  </button>
-                )}
-                {!sticky && (
-                  <button
-                    className={`w-8 h-8 ml-2 p-0 flex items-center justify-center rounded-full transition-all duration-200 bg-gray-900/60 dark:bg-white/60 hover:bg-gray-900/80 dark:hover:bg-white/80 text-white dark:text-black ${
-                      (_content[0] as TextContentInterface).text.trim().length > 0 
-                        ? 'opacity-100 pointer-events-auto' 
-                        : 'opacity-0 pointer-events-none'
-                    }`}
-                    onClick={() => {
-                      !generating && handleGenerate();
-                    }}
-                    aria-label="送信"
-                  >
-                    <SendIcon className='w-4 h-4' />
-                  </button>
-                )}
               </div>
+              
+              {/* 送信ボタン（入力エリアの外側右端） */}
+              {sticky && (
+                <button
+                  className={`absolute right-2 w-8 h-8 p-0 flex items-center justify-center rounded-full transition-all duration-200 ${
+                    (_content[0] as TextContentInterface).text.trim().length > 0 || generating
+                      ? 'opacity-100 pointer-events-auto' 
+                      : 'opacity-0 pointer-events-none'
+                  } ${
+                    generating 
+                      ? 'bg-blue-500/60 hover:bg-blue-500/80 text-blue-600 dark:text-blue-400' 
+                      : 'bg-black/80 dark:bg-white/80 hover:bg-gray-900/80 dark:hover:bg-white/80 text-white dark:text-black'
+                  } ${
+                    textRows === 1 
+                      ? 'top-1/2 transform -translate-y-1/2' 
+                      : 'bottom-2'
+                  }`}
+                  onClick={generating ? handleStopGenerating : handleGenerate}
+                  aria-label={generating ? "停止" : "送信"}
+                >
+                  {generating ? (
+                    <svg
+                      className='h-4 w-4'
+                      xmlns='http://www.w3.org/2000/svg'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                      style={{
+                        animation: 'rotation 1s linear infinite'
+                      }}
+                    >
+                      <circle
+                        className='opacity-25'
+                        cx='12'
+                        cy='12'
+                        r='10'
+                        stroke='currentColor'
+                        strokeWidth='3'
+                      ></circle>
+                      <path
+                        className='opacity-75'
+                        fill='currentColor'
+                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z'
+                      ></path>
+                    </svg>
+                  ) : (
+                    <SendIcon className='w-4 h-4' />
+                  )}
+                </button>
+              )}
+              {!sticky && (
+                <button
+                  className={`absolute right-2 w-8 h-8 p-0 flex items-center justify-center rounded-full transition-all duration-200 bg-gray-900/60 dark:bg-white/60 hover:bg-gray-900/80 dark:hover:bg-white/80 text-white dark:text-black ${
+                    (_content[0] as TextContentInterface).text.trim().length > 0 
+                      ? 'opacity-100 pointer-events-auto' 
+                      : 'opacity-0 pointer-events-none'
+                  } ${
+                    textRows === 1 
+                      ? 'top-1/2 transform -translate-y-1/2' 
+                      : 'bottom-2'
+                  }`}
+                  onClick={() => {
+                    !generating && handleGenerate();
+                  }}
+                  aria-label="送信"
+                >
+                  <SendIcon className='w-4 h-4' />
+                </button>
+              )}
             </div>
           </div>
           

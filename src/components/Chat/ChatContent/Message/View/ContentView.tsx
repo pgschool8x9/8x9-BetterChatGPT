@@ -165,6 +165,8 @@ const ContentView = memo(
                 components={{
                   code,
                   p,
+                  ul,
+                  li,
                 }}
               >
                 {inlineLatex
@@ -241,6 +243,50 @@ const code = memo((props: CodeProps) => {
   }
 });
 
+const ul = memo(
+  (
+    props?: DetailedHTMLProps<
+      HTMLAttributes<HTMLUListElement>,
+      HTMLUListElement
+    > &
+      ReactMarkdownProps
+  ) => {
+    return (
+      <ul 
+        className='space-y-1 my-2'
+        style={{ 
+          listStyle: 'none !important', 
+          paddingLeft: '0 !important',
+          listStyleType: 'none !important'
+        }}
+      >
+        {props?.children}
+      </ul>
+    );
+  }
+);
+
+const li = memo(
+  (
+    props?: DetailedHTMLProps<
+      HTMLAttributes<HTMLLIElement>,
+      HTMLLIElement
+    > &
+      ReactMarkdownProps
+  ) => {
+    return (
+      <li>
+        <span 
+          className='absolute left-0 text-gray-600 dark:text-gray-400 select-none font-bold'
+        >
+           ◦
+        </span>
+        {props?.children}
+      </li>
+    );
+  }
+);
+
 const p = memo(
   (
     props?: Omit<
@@ -256,7 +302,7 @@ const p = memo(
     const textContent = typeof props?.children === 'string' ? props.children : String(props?.children || '');
     
     return (
-      <p className='whitespace-pre-wrap m-2'>
+      <p className='whitespace-pre-wrap m-2 leading-relaxed'>
         {searchHighlightTerm ? highlightText(textContent, searchHighlightTerm) : props?.children}
       </p>
     );

@@ -12,6 +12,28 @@
   color: transparent !important;
 }
 
+/* カスタム箇条書きスタイル - proseクラスを上書き（システムメッセージ以外） */
+.prose:not(.system-message-content) ul,
+.prose:not(.system-message-content) ol {
+  list-style: none !important;
+  padding-left: 0 !important;
+}
+
+.prose:not(.system-message-content) li {
+  list-style: none !important;
+  list-style-type: none !important;
+  list-style-image: none !important;
+  position: relative !important;
+  padding-left: 1.5rem !important;
+  margin: 0.25rem 0 !important;
+}
+
+.prose:not(.system-message-content) li::before,
+.prose:not(.system-message-content) li::marker {
+  display: none !important;
+  content: none !important;
+}
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);

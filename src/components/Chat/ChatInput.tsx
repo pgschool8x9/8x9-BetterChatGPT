@@ -19,6 +19,7 @@ const ChatInput = () => {
 const TextField = () => {
   const [value, setValue] = useState<string>('');
   const [showPromptModal, setShowPromptModal] = useState<boolean>(false);
+  const [isMultiLine, setIsMultiLine] = useState<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const currentChatIndex = useStore((state) => state.currentChatIndex);
 
@@ -26,6 +27,19 @@ const TextField = () => {
   useEffect(() => {
     setValue('');
   }, [currentChatIndex]);
+
+  // textareaの高さを監視して複数行かどうかを判定
+  useEffect(() => {
+    const checkMultiLine = () => {
+      if (textareaRef.current) {
+        const lineHeight = 24; // CSSで設定されている初期の高さ
+        const currentHeight = textareaRef.current.scrollHeight;
+        setIsMultiLine(currentHeight > lineHeight);
+      }
+    };
+
+    checkMultiLine();
+  }, [value]);
 
   // 入力変更の処理
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -64,7 +78,11 @@ const TextField = () => {
         />
         
         <button
-          className='absolute p-1 rounded-md text-gray-500 bottom-1.5 right-1 md:bottom-2.5 md:right-2 hover:bg-gray-100 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent'
+          className={`absolute p-1 rounded-md text-gray-500 right-1 md:right-2 hover:bg-gray-100 dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent ${
+            isMultiLine 
+              ? 'bottom-1.5 md:bottom-2.5' 
+              : 'top-1/2 transform -translate-y-1/2'
+          }`}
           aria-label='submit'
         >
           <SendIcon />
