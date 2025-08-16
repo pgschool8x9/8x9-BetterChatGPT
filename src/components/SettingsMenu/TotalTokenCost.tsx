@@ -59,19 +59,22 @@ const TotalTokenCost = () => {
     setCostMapping(updatedCostMapping);
   }, [totalTokenUsed]);
 
-  // USD固定表示に変更（為替取得を無効化）
+  // ローカライズされた通貨表示
   useEffect(() => {
     if (costMapping.length > 0) {
-      const convertedMapping = costMapping.map(({ model, cost }) => ({
+      const convertedMappingPromises = costMapping.map(async ({ model, cost }) => ({
         model,
-        cost: `$${cost.toFixed(3)}`
+        cost: await formatLocalizedCurrency(cost).catch(() => `$${cost.toFixed(3)}`)
       }));
-      setLocalizedCostMapping(convertedMapping);
+
+      Promise.all(convertedMappingPromises).then(setLocalizedCostMapping);
 
       const totalCost = costMapping.reduce((prev, curr) => prev + curr.cost, 0);
-      setLocalizedTotal(`$${totalCost.toFixed(3)}`);
+      formatLocalizedCurrency(totalCost)
+        .then(setLocalizedTotal)
+        .catch(() => setLocalizedTotal(`$${totalCost.toFixed(3)}`));
     }
-  }, [costMapping]);
+  }, [costMapping, formatLocalizedCurrency]);
 
   return countTotalTokens ? (
     <div className='flex flex-col items-center gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg'>
@@ -83,7 +86,7 @@ const TotalTokenCost = () => {
             <thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
               <tr>
                 <th className='px-4 py-2'>{t('model', { ns: 'model' })}</th>
-                <th className='px-4 py-2'>USD</th>
+                <th className='px-4 py-2'>{currentCurrency}</th>
               </tr>
             </thead>
             <tbody>

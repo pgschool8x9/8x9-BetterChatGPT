@@ -170,28 +170,28 @@ const ChatContent = () => {
                                     <div className="w-2 h-2 rounded-full animate-bounce" 
                                          style={{
                                            animationDelay: '0ms',
-                                           background: 'linear-gradient(45deg, #ff4757, #3742fa, #ff6b9d, #a55eea)',
+                                           background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
                                            backgroundSize: '300% 300%',
                                            animation: 'bounce 1s infinite 0ms, rainbow 2s linear infinite'
                                          }}></div>
                                     <div className="w-2 h-2 rounded-full animate-bounce" 
                                          style={{
                                            animationDelay: '150ms',
-                                           background: 'linear-gradient(45deg, #ff4757, #3742fa, #ff6b9d, #a55eea)',
+                                           background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
                                            backgroundSize: '300% 300%',
                                            animation: 'bounce 1s infinite 150ms, rainbow 2s linear infinite 0.3s'
                                          }}></div>
                                     <div className="w-2 h-2 rounded-full animate-bounce" 
                                          style={{
                                            animationDelay: '300ms',
-                                           background: 'linear-gradient(45deg, #ff4757, #3742fa, #ff6b9d, #a55eea)',
+                                           background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
                                            backgroundSize: '300% 300%',
                                            animation: 'bounce 1s infinite 300ms, rainbow 2s linear infinite 0.6s'
                                          }}></div>
                                   </div>
                                   <span className="font-medium text-base" 
                                         style={{
-                                          background: 'linear-gradient(45deg, #ff4757, #3742fa, #ff6b9d, #a55eea)',
+                                          background: 'linear-gradient(120deg, #ff4757, rgba(182, 139, 247, 1), hsla(237, 85%, 68%, 1.00))',
                                           backgroundSize: '300% 300%',
                                           WebkitBackgroundClip: 'text',
                                           WebkitTextFillColor: 'transparent',

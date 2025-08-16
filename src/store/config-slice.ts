@@ -51,7 +51,7 @@ export const createConfigSlice: StoreSlice<ConfigSlice> = (set, get) => ({
   autoTitle: true,
   titleModel: defaultModel,
   enterToSubmit: true,
-  advancedMode: false,
+  advancedMode: true,
   defaultChatConfig: _defaultChatConfig,
   defaultSystemMessage: _defaultSystemMessage,
   inlineLatex: false,
