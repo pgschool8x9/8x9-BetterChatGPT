@@ -153,8 +153,8 @@ const ChatContent = () => {
                     </div>
                   </div>
                   
-                  {/* 入力中の場合：システムメッセージがあれば表示 */}
-                  {isTyping && messages && messages.length === 1 && messages[0].role === 'system' && (
+                  {/* 入力中の場合：システムメッセージがあれば表示（設定に応じて） */}
+                  {isTyping && messages && messages.length === 1 && messages[0].role === 'system' && advancedMode && (
                     <Message
                       role={messages[0].role}
                       content={messages[0].content}

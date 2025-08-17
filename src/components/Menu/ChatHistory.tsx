@@ -152,7 +152,7 @@ const ChatHistory = React.memo(
           setLocalizedCost(formatted);
         }).catch((error) => {
           console.error('Currency formatting error:', error);
-          setLocalizedCost(`$${tokenInfo.usdCost.toFixed(4)}`);
+          setLocalizedCost(`$${tokenInfo.usdCost.toFixed(2)}`);
         });
       }
     }, [tokenInfo?.usdCost, chatIndex, currentLanguage, currentCurrency]);
@@ -216,6 +216,7 @@ const ChatHistory = React.memo(
     };
 
     const handleCheckboxClick = (e: React.MouseEvent<HTMLInputElement>) => {
+      e.stopPropagation();
       if (e.shiftKey && lastSelectedIndex !== null) {
         const start = Math.min(lastSelectedIndex, chatIndex);
         const end = Math.max(lastSelectedIndex, chatIndex);
@@ -321,8 +322,16 @@ const ChatHistory = React.memo(
             ? 'cursor-not-allowed opacity-40'
             : 'cursor-pointer opacity-100'
         } ${selectedChats.includes(chatIndex) ? 'bg-blue-500' : ''}`}
-        onClick={() => {
-          if (!generating && !isSelectionMode) setCurrentChatIndex(chatIndex);
+        onClick={(e) => {
+          if (!generating) {
+            if (isSelectionMode) {
+              // 複数選択モード時はチェック機能
+              handleCheckboxClick(e as any);
+            } else {
+              // 通常時はチャット切り替え
+              setCurrentChatIndex(chatIndex);
+            }
+          }
         }}
         draggable
         onDragStart={handleDragStart}

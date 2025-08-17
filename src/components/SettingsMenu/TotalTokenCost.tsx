@@ -64,7 +64,7 @@ const TotalTokenCost = () => {
     if (costMapping.length > 0) {
       const convertedMappingPromises = costMapping.map(async ({ model, cost }) => ({
         model,
-        cost: await formatLocalizedCurrency(cost).catch(() => `$${cost.toFixed(3)}`)
+        cost: await formatLocalizedCurrency(cost).catch(() => `$${cost.toFixed(2)}`)
       }));
 
       Promise.all(convertedMappingPromises).then(setLocalizedCostMapping);
@@ -72,7 +72,7 @@ const TotalTokenCost = () => {
       const totalCost = costMapping.reduce((prev, curr) => prev + curr.cost, 0);
       formatLocalizedCurrency(totalCost)
         .then(setLocalizedTotal)
-        .catch(() => setLocalizedTotal(`$${totalCost.toFixed(3)}`));
+        .catch(() => setLocalizedTotal(`$${totalCost.toFixed(2)}`));
     }
   }, [costMapping, formatLocalizedCurrency]);
 
@@ -190,7 +190,7 @@ export const TotalTokenCostDisplay = () => {
   useEffect(() => {
     if (totalCost !== undefined) {
       formatLocalizedCurrency(totalCost).then(setLocalizedCost).catch(() => {
-        setLocalizedCost(`$${totalCost.toFixed(3)}`);
+        setLocalizedCost(`$${totalCost.toFixed(2)}`);
       });
     }
   }, [totalCost, currentLanguage, currentCurrency]);
@@ -198,7 +198,7 @@ export const TotalTokenCostDisplay = () => {
   return (
     <a className='flex py-2 px-2 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-black dark:text-white text-sm'>
       <CalculatorIcon />
-      {!isHydrated ? 'Loading...' : (localizedCost || (totalCost === 0 ? '$0.000' : 'Loading...'))}
+      {!isHydrated ? 'Loading...' : (localizedCost || (totalCost === 0 ? '$0.00' : 'Loading...'))}
     </a>
   );
 };

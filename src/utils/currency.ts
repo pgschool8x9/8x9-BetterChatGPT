@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 
-// 言語コードから通貨コードへのマッピング
+// Language code to currency code mapping
 export const LANGUAGE_CURRENCY_MAP: Record<string, string> = {
   'ja': 'JPY',      // 日本語 → 日本円
   'ja_jp': 'JPY',   // 日本語(アンダースコア) → 日本円
@@ -30,10 +30,10 @@ export const LANGUAGE_CURRENCY_MAP: Record<string, string> = {
   'yue': 'HKD',     // 広東語 → 香港ドル
 };
 
-// デフォルト通貨
+// Default currency
 const DEFAULT_CURRENCY = 'USD';
 
-// 為替レートのキャッシュ
+// Exchange rate cache
 interface ExchangeRateCache {
   rates: Record<string, number>;
   timestamp: number;
@@ -43,7 +43,7 @@ interface ExchangeRateCache {
 const CACHE_KEY = 'exchangeRateCache';
 const CACHE_DURATION = 1000 * 60 * 60 * 24; // 24時間
 
-// キャッシュからデータを取得
+// Get data from cache
 const getCachedRates = (): ExchangeRateCache | null => {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
@@ -55,21 +55,21 @@ const getCachedRates = (): ExchangeRateCache | null => {
       }
     }
   } catch (error) {
-    console.warn('キャッシュ読み込みエラー:', error);
+    console.warn('Cache read error:', error);
   }
   return null;
 };
 
-// キャッシュにデータを保存
+// Save data to cache
 const setCachedRates = (cache: ExchangeRateCache): void => {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
   } catch (error) {
-    console.warn('キャッシュ保存エラー:', error);
+    console.warn('Cache save error:', error);
   }
 };
 
-// 為替レート取得
+// Fetch exchange rates
 export const fetchExchangeRates = async (): Promise<Record<string, number>> => {
   // キャッシュをチェック
   const cachedRates = getCachedRates();
@@ -91,10 +91,10 @@ export const fetchExchangeRates = async (): Promise<Record<string, number>> => {
       return data.rates;
     }
   } catch (error) {
-    console.warn('為替レート取得に失敗しました:', error);
+    console.warn('Failed to fetch exchange rates:', error);
   }
 
-  // フォールバック: デフォルトレート（概算値）
+  // Fallback: default rates (approximate values)
   return {
     USD: 1,
     JPY: 150,
@@ -114,15 +114,15 @@ export const fetchExchangeRates = async (): Promise<Record<string, number>> => {
   }
 };
 
-// 現在の言語に基づいて通貨コードを取得
+// Get currency code based on current language
 export const getCurrentCurrency = (language: string): string => {  
-  // 完全一致をチェック
+  // Check for exact match
   if (LANGUAGE_CURRENCY_MAP[language]) {
     const currency = LANGUAGE_CURRENCY_MAP[language];
     return currency;
   }
   
-  // 部分一致をチェック（ja_jp → ja など）
+  // Check for partial match (ja_jp → ja etc.)
   const languageBase = language.split(/[-_]/)[0];
   if (LANGUAGE_CURRENCY_MAP[languageBase]) {
     const currency = LANGUAGE_CURRENCY_MAP[languageBase];
@@ -131,28 +131,28 @@ export const getCurrentCurrency = (language: string): string => {
   return DEFAULT_CURRENCY;
 };
 
-// 通貨フォーマット
+// Currency formatting
 export const formatCurrency = (
   amount: number, 
   currency: string, 
   locale?: string
 ): string => {
   try {
-    // 無効な値の処理
+    // Handle invalid values
     if (!isFinite(amount) || isNaN(amount)) {
       const symbol = getCurrencySymbol(currency);
       return `${symbol}0`;
     }
 
-    // 言語に基づいてロケールを決定
+    // Determine locale based on language
     const formatLocale = locale || getLocaleFromCurrency(currency);
     
-    // 小数点以下の桁数を通貨に応じて調整
+    // Adjust decimal places based on currency
     const isIntegerCurrency = currency === 'KRW' || currency === 'VND'; // JPYを除外
     
-    // 小数点桁数の設定（常に3桁表示）
-    let maxDigits = 3;
-    let minDigits = 3;
+    // Decimal places setting (always 2 digits)
+    let maxDigits = 2;
+    let minDigits = 2;
     
     return new Intl.NumberFormat(formatLocale, {
       style: 'currency',
@@ -162,14 +162,14 @@ export const formatCurrency = (
     }).format(amount);
   } catch (error) {
     console.error('Currency formatting error:', error, 'Amount:', amount, 'Currency:', currency);
-    // フォールバック
+    // Fallback
     const symbol = getCurrencySymbol(currency);
-    // 常に小数点第3位まで表示
-    return `${symbol}${amount.toFixed(3)}`;
+    // Always display to 2 decimal places
+    return `${symbol}${amount.toFixed(2)}`;
   }
 };
 
-// 通貨コードからロケールを推定
+// Estimate locale from currency code
 const getLocaleFromCurrency = (currency: string): string => {
   const currencyLocaleMap: Record<string, string> = {
     'USD': 'en-US',
@@ -191,7 +191,7 @@ const getLocaleFromCurrency = (currency: string): string => {
   return currencyLocaleMap[currency] || 'en-US';
 };
 
-// 通貨シンボル取得（フォールバック用）
+// Get currency symbol (for fallback)
 const getCurrencySymbol = (currency: string): string => {
   const symbolMap: Record<string, string> = {
     'USD': '$',
@@ -213,7 +213,7 @@ const getCurrencySymbol = (currency: string): string => {
   return symbolMap[currency] || currency;
 };
 
-// USD から指定通貨に変換
+// Convert from USD to specified currency
 export const convertUsdToCurrency = async (
   usdAmount: number, 
   targetCurrency: string
@@ -224,14 +224,14 @@ export const convertUsdToCurrency = async (
   const rate = rates[targetCurrency];
   
   if (!rate) {
-    console.warn(`通貨レート未対応: ${targetCurrency}`);
+    console.warn(`Unsupported currency rate: ${targetCurrency}`);
     return usdAmount;
   }
   
   return usdAmount * rate;
 };
 
-// メインフック：USD金額を現在の言語通貨でフォーマット
+// Main hook: Format USD amount in current language currency
 export const useLocalizedCurrency = () => {
   const { i18n } = useTranslation();
   const currentLanguage = i18n.language;
@@ -249,8 +249,8 @@ export const useLocalizedCurrency = () => {
       return formatted;
     } catch (error) {
       console.error('formatLocalizedCurrency error:', error);
-      // フォールバック: USDで表示
-      return `$${usdAmount.toFixed(4)}`;
+      // Fallback: display in USD
+      return `$${usdAmount.toFixed(2)}`;
     }
   }, [currentCurrency, currentLanguage]);
 
