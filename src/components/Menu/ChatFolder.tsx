@@ -174,7 +174,7 @@ const ChatFolder = ({
       <div
         style={{ background: color || '' }}
         className={`${
-          color ? '' : 'hover:bg-gray-850'
+          color ? '' : 'text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-850'
         } transition-colors flex py-2 pl-2 pr-1 items-center gap-3 relative rounded-md break-all cursor-pointer parent-sibling`}
         onClick={toggleExpanded}
         ref={folderRef}
@@ -227,14 +227,14 @@ const ChatFolder = ({
           {isDelete || isEdit ? (
             <>
               <button
-                className='p-1 hover:text-white'
+                className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white'
                 onClick={handleTick}
                 aria-label='confirm'
               >
                 <TickIcon />
               </button>
               <button
-                className='p-1 hover:text-white'
+                className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white'
                 onClick={handleCross}
                 aria-label='cancel'
               >
@@ -248,7 +248,7 @@ const ChatFolder = ({
                 ref={paletteRef}
               >
                 <button
-                  className='p-1 hover:text-white'
+                  className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white'
                   onClick={() => {
                     setShowPalette((prev) => !prev);
                   }}
@@ -284,21 +284,21 @@ const ChatFolder = ({
               </div>
 
               <button
-                className='p-1 hover:text-white md:hidden group-hover/folder:md:inline'
+                className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white md:hidden group-hover/folder:md:inline'
                 onClick={() => setIsEdit(true)}
                 aria-label='edit folder title'
               >
                 <EditIcon />
               </button>
               <button
-                className='p-1 hover:text-white md:hidden group-hover/folder:md:inline'
+                className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white md:hidden group-hover/folder:md:inline'
                 onClick={() => setIsDelete(true)}
                 aria-label='delete folder'
               >
                 <DeleteIcon />
               </button>
               <button
-                className='p-1 hover:text-white'
+                className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white'
                 onClick={toggleExpanded}
                 aria-label='expand folder'
               >
@@ -312,7 +312,7 @@ const ChatFolder = ({
           )}
         </div>
       </div>
-      <div className='ml-3 pl-1 border-l-2 border-gray-700 flex flex-col gap-1 parent'>
+      <div className='ml-3 pl-1 border-l-2 border-gray-400 dark:border-gray-700 flex flex-col gap-1 parent'>
         {isExpanded && <NewChat folder={folderId} />}
         {isExpanded &&
           folderChats.map((chat) => (

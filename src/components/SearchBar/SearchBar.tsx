@@ -19,7 +19,8 @@ const SearchBar = ({
       <input
         disabled={disabled}
         type='text'
-        className='text-gray-800 dark:text-white p-3 text-sm bg-transparent disabled:opacity-40  disabled:cursor-not-allowed transition-opacity m-0 w-full h-full focus:outline-none rounded border border-white/20'
+        className='text-gray-800 dark:text-white placeholder:text-gray-500
+  dark:placeholder:text-gray-400 p-5 text-sm bg-gray-100 dark:bg-gray-700 disabled:opacity-40  disabled:cursor-not-allowed transition-opacity m-0 w-full h-full focus:outline-none rounded shadow-lg'
         placeholder={t('search') as string}
         value={value}
         onChange={(e) => {

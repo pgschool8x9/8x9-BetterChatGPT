@@ -17,13 +17,13 @@ import { useLocalizedCurrency } from '@utils/currency';
 
 const ChatHistoryClass = {
   normal:
-    'flex py-2 px-3 items-center gap-3 relative rounded-md bg-gray-800 hover:bg-gray-850 break-all hover:pr-4 group transition-opacity',
+    'flex py-2 px-3 items-center gap-3 relative rounded-md bg-white dark:bg-gray-900 hover:bg-gray-300 dark:hover:bg-gray-850 break-all hover:pr-4 group transition-opacity text-black dark:text-white',
   active:
-    'flex py-2 px-3 items-center gap-3 relative rounded-md break-all pr-14 bg-gray-900 hover:bg-gray-850 group transition-opacity',
+    'flex py-2 px-3 items-center gap-3 relative rounded-md break-all pr-14 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-850 group transition-opacity text-black dark:text-white',
   normalGradient:
-    'absolute inset-y-0 right-0 w-8 z-10 bg-gradient-to-l from-gray-800 group-hover:from-gray-850',
+    'absolute inset-y-0 right-0 w-8 z-10 bg-gradient-to-l from-white dark:from-gray-900 group-hover:from-gray-300 dark:group-hover:from-gray-850',
   activeGradient:
-    'absolute inset-y-0 right-0 w-8 z-10 bg-gradient-to-l from-gray-900 group-hover:from-gray-850',
+    'absolute inset-y-0 right-0 w-8 z-10 bg-gradient-to-l from-gray-200 dark:from-gray-800 group-hover:from-gray-300 dark:group-hover:from-gray-850',
 };
 
 const tokenCostToCost = (
@@ -365,7 +365,7 @@ const ChatHistory = React.memo(
           
           {/* 2行目: トークン情報 */}
           {!isEdit && tokenInfo && (
-            <div className='text-xs text-gray-400 leading-tight mt-0.5'>
+            <div className='text-xs text-gray-500 dark:text-gray-400 leading-tight mt-0.5'>
               Tokens: {tokenInfo.tokens} ({localizedCost || 'Loading...'})
             </div>
           )}
@@ -402,14 +402,14 @@ const ChatHistory = React.memo(
             ) : (
               <>
                 <button
-                  className='p-1 hover:text-white'
+                  className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white'
                   onClick={() => setIsEdit(true)}
                   aria-label='edit chat title'
                 >
                   <EditIcon />
                 </button>
                 <button
-                  className='p-1 hover:text-white'
+                  className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white'
                   onClick={() => setIsDelete(true)}
                   aria-label='delete chat'
                 >

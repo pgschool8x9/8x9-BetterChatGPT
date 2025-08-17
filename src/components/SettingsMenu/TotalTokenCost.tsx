@@ -196,7 +196,7 @@ export const TotalTokenCostDisplay = () => {
   }, [totalCost, currentLanguage, currentCurrency]);
 
   return (
-    <a className='flex py-2 px-2 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white text-sm'>
+    <a className='flex py-2 px-2 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-black dark:text-white text-sm'>
       <CalculatorIcon />
       {!isHydrated ? 'Loading...' : (localizedCost || (totalCost === 0 ? '$0.000' : 'Loading...'))}
     </a>

@@ -31,7 +31,7 @@ const SettingsMenu = () => {
   return (
     <>
       <a
-        className='flex py-2 px-2 items-center justify-center rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm'
+        className='flex py-2 px-2 items-center justify-center rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-black dark:text-white cursor-pointer text-sm'
         onClick={() => {
           setIsModalOpen(true);
         }}
