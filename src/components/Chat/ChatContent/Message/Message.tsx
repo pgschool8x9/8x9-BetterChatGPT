@@ -154,7 +154,7 @@ const Message = React.memo(
     }
 
     return (
-      <div className="w-full px-1 py-1 bg-white dark:bg-gray-900">
+      <div className="w-full px-1 py-3 bg-white dark:bg-gray-900">
         <div
           className={`flex flex-col gap-1 ${hideSideMenu
             ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
@@ -244,7 +244,7 @@ const Message = React.memo(
                     aria-label="システムメッセージを削除"
                     title="このチャットからシステムメッセージを削除"
                   >
-                    <DeleteIcon className="w-4 h-4" />
+                    <DeleteIcon />
                   </button>
                 </div>
               )}
