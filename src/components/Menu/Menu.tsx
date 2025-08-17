@@ -74,7 +74,7 @@ const Menu = () => {
     <>
       <div
         id='menu'
-        className={`group/menu bg-white dark:bg-gray-900 fixed md:inset-y-0 md:flex md:flex-col transition-transform z-[999] top-0 left-0 h-full max-md:w-3/4 ${
+        className={`group/menu bg-white dark:bg-gray-900 fixed md:inset-y-0 md:flex md:flex-col transition-transform z-[999] top-0 left-0 h-full max-md:w-3/4 shadow-xl dark:shadow-2xl dark:shadow-black/50 ${
           hideSideMenu ? 'translate-x-[-100%]' : 'translate-x-[0%]'
         }`}
         style={{ width: `${menuWidth}px` }}
