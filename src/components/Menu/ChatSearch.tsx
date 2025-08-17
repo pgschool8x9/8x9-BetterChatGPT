@@ -38,12 +38,14 @@ const ChatSearch = ({
   }, [filter, setSearchHighlightTerm]);
 
   return (
-    <SearchBar
-      value={_filter}
-      handleChange={handleChange}
-      className='h-8 mb-4'
-      disabled={generating}
-    />
+    <div onClick={(e) => e.stopPropagation()}>
+      <SearchBar
+        value={_filter}
+        handleChange={handleChange}
+        className='h-8 mb-4'
+        disabled={generating}
+      />
+    </div>
   );
 };
 

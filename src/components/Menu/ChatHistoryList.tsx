@@ -31,6 +31,7 @@ const ChatHistoryList = () => {
   const setFolders = useStore((state) => state.setFolders);
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
   const hideSideMenu = useStore((state) => state.hideSideMenu);
+  const setHideSideMenu = useStore((state) => state.setHideSideMenu);
   const chatTitles = useStore(
     (state) => state.chats?.map((chat) => chat.title),
     shallow
@@ -286,6 +287,13 @@ const ChatHistoryList = () => {
     setLastSelectedIndex(null);
   };
 
+  // モバイル表示でチャットリストをタップした時にメニューを閉じる
+  const handleMobileClick = () => {
+    if (window.innerWidth < 768) {
+      setHideSideMenu(true);
+    }
+  };
+
   const deleteSelectedChats = () => {
     const updatedChats = JSON.parse(
       JSON.stringify(useStore.getState().chats)
@@ -329,6 +337,7 @@ const ChatHistoryList = () => {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDragEnd={handleDragEnd}
+      onClick={handleMobileClick}
     >
       <ChatSearch filter={filter} setFilter={setFilter} />
       {isSelectionMode && (
