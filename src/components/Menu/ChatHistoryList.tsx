@@ -341,12 +341,12 @@ const ChatHistoryList = () => {
     >
       <ChatSearch filter={filter} setFilter={setFilter} />
       {isSelectionMode && (
-        <div className='flex items-center px-3 py-2 bg-indigo-500/20 text-white text-sm rounded-md mb-2'>
+        <div className='flex items-center px-3 py-2 bg-indigo-500/20 text-black dark:text-white text-sm rounded-md mb-2'>
           <span className='flex-1'>{selectedChats.length}件選択中</span>
           <div className='flex items-center gap-2 ml-auto'>
             <button
               onClick={deleteSelectedChats}
-              className='text-white hover:text-red-200'
+              className='text-blak dark:text-white hover:text-red-300'
               disabled={selectedChats.length === 0}
               aria-label='選択したチャットを削除'
             >
@@ -354,7 +354,7 @@ const ChatHistoryList = () => {
             </button>
             <button
               onClick={resetSelectionMode}
-              className='text-white hover:text-gray-200 p-1'
+              className='text-blak dark:text-white hover:text-gray-500 dark:hover:text-gray-200 p-1'
               aria-label='選択モードを終了'
             >
               <CrossIcon />

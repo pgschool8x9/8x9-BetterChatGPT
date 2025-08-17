@@ -43,7 +43,7 @@ const NewFolder = () => {
 
   return (
     <a
-      className={`flex items-center rounded-full shadow-md bg-indigo-800/20 dark:bg-indigo-400/20 hover:bg-gray-500/10 transition-all duration-200 text-black dark:text-white text-sm flex-shrink-0 py-2 px-2 gap-3 mb-2 ${
+      className={`flex items-center rounded-full shadow-md bg-gray-700 dark:bg-gray-300 hover:bg-gray-500 transition-all duration-200 text-white dark:text-black text-sm flex-shrink-0 py-2 px-5 gap-3 mb-2 ${
         generating
           ? 'cursor-not-allowed opacity-40'
           : 'cursor-pointer opacity-100'

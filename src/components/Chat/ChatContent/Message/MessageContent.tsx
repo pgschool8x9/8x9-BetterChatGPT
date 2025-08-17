@@ -11,6 +11,7 @@ const MessageContent = ({
   sticky = false,
   isEdit,
   setIsEdit,
+  onTypingChange,
 }: {
   role: string;
   content: ContentInterface[];
@@ -18,6 +19,7 @@ const MessageContent = ({
   sticky?: boolean;
   isEdit?: boolean;
   setIsEdit?: React.Dispatch<React.SetStateAction<boolean>>;
+  onTypingChange?: (isTyping: boolean) => void;
 }) => {
   const localIsEdit = isEdit !== undefined ? isEdit : useState<boolean>(sticky)[0];
   const localSetIsEdit = setIsEdit !== undefined ? setIsEdit : useState<boolean>(sticky)[1];
@@ -30,6 +32,7 @@ const MessageContent = ({
           setIsEdit={localSetIsEdit}
           messageIndex={messageIndex}
           sticky={sticky}
+          onTypingChange={onTypingChange}
         />
       ) : (
         <ContentView

@@ -19,6 +19,7 @@ import { toast } from 'react-toastify';
 const ChatContent = () => {
   const { t } = useTranslation();
   const inputRole = useStore((state) => state.inputRole);
+  const [isTyping, setIsTyping] = useState(false);
   
   // ランダムメッセージ配列をlocaleから取得
   const inspirationalMessages = t('inspirationalMessages', { returnObjects: true }) as string[];
@@ -35,6 +36,7 @@ const ChatContent = () => {
       : []
   );
   const currentChatIndex = useStore((state) => state.currentChatIndex);
+  const chats = useStore((state) => state.chats);
   
   // ランダムメッセージを選択（チャットが空の時のみ新しく選択）
   const randomMessage = useMemo(() => {
@@ -114,6 +116,11 @@ const ChatContent = () => {
     }
   }, [generating, t]);
 
+  // チャット切り替え時・チャット作成時にisTyping状態をリセット
+  useEffect(() => {
+    setIsTyping(false);
+  }, [currentChatIndex, chats?.length]);
+
   const { error } = useSubmit();
 
   return (
@@ -134,14 +141,28 @@ const ChatContent = () => {
               <ChatTitle saveRef={saveRef} />
               {/* NewMessageButton非表示化 */}
               {(!messages || messages.length === 0 || (messages.length === 1 && messages[0].role === 'system')) ? (
-                // チャット履歴が空の場合の初期メッセージ
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <h2 className="text-base font-normal text-gray-600 dark:text-gray-300 px-16 py-2 italic">
-                      {randomMessage}
-                    </h2>
+                <>
+                  {/* inspirationalMessagesビュー（アニメーション付き） */}
+                  <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ease-in-out ${
+                    isTyping ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                  }`}>
+                    <div className="text-center">
+                      <h2 className="text-base font-normal text-gray-600 dark:text-gray-300 px-16 py-2 italic">
+                        {randomMessage}
+                      </h2>
+                    </div>
                   </div>
-                </div>
+                  
+                  {/* 入力中の場合：システムメッセージがあれば表示 */}
+                  {isTyping && messages && messages.length === 1 && messages[0].role === 'system' && (
+                    <Message
+                      role={messages[0].role}
+                      content={messages[0].content}
+                      messageIndex={0}
+                      model={messages[0].model}
+                    />
+                  )}
+                </>
               ) : (
                 // 既存のチャット履歴表示
                 messagesLimited.map(
@@ -264,6 +285,7 @@ const ChatContent = () => {
             content={[{ type: 'text', text: '' } as TextContentInterface]}
             messageIndex={stickyIndex}
             sticky
+            onTypingChange={setIsTyping}
           />
         </div>
       </div>

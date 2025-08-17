@@ -7,6 +7,7 @@ import MessageContent from './MessageContent';
 import CopyButton from './View/Button/CopyButton';
 import EditButton from './View/Button/EditButton';
 import RefreshButton from './View/Button/RefreshButton';
+import DeleteIcon from '@icon/DeleteIcon';
 
 import { ContentInterface, Role, ChatInterface, isTextContent } from '@type/chat';
 import { ModelOptions } from '@utils/modelReader';
@@ -25,12 +26,14 @@ const Message = React.memo(
     messageIndex,
     sticky = false,
     model,
+    onTypingChange,
   }: {
     role: Role;
     content: ContentInterface[],
     messageIndex: number;
     sticky?: boolean;
     model?: ModelOptions;
+    onTypingChange?: (isTyping: boolean) => void;
   }) => {
     const { t } = useTranslation();
     const hideSideMenu = useStore((state) => state.hideSideMenu);
@@ -123,6 +126,15 @@ const Message = React.memo(
       handleSubmit();
     };
 
+    const handleDeleteSystemMessage = () => {
+      const updatedChats: ChatInterface[] = JSON.parse(
+        JSON.stringify(useStore.getState().chats)
+      );
+      const updatedMessages = updatedChats[currentChatIndex].messages;
+      updatedMessages.splice(messageIndex, 1);
+      setChats(updatedChats);
+    };
+
     // メッセージ固有のモデル名を取得（assistantメッセージのみ）
     const messageModel = role === 'assistant' && model ? model : null;
 
@@ -135,6 +147,7 @@ const Message = React.memo(
             content={content}
             messageIndex={messageIndex}
             sticky={sticky}
+            onTypingChange={onTypingChange}
           />
         </div>
       );
@@ -219,6 +232,20 @@ const Message = React.memo(
                   <div className="text-gray-700 dark:text-gray-300">
                     <CopyButton onClick={handleCopy} />
                   </div>
+                </div>
+              )}
+
+              {/* システムメッセージの削除ボタン */}
+              {isSystem && (
+                <div className="flex items-center gap-2 justify-start">
+                  <button
+                    className="p-1 text-gray-600 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
+                    onClick={handleDeleteSystemMessage}
+                    aria-label="システムメッセージを削除"
+                    title="このチャットからシステムメッセージを削除"
+                  >
+                    <DeleteIcon className="w-4 h-4" />
+                  </button>
                 </div>
               )}
 

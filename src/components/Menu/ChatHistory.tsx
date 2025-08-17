@@ -201,7 +201,8 @@ const ChatHistory = React.memo(
       else if (isDelete) deleteChat();
     };
 
-    const handleCross = () => {
+    const handleCross = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
       setIsDelete(false);
       setIsEdit(false);
     };
@@ -385,14 +386,14 @@ const ChatHistory = React.memo(
             {isDelete || isEdit ? (
               <>
                 <button
-                  className='p-1 hover:text-white'
+                  className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white'
                   onClick={handleTick}
                   aria-label='confirm'
                 >
                   <TickIcon />
                 </button>
                 <button
-                  className='p-1 hover:text-white'
+                  className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white'
                   onClick={handleCross}
                   aria-label='cancel'
                 >
@@ -403,14 +404,20 @@ const ChatHistory = React.memo(
               <>
                 <button
                   className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white'
-                  onClick={() => setIsEdit(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEdit(true);
+                  }}
                   aria-label='edit chat title'
                 >
                   <EditIcon />
                 </button>
                 <button
                   className='p-1 text-black dark:text-white hover:text-gray-600 dark:hover:text-white'
-                  onClick={() => setIsDelete(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsDelete(true);
+                  }}
                   aria-label='delete chat'
                 >
                   <DeleteIcon />

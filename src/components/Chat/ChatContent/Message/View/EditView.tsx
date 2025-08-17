@@ -26,11 +26,13 @@ const EditView = ({
   setIsEdit,
   messageIndex,
   sticky,
+  onTypingChange,
 }: {
   content: ContentInterface[];
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
   messageIndex: number;
   sticky?: boolean;
+  onTypingChange?: (isTyping: boolean) => void;
 }) => {
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
   const inputRole = useStore((state) => state.inputRole);
@@ -611,10 +613,15 @@ const EditView = ({
                   className='m-0 resize-none bg-transparent overflow-y-hidden focus:ring-0 focus-visible:ring-0 leading-7 flex-1 placeholder:text-black/40
                   dark:placeholder:text-white/40'
                   onChange={(e) => {
+                    const newText = e.target.value;
                     _setContent((prev) => [
-                      { type: 'text', text: e.target.value },
+                      { type: 'text', text: newText },
                       ...prev.slice(1),
                     ]);
+                    // sticky（入力エリア）の場合のみタイピング状態を通知
+                    if (sticky && onTypingChange) {
+                      onTypingChange(newText.trim().length > 0);
+                    }
                   }}
                   value={(_content[0] as TextContentInterface).text}
                   placeholder={t('submitPlaceholder') as string}

@@ -77,15 +77,32 @@ export const getChatCompletion = async (
     };
   }
 
+  // OpenAI API送信ログ
+  console.group('🚀 OpenAI API Request');
+  console.log('📍 Endpoint:', endpoint);
+  console.log('📋 Headers:', JSON.stringify(headers, null, 2));
+  console.log('📦 Request Body:', JSON.stringify(requestBody, null, 2));
+  console.groupEnd();
 
   const response = await fetch(endpoint, {
     method: 'POST',
     headers,
     body: JSON.stringify(requestBody),
   });
-  if (!response.ok) throw new Error(await response.text());
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.group('❌ OpenAI API Error Response');
+    console.log('Status:', response.status);
+    console.log('Error:', errorText);
+    console.groupEnd();
+    throw new Error(errorText);
+  }
 
   const data = await response.json();
+  console.group('✅ OpenAI API Response');
+  console.log('Status:', response.status);
+  console.log('Response Data:', JSON.stringify(data, null, 2));
+  console.groupEnd();
   return data;
 };
 
@@ -153,6 +170,12 @@ export const getChatCompletionStream = async (
     };
   }
 
+  // OpenAI API送信ログ（ストリーミング）
+  console.group('🌊 OpenAI API Request (Stream)');
+  console.log('📍 Endpoint:', endpoint);
+  console.log('📋 Headers:', JSON.stringify(headers, null, 2));
+  console.log('📦 Request Body:', JSON.stringify(requestBody, null, 2));
+  console.groupEnd();
 
   const response = await fetch(endpoint, {
     method: 'POST',
@@ -187,6 +210,10 @@ export const getChatCompletionStream = async (
   }
 
   const stream = response.body;
+  console.group('✅ OpenAI API Stream Response');
+  console.log('Status:', response.status);
+  console.log('Stream started successfully');
+  console.groupEnd();
   return stream;
 };
 
