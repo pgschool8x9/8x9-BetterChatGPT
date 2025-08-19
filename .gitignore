@@ -27,3 +27,6 @@ release/
 
 .env
 models.json
+
+#etc
+*.psd
