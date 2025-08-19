@@ -1,4 +1,3 @@
-import { ShareGPTSubmitBodyInterface } from '@type/api';
 import {
   ConfigInterface,
   MessageInterface,
