@@ -10,7 +10,6 @@ import CrossIcon from '@icon/CrossIcon';
 
 import useSubmit from '@hooks/useSubmit';
 import CloneChat from './CloneChat';
-import ShareGPT from '@components/ShareGPT';
 import { ImageContentInterface, TextContentInterface } from '@type/chat';
 import countTokens, { limitMessageTokens } from '@utils/messageUtils';
 import { defaultModel, reduceMessagesToTotalToken } from '@constants/chat';
@@ -267,7 +266,6 @@ const ChatContent = () => {
             >
               {useStore.getState().generating || (
                 <div className='md:w-[calc(100%-50px)] flex gap-4 flex-wrap justify-center'>
-                  <ShareGPT />
                   <CloneChat />
                 </div>
               )}
